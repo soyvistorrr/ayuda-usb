@@ -362,17 +362,19 @@
                                         <div class="form-group"><label class="form-label">Cédula</label><input type="text" id="ayuda_cedula" class="form-input"></div>
                                         <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Ubicación Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Ej: Res. Caribe, Apto 4B"></div>
-                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento hipertensivo, agua, asistencia de rescate..."></textarea></div>
-                                    <button type="submit" class="btn btn-warning btn-block">Enviar Requerimiento</button>
+                                    <div class="form-group"><label class="form-label">Ubicación Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Ej: Res. Los Corales, Torre A"></div>
+                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento hipertenso, agua limpia, remoción de escombros..."></textarea></div>
+                                    <button type="submit" class="btn btn-warning btn-block">Enviar Solicitud</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio (EXCLUSIVA SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Control Interno Admin)</div>
+                            <!-- BLOQUEO ESTRICTO: NO VISIBLE AL PÚBLICO -->
                             <button id="btnExportarAyuda" class="btn btn-success" style="display: none;">Descargar Excel Ayuda</button>
                         </div>
                         <div class="table-container">
@@ -385,17 +387,19 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 <div class="grid-system" id="mallaColaboradores">
                     <div class="right-column" style="grid-column: span 2;">
                         <div class="toolbar">
-                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
+                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Voluntarias</div>
+                            <!-- BOTÓN BLOQUEADO AL PÚBLICO -->
                             <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
                         </div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr></thead>
+                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>NOTAS</th></tr></thead>
                                 <tbody id="tablaColabCuerpo"></tbody>
                             </table>
                         </div>
@@ -403,11 +407,13 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <!-- Panel de Indicadores Secundario -->
                 <div class="stats-bar" style="margin-bottom: 2rem;">
-                    <div class="stat-card"><span class="stat-value" id="stat-total-2">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
+                    <div class="stat-card"><span class="stat-value" id="stat-total-2">0</span><span class="stat-label">TOTAL AFECTADOS</span></div>
                     <div class="stat-card"><span class="stat-value" id="stat-atrapados-2">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
                     <div class="stat-card"><span class="stat-value" id="stat-vivos-2">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
                     <div class="stat-card"><span class="stat-value" id="stat-desaparecidos-2">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
@@ -415,6 +421,7 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -444,14 +451,24 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Situación Actual *</label>
-                                        <select id="estado" class="form-select" required>
-                                            <option value="Desaparecido">Sin Información / Desaparecido</option>
-                                            <option value="Con Vida">Reportados Bien / Con Vida</option>
-                                            <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
-                                            <option value="Fallecido">Fallecido</option>
-                                        </select>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Situación Actual *</label>
+                                            <select id="estado" class="form-select" required>
+                                                <option value="Desaparecido">Sin Información / Desaparecido</option>
+                                                <option value="Con Vida">Reportados Bien / Con Vida</option>
+                                                <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
+                                                <option value="Fallecido">Fallecido</option>
+                                            </select>
+                                        </div>
+                                        <!-- NUEVO CAMPO SOLICITADO: Clasificación de Damnificados / Pérdidas -->
+                                        <div class="form-group">
+                                            <label class="form-label">¿Persona Damnificada? *</label>
+                                            <select id="es_damnificado" class="form-select" required>
+                                                <option value="No">No</option>
+                                                <option value="Sí">Sí (Pérdida de Vivienda)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="form-group"><label class="form-label">Ubicación</label><input type="text" id="ubicacion" class="form-input"></div>
                                     <div class="form-group"><label class="form-label">Observación</label><input type="text" id="observaciones" class="form-input"></div>
@@ -462,6 +479,7 @@
                         </div>
                     </div>
 
+                    <!-- Listado Central Operativo -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -470,6 +488,7 @@
                         
                         <div class="toolbar">
                             <div class="search-box"><input type="text" id="buscarInput" placeholder="Filtrar por nombre de afectado..."></div>
+                            <!-- BOTÓN DESCARGA OCULTO POR DEFECTO PARA EL PÚBLICO -->
                             <button id="btnExportar" class="btn btn-success" style="display: none;">Descargar Excel Afectados</button>
                         </div>
                         <div class="table-container">
@@ -511,11 +530,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // CONTROLADOR DE ACCESO CON PROTECCIÓN TOTAL DE DESCARGAS EXCEL
+        // CONTROLADOR DE ACCESO CON PRIVACIDAD SEVERA DE DESCARGAS EXCEL
         function conmutarAccesoSeguro() {
             const malla = document.getElementById('mallaPrincipal');
             const mallaAyuda = document.getElementById('mallaAyuda');
-            const mallaColab = document.getElementById('mallaColaboradores');
 
             if (!esAdministrador) {
                 let pass = prompt("Introduzca la clave de seguridad de Administrador de la USB:");
@@ -524,14 +542,13 @@
                     document.getElementById('btn-toggle-role').innerText = "Cerrar Sesión";
                     
                     malla.classList.add('admin-columns-layout');
-                    mallaAyuda.classList.add('admin-layout');
-                    mallaColaboradores.classList.add('admin-layout');
+                    mallaAyuda.classList.add('admin-columns-layout');
 
                     document.getElementById('panel-formulario-afectado').style.display = "block";
                     document.getElementById('panel-tabla-solicitudes').style.display = "block";
                     document.getElementById('dropZone').style.display = "block";
                     
-                    // MOSTRAR EXCLUSIVAMENTE A LOS ADMINISTRADORES LOS BOTONES DE DESCARGA EXCEL
+                    // MOSTRAR EXCLUSIVAMENTE EN LOGEO ADMIN LOS BOTONES DE DESCARGA
                     document.getElementById('btnExportar').style.display = "inline-flex";
                     document.getElementById('btnExportarColab').style.display = "inline-flex";
                     document.getElementById('btnExportarAyuda').style.display = "inline-flex";
@@ -543,14 +560,13 @@
                 document.getElementById('btn-toggle-role').innerText = "Acceso Admin";
                 
                 malla.classList.remove('admin-columns-layout');
-                mallaAyuda.classList.remove('admin-layout');
-                mallaColaboradores.classList.remove('admin-layout');
+                mallaAyuda.classList.remove('admin-columns-layout');
 
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
                 
-                // OCULTAR DE NUEVO TODOS LOS BOTONES EXCEL PARA EL PÚBLICO
+                // RESTABLECER Y OCULTAR LOS BOTONES EXCEL PARA EL PÚBLICO GENERAL
                 document.getElementById('btnExportar').style.display = "none";
                 document.getElementById('btnExportarColab').style.display = "none";
                 document.getElementById('btnExportarAyuda').style.display = "none";
@@ -580,7 +596,7 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Tablas desvinculadas temporalmente."); }
+            } catch(e) { console.log("Estructurando tablas dinámicas."); }
 
             actualizarInterfaz(registrosNube);
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -635,11 +651,12 @@
             cuerpo.innerHTML = '';
             datos.forEach(c => {
                 const fila = document.createElement('tr');
+                // En modo público NO se renderiza la columna del teléfono en el frontend
                 fila.innerHTML = `
                     <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                     <td data-label="Vínculo USB">${c.cargo_usb || 'Estudiante'}</td>
                     <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                    <td data-label="Teléfono">${enmascararTelefono(c.telefono)}</td>
+                    ${esAdministrador ? `<td data-label="Teléfono">${c.telefono || '-'}</td>` : `<td data-label="Teléfono">${enmascararTelefono(c.telefono)}</td>`}
                     <td data-label="Notas">${c.disponibilidad || '-'}</td>
                 `;
                 cuerpo.appendChild(fila);
@@ -675,6 +692,7 @@
             alert("Tu solicitud de asistencia ha sido enviada con éxito.");
             document.getElementById('ayudaForm').reset();
             await cargarDatosDesdeNube();
+            navegarA('view-home');
         });
 
         document.getElementById('colaboradorForm').addEventListener('submit', async function(e) {
@@ -788,6 +806,7 @@
             lector.readAsArrayBuffer(file);
         });
 
+        // DESCARGAS DE EXCEL ASOCIADAS A MATRICES DE CONTROL
         document.getElementById('btnExportar').addEventListener('click', function() {
             let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Ubicacion", "Telefono", "Observacion"]];
             registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.ubicacion, r.telefono, r.observaciones]));
@@ -813,7 +832,7 @@
         }
 
         window.eliminarFila = async function(id) {
-            if(confirm('¿Eliminar registro permanente?')) {
+            if(confirm('¿Eliminar registro de la nube permanentemente?')) {
                 await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
                 await cargarDatosDesdeNube();
             }
@@ -824,10 +843,8 @@
             actualizarInterfaz(registrosNube.filter(r => r.nombre.toLowerCase().includes(t)));
         });
 
-        // Sincronización en tiempo real vía WebSockets
-        supabaseClient.channel('realtime-central-final').on('postgres_changes', { event: '*', schema: 'public', table: '*' }, () => cargarDatosDesdeNube()).subscribe();
+        supabaseClient.channel('realtime-central-final-bloqueado').on('postgres_changes', { event: '*', schema: 'public', table: '*' }, () => cargarDatosDesdeNube()).subscribe();
         cargarDatosDesdeNube();
     </script>
 </body>
 </html>
-    
