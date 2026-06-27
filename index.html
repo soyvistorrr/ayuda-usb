@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Central de Afectados y Contingencia - USB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #111111;         /* Negro USB */
+            --primary-dark: #000000;
+            --accent: #fbc02d;          /* Amarillo Oro USB */
+            --accent-hover: #f9a825;
+            --bg-light: #f8fafc;
+            --text-main: #111111;
+            --text-muted: #475569;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-700: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1440px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Barra de Marca Institucional USB */
+        .brand-bar {
+            background-color: #ffffff;
+            border-bottom: 4px solid var(--accent);
+            padding: 1.5rem 0;
+        }
+
+        .brand-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-usb { height: 65px; width: auto; object-fit: contain; }
+        .logo-aeusb { height: 75px; width: auto; object-fit: contain; }
+
+        .brand-title-block h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.625rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* Banner de Invitación a Voluntarios */
+        .volunteer-invite-banner {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .volunteer-invite-text strong {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--success);
+            font-size: 0.95rem;
+        }
+
+        .volunteer-invite-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Panel de Indicadores Críticos */
+        .dashboard-hero {
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 2rem 0;
+        }
+
+        .hero-context p {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.25rem;
+        }
+
+        .stat-card {
+            background: #1e1e1e;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
+        .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.5rem; display: block; }
+
+        /* Malla Estructural Dinámica (Híbrida) */
+        .main-layout { padding: 2rem 0; }
+        .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
+        
+        .grid-system.admin-columns-layout {
+            grid-template-columns: 380px 1fr;
+        }
+
+        .panel-card {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); background-color: var(--gray-100); }
+        .panel-title { font-size: 0.95rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+        .panel-body { padding: 1.5rem; }
+
+        /* Controles de Formulario */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 0.65rem 0.875rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
+        }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* Carga Masiva y Filtros */
+        .import-zone {
+            border: 2px dashed var(--gray-300); background-color: #ffffff; border-radius: 0.5rem; padding: 2rem; text-align: center; margin-bottom: 1.75rem; cursor: pointer;
+        }
+        .import-zone:hover { border-color: var(--primary); background-color: #fffbeb; }
+        .toolbar { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+        .search-box { position: relative; flex: 1; min-width: 280px; }
+        .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
+
+        /* Ventana Desplegable Emergente (Modal Voluntarios) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success);
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Estructura de Tablas Nativas */
+        .table-container { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--gray-200); background: #ffffff; margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
+        thead { background: var(--primary); color: #ffffff; }
+        th { padding: 0.875rem 1.25rem; font-weight: 600; color: #ffffff; border-bottom: 1px solid var(--gray-200); font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
+        tbody tr:hover { background-color: var(--gray-100); }
+
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .badge-danger { background: #fef2f2; color: var(--danger); }
+        .badge-success { background: #f0fdf4; color: var(--success); }
+        .badge-warning { background: #fffbeb; color: var(--warning); }
+
+        /* Botonera */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; letter-spacing: 0.02em; }
+        .btn-primary { background: var(--accent); color: var(--primary); }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: #ea580c; color: white; }
+        .btn-block { width: 100%; }
+        
+        .actions-cell { display: flex; gap: 0.5rem; }
+        .btn-edit-table { background: var(--gray-100); color: var(--primary); border: 1px solid var(--gray-300); padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+        .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+
+        /* SPA Navigation Styles */
+        .app-view { display: none; padding: 2rem 0; animation: viewFadeIn 0.2s ease-out; }
+        .app-view.active { display: block; }
+        @keyframes viewFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilos de Tarjetas del Home */
+        .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
+        .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
+        .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
+        .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 2rem; text-align: center; transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
+        .action-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
+        .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
+
+        /* Responsive Elements */
+        @media (max-width: 1024px) {
+            .grid-system.admin-columns-layout { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+            .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
+            .brand-left { flex-direction: column; gap: 0.75rem; }
+            .volunteer-invite-banner { flex-direction: column; text-align: center; align-items: stretch; }
+            .home-hero h2 { font-size: 1.75rem; }
+
+            .table-container { border: none; background: transparent; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
+            tr { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.25rem; }
+            td { border-bottom: 1px solid var(--gray-100); padding: 0.5rem 0; position: relative; padding-left: 45%; white-space: normal; min-height: 2.25rem; text-align: left; }
+            td:last-child { border-bottom: none; }
+            td::before { content: attr(data-label); position: absolute; left: 0; top: 0.5rem; width: 40%; font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; }
+            .actions-cell { justify-content: flex-start; margin-top: 0.5rem; border-top: 1px solid var(--gray-200); padding-top: 0.75rem; }
+        }
+        @media (max-width: 540px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .form-row { grid-template-columns: 1fr; gap: 0.75rem; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+     <div class="brand-bar">
+        <div class="container brand-container">
+            <div class="brand-left" onclick="navegarA('view-home')">
+                <img src="images.png" alt="Logo USB" class="logo-usb">
+                <div class="brand-title-block">
+                    <h1>Universidad Simón Bolívar</h1>
+                </div>
+            </div>
+            
+            <div>
+                <button class="btn btn-primary" id="btn-toggle-role" onclick="conmutarAccesoSeguro()">Acceso Admin</button>
+            </div>
+
+            <img src="Logo-AEUSB-fondo-blanco.png" alt="Logo AEUSB" class="logo-aeusb">
+        </div>
+    </div>
+
+    <div class="container" id="banner-voluntariado">
+        <div class="volunteer-invite-banner">
+            <div class="volunteer-invite-text">
+                <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
+                <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
+            </div>
+            <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalVoluntario" onclick="cerrarModalVoluntarioExterno(event)">
+        <div class="modal-box">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="panel-title">Inscripción de Colaborador</div>
+                <span onclick="cancelarVoluntariadoForm()" style="cursor:pointer; font-weight:700; color:var(--text-muted);">✕</span>
+            </div>
+            <div class="panel-body">
+                <form id="colaboradorForm">
+                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
+                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Vínculo con la USB *</label>
+                            <select id="colab_cargo" class="form-select" required>
+                                <option value="Estudiante">Estudiante USB</option>
+                                <option value="Profesor">Profesor USB</option>
+                                <option value="Egresado">Egresado USB</option>
+                                <option value="Administrativo">Administrativo USB</option>
+                                <option value="Obrero">Obrero USB</option>
+                                <option value="Externo">Externo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Área de Apoyo Principal *</label>
+                            <select id="colab_area" class="form-select" required>
+                                <option value="Remoción de Escombros">Remoción de Escombros</option>
+                                <option value="Recolección de Insumos">Recolección de Insumos</option>
+                                <option value="Logística y Transporte">Logística y Transporte</option>
+                                <option value="Primeros Auxilios">Primeros Auxilios</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-layout">
+        <div class="container">
+            
+            <section class="app-view active" id="view-home">
+                <div class="home-hero">
+                    <h2>Uesebistas te necesitamos</h2>
+                    <p>Plataforma centralizada de registro humanitario y apoyo comunitario de emergencia. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas tácticas de ayuda.</p>
+                </div>
+                
+                <div class="home-grid-buttons">
+                    <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
+                        <div>
+                            <h3>Necesito Ayuda</h3>
+                            <p>Registra requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate) directamente para la mesa de administración central.</p>
+                        </div>
+                        <button class="btn btn-warning btn-block">Registrar Solicitud</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-colaborar')">
+                        <div>
+                            <h3>Quiero ser Colaborador</h3>
+                            <p>Únete a las brigadas organizadas de remoción de escombros, operaciones logísticas y primeros auxilios médicos en las zonas afectadas.</p>
+                        </div>
+                        <button class="btn btn-success btn-block">Unirme como Voluntario</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-buscar')">
+                        <div>
+                            <h3>Busco a Alguien</h3>
+                            <p>Consulta el tablero general público en tiempo real para verificar el estatus de localización, salud y condiciones de miembros de la comunidad.</p>
+                        </div>
+                        <button class="btn btn-primary btn-block">Ver Tablero General</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-view" id="view-necesito-ayuda">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                
+                <div class="grid-system" id="mallaAyuda">
+                    <div class="left-column">
+                        <div class="panel-card" style="border-top: 4px solid var(--warning);">
+                            <div class="panel-header"><div class="panel-title">Formulario de Solicitud de Auxilio</div></div>
+                            <div class="panel-body">
+                                <form id="ayudaForm">
+                                    <div class="form-group"><label class="form-label">Nombre Completo *</label><input type="text" id="ayuda_nombre" class="form-input" required></div>
+                                    <div class="form-row">
+                                        <div class="form-group"><label class="form-label">Cédula</label><input type="text" id="ayuda_cedula" class="form-input"></div>
+                                        <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
+                                    </div>
+                                    <div class="form-group"><label class="form-label">Ubicación Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Ej: Res. Caribe, Apto 4B"></div>
+                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento hipertensivo, agua, asistencia de rescate..."></textarea></div>
+                                    <button type="submit" class="btn btn-warning btn-block">Enviar Requerimiento</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
+                        <div class="toolbar">
+                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Control Interno Admin)</div>
+                            <button id="btnExportarAyuda" class="btn btn-success" style="display: none;">Descargar Excel Ayuda</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>SOLICITANTE</th><th>CÉDULA</th><th>TELÉFONO</th><th>UBICACIÓN</th><th>REQUERIMIENTO</th></tr></thead>
+                                <tbody id="tablaAyudaCuerpo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-view" id="view-colaborar">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="grid-system" id="mallaColaboradores">
+                    <div class="right-column" style="grid-column: span 2;">
+                        <div class="toolbar">
+                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
+                            <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr></thead>
+                                <tbody id="tablaColabCuerpo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-view" id="view-buscar">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                
+                <div class="stats-bar" style="margin-bottom: 2rem;">
+                    <div class="stat-card"><span class="stat-value" id="stat-total-2">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
+                    <div class="stat-card"><span class="stat-value" id="stat-atrapados-2">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
+                    <div class="stat-card"><span class="stat-value" id="stat-vivos-2">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
+                    <div class="stat-card"><span class="stat-value" id="stat-desaparecidos-2">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
+                    <div class="stat-card"><span class="stat-value" id="stat-fallecidos-2">0</span><span class="stat-label">FALLECIDOS</span></div>
+                </div>
+
+                <div class="grid-system" id="mallaPrincipal">
+                    <div class="left-column" id="panel-formulario-afectado" style="display: none;">
+                        <div class="panel-card">
+                            <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
+                            <div class="panel-body">
+                                <form id="registroForm">
+                                    <div class="form-group"><label class="form-label">Nombre Completo *</label><input type="text" id="nombre" class="form-input" required></div>
+                                    <div class="form-row">
+                                        <div class="form-group"><label class="form-label">Cédula</label><input type="text" id="cedula_id" class="form-input"></div>
+                                        <div class="form-group"><label class="form-label">Teléfono Contacto</label><input type="text" id="telefono_id" class="form-input"></div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Comunidad *</label>
+                                            <select id="comunidad" class="form-select" required>
+                                                <option value="Universidad Simón Bolívar">Universidad Simón Bolívar</option>
+                                                <option value="Externo">Externo</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Grupo (Cargo) *</label>
+                                            <select id="grupo" class="form-select" required>
+                                                <option value="Estudiante">Estudiante</option>
+                                                <option value="Profesor">Profesor</option>
+                                                <option value="Egresado">Egresado</option>
+                                                <option value="Administrativo">Administrativo</option>
+                                                <option value="Obrero">Obrero</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Situación Actual *</label>
+                                        <select id="estado" class="form-select" required>
+                                            <option value="Desaparecido">Sin Información / Desaparecido</option>
+                                            <option value="Con Vida">Reportados Bien / Con Vida</option>
+                                            <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
+                                            <option value="Fallecido">Fallecido</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group"><label class="form-label">Ubicación</label><input type="text" id="ubicacion" class="form-input"></div>
+                                    <div class="form-group"><label class="form-label">Observación</label><input type="text" id="observaciones" class="form-input"></div>
+                                    <button type="submit" class="btn btn-primary btn-block" id="btn-submit-form">Guardar en la Nube</button>
+                                    <div id="cancel-edit-container"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right-column" id="panel-tabla-afectados">
+                        <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
+                            <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
+                            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display:none">
+                        </div>
+                        
+                        <div class="toolbar">
+                            <div class="search-box"><input type="text" id="buscarInput" placeholder="Filtrar por nombre de afectado..."></div>
+                            <button id="btnExportar" class="btn btn-success" style="display: none;">Descargar Excel Afectados</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr><th>SITUACIÓN</th><th>CÉDULA</th><th>NOMBRE</th><th>COMUNIDAD</th><th>GRUPO</th><th>UBICACIÓN</th><th>TELÉFONO</th><th>OBSERVACIÓN</th><th class="admin-action-header" style="display: none;">ACCIONES</th></tr>
+                                </thead>
+                                <tbody id="tablaCuerpo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_ECurpyGW8jSgTMe30r89xA_o-WRwADV";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let registrosNube = [];
+        let colaboradoresNube = [];
+        let ayudaNube = [];
+        let esAdministrador = false; 
+        let idEnEdicion = null;
+
+        const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
+        const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero' };
+
+        function abrirModalVoluntario() { document.getElementById('modalVoluntario').style.display = "flex"; }
+        function cancelarVoluntariadoForm() { document.getElementById('modalVoluntario').style.display = "none"; }
+        function cerrarModalVoluntarioExterno(e) { if(e.target.id === "modalVoluntario") cancelarVoluntariadoForm(); }
+
+        function navegarA(idSeccion) {
+            document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
+            document.getElementById(idSeccion).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // CONTROLADOR DE ACCESO CON PROTECCIÓN TOTAL DE DESCARGAS EXCEL
+        function conmutarAccesoSeguro() {
+            const malla = document.getElementById('mallaPrincipal');
+            const mallaAyuda = document.getElementById('mallaAyuda');
+            const mallaColab = document.getElementById('mallaColaboradores');
+
+            if (!esAdministrador) {
+                let pass = prompt("Introduzca la clave de seguridad de Administrador de la USB:");
+                if (pass === "USB2026") {
+                    esAdministrador = true;
+                    document.getElementById('btn-toggle-role').innerText = "Cerrar Sesión";
+                    
+                    malla.classList.add('admin-columns-layout');
+                    mallaAyuda.classList.add('admin-layout');
+                    mallaColaboradores.classList.add('admin-layout');
+
+                    document.getElementById('panel-formulario-afectado').style.display = "block";
+                    document.getElementById('panel-tabla-solicitudes').style.display = "block";
+                    document.getElementById('dropZone').style.display = "block";
+                    
+                    // MOSTRAR EXCLUSIVAMENTE A LOS ADMINISTRADORES LOS BOTONES DE DESCARGA EXCEL
+                    document.getElementById('btnExportar').style.display = "inline-flex";
+                    document.getElementById('btnExportarColab').style.display = "inline-flex";
+                    document.getElementById('btnExportarAyuda').style.display = "inline-flex";
+
+                    document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
+                } else { alert("Clave incorrecta. Acceso denegado."); }
+            } else {
+                esAdministrador = false;
+                document.getElementById('btn-toggle-role').innerText = "Acceso Admin";
+                
+                malla.classList.remove('admin-columns-layout');
+                mallaAyuda.classList.remove('admin-layout');
+                mallaColaboradores.classList.remove('admin-layout');
+
+                document.getElementById('panel-formulario-afectado').style.display = "none";
+                document.getElementById('panel-tabla-solicitudes').style.display = "none";
+                document.getElementById('dropZone').style.display = "none";
+                
+                // OCULTAR DE NUEVO TODOS LOS BOTONES EXCEL PARA EL PÚBLICO
+                document.getElementById('btnExportar').style.display = "none";
+                document.getElementById('btnExportarColab').style.display = "none";
+                document.getElementById('btnExportarAyuda').style.display = "none";
+
+                document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "none");
+                cancelarEdicion();
+            }
+            actualizarInterfaz(registrosNube);
+            actualizarInterfazColaboradores(colaboradoresNube);
+            actualizarInterfazAyuda(ayudaNube);
+        }
+
+        function enmascararTelefono(tlf) {
+            let t = String(tlf || '').trim();
+            if (!t || t === '-') return '-';
+            if (esAdministrador) return t; 
+            return t.length > 4 ? t.substring(0, 4) + "-***" + t.substring(t.length - 4) : "****";
+        }
+
+        async function cargarDatosDesdeNube() {
+            const { data: afect } = await supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false });
+            if (afect) registrosNube = afect;
+            
+            try {
+                const { data: colabs } = await supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false });
+                if (colabs) colaboradoresNube = colabs;
+
+                const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
+                if (ayudas) ayudaNube = ayudas;
+            } catch(e) { console.log("Tablas desvinculadas temporalmente."); }
+
+            actualizarInterfaz(registrosNube);
+            actualizarInterfazColaboradores(colaboradoresNube);
+            actualizarInterfazAyuda(ayudaNube);
+        }
+
+        function actualizarInterfaz(datos) {
+            const cuerpo = document.getElementById('tablaCuerpo');
+            cuerpo.innerHTML = '';
+            
+            datos.forEach(reg => {
+                let badgeClass = 'badge-info';
+                let est = reg.estado || 'Desaparecido';
+                if (est.startsWith('Desaparecido')) badgeClass = 'badge-warning';
+                if (est.startsWith('Con Vida')) badgeClass = 'badge-success';
+                if (est.startsWith('Atrapado')) badgeClass = 'badge-danger';
+                if (est.startsWith('Fallecido')) badgeClass = 'badge-gray';
+
+                let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
+                let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
+
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
+                    <td data-label="Cédula">${reg.cedula_identidad || '-'}</td>
+                    <td data-label="Nombre"><strong>${reg.nombre}</strong></td>
+                    <td data-label="Comunidad">${comLimpia}</td>
+                    <td data-label="Grupo">${grpLimpio}</td>
+                    <td data-label="Ubicación">${reg.ubicacion || '-'}</td>
+                    <td data-label="Teléfono">${enmascararTelefono(reg.telefono)}</td>
+                    <td data-label="Observación">${reg.observaciones || '-'}</td>
+                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina(${reg.id})">Editar</button><button class="btn-delete" onclick="eliminarFila(${reg.id})">Eliminar</button></td>` : ''}
+                `;
+                cuerpo.appendChild(fila);
+            });
+
+            let total = registrosNube.length;
+            let trap = registrosNube.filter(r => r.estado && r.estado.startsWith('Atrapado')).length;
+            let vivos = registrosNube.filter(r => r.estado && r.estado.startsWith('Con Vida')).length;
+            let des = registrosNube.filter(r => r.estado && r.estado.startsWith('Desaparecido')).length;
+            let fall = registrosNube.filter(r => r.estado === 'Fallecido').length;
+
+            document.getElementById('stat-total').innerText = document.getElementById('stat-total-2').innerText = total;
+            document.getElementById('stat-atrapados').innerText = document.getElementById('stat-atrapados-2').innerText = trap;
+            document.getElementById('stat-vivos').innerText = document.getElementById('stat-vivos-2').innerText = vivos;
+            document.getElementById('stat-desaparecidos').innerText = document.getElementById('stat-desaparecidos-2').innerText = des;
+            document.getElementById('stat-fallecidos').innerText = document.getElementById('stat-fallecidos-2').innerText = fall;
+        }
+
+        function actualizarInterfazColaboradores(datos) {
+            const cuerpo = document.getElementById('tablaColabCuerpo');
+            cuerpo.innerHTML = '';
+            datos.forEach(c => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
+                    <td data-label="Vínculo USB">${c.cargo_usb || 'Estudiante'}</td>
+                    <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                    <td data-label="Teléfono">${enmascararTelefono(c.telefono)}</td>
+                    <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                `;
+                cuerpo.appendChild(fila);
+            });
+        }
+
+        function actualizarInterfazAyuda(datos) {
+            const cuerpo = document.getElementById('tablaAyudaCuerpo');
+            cuerpo.innerHTML = '';
+            datos.forEach(a => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td data-label="Solicitante"><strong>${a.nombre}</strong></td>
+                    <td data-label="Cédula">${a.cedula || '-'}</td>
+                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                    <td data-label="Ubicación">${a.ubicacion || '-'}</td>
+                    <td data-label="Requerimiento">${a.descripcion_ayuda || '-'}</td>
+                `;
+                cuerpo.appendChild(fila);
+            });
+        }
+
+        document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nuevaSolicitud = {
+                nombre: document.getElementById('ayuda_nombre').value.trim(),
+                cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
+                telefono: document.getElementById('ayuda_telefono').value.trim(),
+                ubicacion: document.getElementById('ayuda_ubicacion').value.trim(),
+                descripcion_ayuda: document.getElementById('ayuda_descripcion').value.trim()
+            };
+            await supabaseClient.from('solicitudes_ayuda').insert([nuevaSolicitud]);
+            alert("Tu solicitud de asistencia ha sido enviada con éxito.");
+            document.getElementById('ayudaForm').reset();
+            await cargarDatosDesdeNube();
+        });
+
+        document.getElementById('colaboradorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nuevoVoluntario = {
+                nombre: document.getElementById('colab_nombre').value.trim(),
+                telefono: document.getElementById('colab_telefono').value.trim(),
+                cargo_usb: document.getElementById('colab_cargo').value,
+                area_apoyo: document.getElementById('colab_area').value,
+                disponibilidad: document.getElementById('colab_notas').value.trim() || '-'
+            };
+            await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
+            alert("¡Registro Completado! Gracias por sumarte.");
+            cancelarVoluntariadoForm();
+            document.getElementById('colaboradorForm').reset();
+            await cargarDatosDesdeNube();
+        });
+
+        window.activarEdiciónEnPagina = function(id) {
+            const reg = registrosNube.find(r => r.id === id);
+            if (!reg) return;
+            idEnEdicion = id;
+            document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro";
+            document.getElementById('nombre').value = reg.nombre;
+            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
+            document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
+            document.getElementById('ubicacion').value = reg.ubicacion === '-' ? '' : reg.ubicacion;
+            document.getElementById('observaciones').value = reg.observaciones === '-' ? '' : reg.observaciones;
+            document.getElementById('estado').value = reg.estado;
+            
+            document.getElementById('btn-submit-form').innerText = "Actualizar en la Nube";
+            document.getElementById('cancel-edit-container').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicion()">Cancelar</button>`;
+        };
+
+        window.cancelarEdicion = function() {
+            idEnEdicion = null; document.getElementById('registroForm').reset();
+            document.getElementById('form-mode-title-afectado').innerText = "Registro Individual";
+            document.getElementById('btn-submit-form').innerText = "Guardar en la Nube";
+            document.getElementById('cancel-edit-container').innerHTML = '';
+        };
+
+        document.getElementById('registroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const manual = {
+                nombre: document.getElementById('nombre').value.trim(),
+                cedula_identidad: document.getElementById('cedula_id').value.trim() || '-',
+                telefono: document.getElementById('telefono_id').value.trim() || '-',
+                cedula: document.getElementById('comunidad').value === "Universidad Simón Bolívar" ? "USB" : "EXT",
+                edad: document.getElementById('grupo').value === "Profesor" ? "PROF" : (document.getElementById('grupo').value === "Egresado" ? "EGR" : (document.getElementById('grupo').value === "Administrativo" ? "ADM" : (document.getElementById('grupo').value === "Obrero" ? "OBR" : "EST"))),
+                estado: document.getElementById('estado').value,
+                ubicacion: document.getElementById('ubicacion').value.trim() || '-',
+                observaciones: document.getElementById('observaciones').value.trim() || '-'
+            };
+
+            if (idEnEdicion !== null) {
+                await supabaseClient.from('registros_ciudadanos').update(manual).eq('id', idEnEdicion);
+                cancelarEdicion();
+            } else {
+                await supabaseClient.from('registros_ciudadanos').insert([manual]);
+                document.getElementById('registroForm').reset();
+            }
+            await cargarDatosDesdeNube();
+        });
+
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const lector = new FileReader();
+            lector.onload = async function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const libro = XLSX.read(data, { type: 'array' });
+                    const hoja = libro.Sheets[libro.SheetNames[0]];
+                    const rawData = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" });
+                    
+                    while (rawData.length > 0 && !rawData[0].some(c => String(c).toLowerCase().trim().includes('nombre') || String(c).toLowerCase().trim().includes('situacion'))) {
+                        rawData.shift();
+                    }
+
+                    let cabecera = rawData.shift().map(c => String(c).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+                    let iEst = cabecera.indexOf('situacion');
+                    let iNom = cabecera.indexOf('nombre');
+                    let iCom = cabecera.indexOf('comunidad');
+                    let iGru = cabecera.indexOf('grupo');
+                    let iUbi = cabecera.indexOf('ubicacion');
+                    let iObs = cabecera.indexOf('observacion');
+
+                    for (let row of rawData) {
+                        let nomVal = String(row[iNom] || '').trim();
+                        if (!nomVal || nomVal.toLowerCase().includes('nombre')) continue;
+
+                        let rawEst = String(row[iEst] || '').trim();
+                        let estadoFinal = 'Desaparecido';
+                        if (rawEst.includes('⚠️') || rawEst.toLowerCase().includes('atrapado')) estadoFinal = 'Atrapado';
+                        if (rawEst.includes('✅') || rawEst.toLowerCase().includes('bien')) estadoFinal = 'Con Vida';
+                        if (rawEst.includes('🕊️') || rawEst.includes('💀') || rawEst.toLowerCase().includes('fallecido')) estadoFinal = 'Fallecido';
+
+                        await supabaseClient.from('registros_ciudadanos').insert([{
+                            nombre: nomVal,
+                            cedula: iCom !== -1 ? String(row[iCom] || 'USB').trim() : 'USB',
+                            edad: iGru !== -1 ? String(row[iGru] || 'EST').trim() : 'EST',
+                            estado: estadoFinal,
+                            ubicacion: iUbi !== -1 ? String(row[iUbi] || '-').trim() : '-',
+                            observaciones: iObs !== -1 ? String(row[iObs] || '-').trim() : '-',
+                            cedula_identidad: '-', telefono: '-'
+                        }]);
+                    }
+                    alert("Plantilla procesada.");
+                    await cargarDatosDesdeNube();
+                } catch (err) { alert('Error.'); }
+            };
+            lector.readAsArrayBuffer(file);
+        });
+
+        document.getElementById('btnExportar').addEventListener('click', function() {
+            let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Ubicacion", "Telefono", "Observacion"]];
+            registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.ubicacion, r.telefono, r.observaciones]));
+            descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
+        });
+
+        document.getElementById('btnExportarColab').addEventListener('click', function() {
+            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Telefono", "Disponibilidad / Notas"]];
+            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.telefono, c.disponibilidad]));
+            descargarMatrizComoExcel(matriz, "Cuadrillas_Voluntarios_USB");
+        });
+
+        document.getElementById('btnExportarAyuda').addEventListener('click', function() {
+            let matriz = [["Solicitante", "Cedula", "Telefono", "Ubicacion", "Descripcion Requerimiento"]];
+            ayudaNube.forEach(a => matriz.push([a.nombre, a.cedula, a.telefono, a.ubicacion, a.descripcion_ayuda]));
+            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB");
+        });
+
+        function descargarMatrizComoExcel(matriz, nombreArchivo) {
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
+            XLSX.utils.book_append_sheet(wb, ws, "Datos");
+            XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        window.eliminarFila = async function(id) {
+            if(confirm('¿Eliminar registro permanente?')) {
+                await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
+
+        document.getElementById('buscarInput').addEventListener('input', function(e) {
+            const t = e.target.value.toLowerCase();
+            actualizarInterfaz(registrosNube.filter(r => r.nombre.toLowerCase().includes(t)));
+        });
+
+        // Sincronización en tiempo real vía WebSockets
+        supabaseClient.channel('realtime-central-final').on('postgres_changes', { event: '*', schema: 'public', table: '*' }, () => cargarDatosDesdeNube()).subscribe();
+        cargarDatosDesdeNube();
+    </script>
+</body>
+</html>
+    
