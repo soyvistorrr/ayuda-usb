@@ -6,7 +6,6 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -31,10 +30,19 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
+            background: linear-gradient(-45deg, #f8fafc, #f1f5f9, #fffbeb, #f0fdf4);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
             color: var(--text-main);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container { max-width: 1440px; margin: 0 auto; padding: 0 1.5rem; }
@@ -44,6 +52,7 @@
             background-color: #ffffff;
             border-bottom: 4px solid var(--accent);
             padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .brand-container {
@@ -79,6 +88,7 @@
             padding: 2rem 0;
             border-radius: 0.5rem;
             margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
         .hero-context p {
@@ -121,11 +131,12 @@
 
         .panel-card {
             background: #ffffff;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.02);
             border: 1px solid var(--gray-200);
             overflow: hidden;
             margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
         }
 
         .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); background-color: var(--gray-100); }
@@ -134,12 +145,12 @@
 
         /* Controles de Formulario */
         .form-group { margin-bottom: 1.25rem; }
-        .form-group label.form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-input, .form-select, .form-textarea {
-            width: 100%; padding: 0.65rem 0.875rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.25); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         /* Carga Masiva y Filtros */
@@ -155,12 +166,13 @@
         .table-container { 
             overflow: auto; 
             max-height: 580px; 
-            border-radius: 0.5rem; 
+            border-radius: 12px; 
             border: 1px solid var(--gray-200); 
             background: #ffffff; 
             margin-bottom: 2rem;
             position: relative;
             -webkit-overflow-scrolling: touch; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
         }
         
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; }
@@ -181,17 +193,19 @@
         td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
         tbody tr:hover { background-color: var(--gray-100); }
 
-        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .badge { display: inline-flex; align-items: center; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
         .badge-danger { background: #fef2f2; color: var(--danger); }
         .badge-success { background: #f0fdf4; color: var(--success); }
         .badge-warning { background: #fffbeb; color: var(--warning); }
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
         /* Botonera */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; letter-spacing: 0.02em; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--accent); color: var(--primary); }
-        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.2); }
         .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2); }
         .btn-warning { background: #ea580c; color: white; }
         .btn-block { width: 100%; }
         
@@ -207,7 +221,7 @@
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.02em; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.05rem; }
         
-        /* Banner de Acopio de Insumos Físicos Asimétrico */
+        /* Banner de Acopio de Insumos Físicos */
         .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-top: 4px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 768px) { .acopio-banner-card { grid-template-columns: 350px 1fr; } }
         .acopio-info-side { border-right: 1px solid var(--gray-200); padding-right: 1.5rem; }
@@ -218,12 +232,12 @@
         .acopio-list-grid li { background: var(--bg-light); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--primary); border: 1px solid var(--gray-200); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); line-height: 1.4; }
         .acopio-list-grid li:hover { transform: translateY(-3px); border-color: var(--success); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.06); }
 
-        /* Rejilla de Navegación 2x2 Balanceada */
-        .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
-        .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 2rem; text-align: center; transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
-        .action-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
-        .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
+        /* Rejilla de Navegación Flexible Centrada e Interactiva */
+        .home-grid-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+        .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 2.25rem 2rem; text-align: center; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); flex: 1 1 280px; max-width: 340px; }
+        .action-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 25px -5px rgba(251, 192, 45, 0.15), 0 10px 10px -5px rgba(251, 192, 45, 0.04); }
+        .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.01em; }
+        .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; line-height: 1.6; }
 
         /* Vista de Donación Premium Estilizada */
         .donation-hero-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 3rem 2rem; border-radius: 12px; text-align: center; margin-bottom: 2.5rem; border-bottom: 4px solid var(--success); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03); }
@@ -231,12 +245,12 @@
         .donation-hero-banner p { max-width: 680px; margin: 0 auto; color: #cbd5e1; font-size: 1.1rem; font-style: italic; }
         
         .donation-data-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; }
-        .donation-data-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .donation-data-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); }
         .donation-data-header { padding: 1.25rem 1.5rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
         .donation-data-body { padding: 1.5rem; font-size: 0.9rem; color: var(--gray-700); }
         .donation-table-info { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .donation-table-info td { padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; color: var(--primary); text-align: left; display: table-cell !important; }
-        .donation-table-info td strong { color: var(--gray-700); font-size: 0.8rem; text-transform: uppercase; display: block; }
+        .donation-table-info td { padding: 0.65rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; color: var(--primary); text-align: left; display: table-cell !important; }
+        .donation-table-info td strong { color: var(--gray-700); font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
         
         /* Pie de Página */
         .site-footer { background-color: #ffffff; border-top: 1px solid var(--gray-200); padding: 2.5rem 0; margin-top: 4rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); box-shadow: 0 -2px 10px rgba(0,0,0,0.01); }
@@ -294,7 +308,6 @@
 </head>
 <body>
 
-    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -312,18 +325,15 @@
         </div>
     </div>
 
-    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
-            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
                     <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
-                <!-- PUNTO USB DE RECEPCIÓN FÍSICO DIVIDIDO ASIMÉTRICO (OPCIÓN 1 PREMIUM) -->
                 <div class="acopio-banner-card">
                     <div class="acopio-info-side">
                         <h4>📍 Centro de Recepción Física</h4>
@@ -380,7 +390,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -449,7 +458,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -465,12 +473,10 @@
                 </div>
             </section>
 
-            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
                 <div class="grid-system" id="mallaColaboradores">
-                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
                             <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
@@ -501,24 +507,9 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- NUEVAS COLUMNAS ADICIONALES INTEGRADAS -->
                                     <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Lugar de Voluntariado *</label>
-                                            <select id="colab_lugar" class="form-select" required>
-                                                <option value="Punto de Acopio USB">Punto de Acopio USB</option>
-                                                <option value="Otro Lugar">Otro Lugar (Especificar en observaciones)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">¿Dispone de Vehículo para Apoyo? *</label>
-                                            <select id="colab_vehiculo" class="form-select" required>
-                                                <option value="No">No poseo vehículo</option>
-                                                <option value="Carro">Sí (Carro)</option>
-                                                <option value="Moto">Sí (Moto)</option>
-                                                <option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option>
-                                            </select>
-                                        </div>
+                                        <div class="form-group"><label class="form-label">Lugar de Voluntariado *</label><select id="colab_lugar" class="form-select" required><option value="Punto de Acopio USB">Punto de Acopio USB</option><option value="Otro Lugar">Otro Lugar (Especificar en observaciones)</option></select></div>
+                                        <div class="form-group"><label class="form-label">¿Dispone de Vehículo para Apoyo? *</label><select id="colab_vehiculo" class="form-select" required><option value="No">No poseo vehículo</option><option value="Carro">Sí (Carro)</option><option value="Moto">Sí (Moto)</option><option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option></select></div>
                                     </div>
                                     
                                     <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notes" class="form-input" placeholder="Ej: Fines de semana"></div>
@@ -528,7 +519,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabla de Cuadrillas Registradas (SIEMPRE VISIBLE AL PÚBLICO) -->
                     <div class="right-column" id="panel-tabla-colaboradores">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
@@ -544,11 +534,9 @@
                 </div>
             </section>
 
-            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -563,7 +551,6 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
-                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -622,7 +609,6 @@
                         </div>
                     </div>
 
-                    <!-- Listado Central Operativo con Filtros Especiales -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -664,7 +650,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 5: PÁGINA PREMIUM DE DONACIONES DIGITALES -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -674,7 +659,6 @@
                 </div>
 
                 <div class="donation-data-row">
-                    <!-- Soporte USD -->
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
                         <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
@@ -683,7 +667,6 @@
                         </div>
                     </div>
 
-                    <!-- Soporte Bs -->
                     <div class="donation-data-card" style="border-top: 4px solid var(--success);">
                         <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
                         <div class="donation-data-body">
@@ -705,7 +688,6 @@
         </div>
     </main>
 
-    <!-- PIE DE PÁGINA INSTITUCIONAL -->
     <footer class="site-footer">
         <div class="container">
             <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
@@ -794,7 +776,7 @@
             }
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
-            actualizarInterfazAyuda(ayudaNube);
+            actualizarInterfazAyuda(ayubeNube || ayudaNube);
         }
 
         function enmascararTelefono(tlf) {
@@ -843,7 +825,6 @@
 
                 return cumpleTexto && cumpleEst && cumpleGrp;
             });
-
             actualizarInterfazTablero(registrosFiltrados);
         }
 
@@ -941,7 +922,7 @@
             cuerpo.innerHTML = '';
             datos.forEach(a => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = ` 
+                fila.innerHTML = `
                     <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                     <td data-label="Afectado"><strong>${a.nombre}</strong></td>
                     <td data-label="Cédula">${a.cedula || '-'}</td>
@@ -959,7 +940,7 @@
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const nuevaSolicitud = { 
+            const nuevaSolicitud = {
                 nombre: document.getElementById('ayuda_nombre').value.trim(),
                 cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
                 telefono: document.getElementById('ayuda_telefono').value.trim(),
@@ -1128,7 +1109,6 @@
             descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB"); 
         });
 
-        
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
             const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
             XLSX.utils.book_append_sheet(wb, ws, "Datos");
