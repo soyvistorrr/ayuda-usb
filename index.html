@@ -71,7 +71,31 @@
             text-transform: uppercase;
         }
 
-        /* Panel de Indicadores Críticos (EXCLUSIVO DENTRO DE TABLERO BUSCAR) */
+        /* Banner de Invitación a Voluntarios */
+        .volunteer-invite-banner {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .volunteer-invite-text strong {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--success);
+            font-size: 0.95rem;
+        }
+
+        .volunteer-invite-text p {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        /* Panel de Indicadores Críticos */
         .dashboard-hero {
             background-color: var(--primary);
             color: #ffffff;
@@ -106,7 +130,7 @@
         .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.5rem; display: block; }
 
         /* Malla Estructural Dinámica */
-        .main-layout { padding: 1.5rem 0; }
+        .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
         .grid-system.admin-columns-layout {
@@ -146,15 +170,8 @@
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
         /* Ventana Desplegable Emergente (Modal Voluntarios) */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;
-        }
-        .modal-box {
-            background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success);
-            animation: fadeIn 0.2s ease-out;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-box { background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success); animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         /* Estructura de Tablas Nativas */
@@ -187,7 +204,7 @@
         .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos de Tarjetas del Home (Fiel a tu captura) */
+        /* Estilos del Home (Fiel a tu captura) */
         .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
@@ -197,7 +214,7 @@
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* Tarjetas Táctiles Interactivas Móviles */
+        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
         @media (max-width: 1024px) {
             .grid-system.admin-columns-layout { grid-template-columns: 1fr !important; }
         }
@@ -287,7 +304,7 @@
     <main class="main-layout">
         <div class="container">
             
-            <!-- VISTA 1: HOME MENÚ CENTRAL (Limpio y libre de elementos externos) -->
+            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -362,10 +379,17 @@
 
             <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
-                <div class="toolbar">
-                    <button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                
+                <!-- Banner de Registro Interno -->
+                <div class="volunteer-invite-banner">
+                    <div class="volunteer-invite-text">
+                        <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
+                        <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
+                    </div>
                     <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme como Colaborador</button>
                 </div>
+
                 <div class="grid-system" id="mallaColaboradores">
                     <div class="right-column" style="grid-column: span 2;">
                         <div class="toolbar">
@@ -374,7 +398,7 @@
                         </div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>NOTAS</th></tr></thead>
+                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th class="admin-action-header" style="display: none;">TELÉFONO</th><th>NOTAS</th></tr></thead>
                                 <tbody id="tablaColabCuerpo"></tbody>
                             </table>
                         </div>
@@ -382,19 +406,21 @@
                 </div>
             </section>
 
-            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN - AQUÍ VAN LAS ESTADÍSTICAS) -->
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- Panel de Indicadores Críticos (Ubicado correctamente aquí) -->
+                <!-- Panel de Indicadores Críticos (Exclusivo de esta sección) -->
                 <div class="dashboard-hero">
-                    <div class="hero-context"><p>Sistema Integral de Registro y Monitoreo de Afectados</p></div>
-                    <div class="stats-bar">
-                        <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
-                        <div class="stat-card"><span class="stat-value" id="stat-atrapados">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
-                        <div class="stat-card"><span class="stat-value" id="stat-vivos">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
-                        <div class="stat-card"><span class="stat-value" id="stat-desaparecidos">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
-                        <div class="stat-card"><span class="stat-value" id="stat-fallecidos">0</span><span class="stat-label">FALLECIDOS</span></div>
+                    <div class="container hero-context">
+                        <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
+                        <div class="stats-bar">
+                            <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
+                            <div class="stat-card"><span class="stat-value" id="stat-atrapados">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
+                            <div class="stat-card"><span class="stat-value" id="stat-vivos">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
+                            <div class="stat-card"><span class="stat-value" id="stat-desaparecidos">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
+                            <div class="stat-card"><span class="stat-value" id="stat-fallecidos">0</span><span class="stat-label">FALLECIDOS</span></div>
+                        </div>
                     </div>
                 </div>
 
@@ -440,6 +466,7 @@
                                                 <option value="Fallecido">Fallecido</option>
                                             </select>
                                         </div>
+                                        <!-- CAMPO OFICIAL: Clasificación de Damnificados -->
                                         <div class="form-group">
                                             <label class="form-label">¿Es Damnificado? *</label>
                                             <select id="es_damnificado" class="form-select" required>
@@ -502,7 +529,7 @@
         function cancelarVoluntariadoForm() { document.getElementById('modalVoluntario').style.display = "none"; }
         function cerrarModalVoluntarioExterno(e) { if(e.target.id === "modalVoluntario") cancelarVoluntariadoForm(); }
 
-        // ENRUTADOR SPA SEGURO CON HISTORIAL COMPATIBLE CON EL BOTÓN FÍSICO ATRÁS
+        // MOTOR RESPONSIVO SPA CON HISTORIAL NATIVO (SOPORTE BOTÓN ATRÁS DEL TELÉFONO)
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
             const seccionDestino = document.getElementById(idSeccion);
@@ -594,6 +621,7 @@
             actualizarInterfazAyuda(ayudaNube);
         }
 
+        // MOTOR CENTRAL: COMPUTA MÉTRICAS INMUNE A CONGELAMIENTOS
         function actualizarInterfaz(datos) {
             const cuerpo = document.getElementById('tablaCuerpo');
             if (!cuerpo) return;
@@ -601,11 +629,11 @@
             
             datos.forEach(reg => {
                 let badgeClass = 'badge-info';
-                let est = reg.estado || 'Desaparecido';
-                if (est.trim() === 'Desaparecido') badgeClass = 'badge-warning';
-                if (est.trim() === 'Con Vida') badgeClass = 'badge-success';
-                if (est.trim() === 'Atrapado') badgeClass = 'badge-danger';
-                if (est.trim() === 'Fallecido') badgeClass = 'badge-gray';
+                let est = String(reg.estado || 'Desaparecido').trim();
+                if (est.includes('Desaparecido')) badgeClass = 'badge-warning';
+                if (est.includes('Con Vida') || est.includes('Bien')) badgeClass = 'badge-success';
+                if (est.includes('Atrapado')) badgeClass = 'badge-danger';
+                if (est.includes('Fallecido')) badgeClass = 'badge-gray';
 
                 let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
                 let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
@@ -627,18 +655,18 @@
                 cuerpo.appendChild(fila);
             });
 
-            // Conteo exacto por strings
+            // Conteo flexible defensivo contra emojis o caracteres extraños
             let total = registrosNube.length;
-            let trap = registrosNube.filter(r => r.estado && r.estado.trim() === 'Atrapado').length;
-            let vivos = registrosNube.filter(r => r.estado && r.estado.trim() === 'Con Vida').length;
-            let des = registrosNube.filter(r => r.estado && r.estado.trim() === 'Desaparecido').length;
-            let fall = registrosNube.filter(r => r.estado && r.estado.trim() === 'Fallecido').length;
+            let trap = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('atrapado')).length;
+            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien'))).length;
+            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion'))).length;
+            let fall = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('fallecido')).length;
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-atrapados').innerText = trap;
-            document.getElementById('stat-vivos').innerText = vivos;
-            document.getElementById('stat-desaparecidos').innerText = des;
-            document.getElementById('stat-fallecidos').innerText = fall;
+            const elTotal = document.getElementById('stat-total'); if (elTotal) elTotal.innerText = total;
+            const elTrap = document.getElementById('stat-atrapados'); if (elTrap) elTrap.innerText = trap;
+            const elVivos = document.getElementById('stat-vivos'); if (elVivos) elVivos.innerText = vivos;
+            const elDes = document.getElementById('stat-desaparecidos'); if (elDes) elDes.innerText = des;
+            const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
         }
 
         function actualizarInterfazColaboradores(datos) {
@@ -652,6 +680,7 @@
                     <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                     <td data-label="Vínculo USB">${grpVoluntario}</td>
                     <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                    <td class="admin-action-header" data-label="Teléfono" style="${esAdministrador ? 'display: table-cell;' : 'display: none;'}">${c.telefono || '-'}</td>
                     <td data-label="Notas">${c.disponibilidad || '-'}</td>
                 `;
                 cuerpo.appendChild(fila);
@@ -698,7 +727,7 @@
                 telefono: document.getElementById('colab_telefono').value.trim(),
                 cargo_usb: document.getElementById('colab_cargo').value,
                 area_apoyo: document.getElementById('colab_area').value,
-                disponibilidad: document.getElementById('colab_notas').value.trim() || '-'
+                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
             alert("¡Registro Completado! Gracias por sumarte.");
@@ -738,7 +767,7 @@
                 cedula_identidad: document.getElementById('cedula_id').value.trim() || '-',
                 telefono: document.getElementById('telefono_id').value.trim() || '-',
                 cedula: document.getElementById('comunidad').value === "Universidad Simón Bolívar" ? "USB" : "EXT",
-                edad: document.getElementById('grupo').value,
+                edad: document.getElementById('grupo').value === "Profesor" ? "PROF" : (document.getElementById('grupo').value === "Egresado" ? "EGR" : (document.getElementById('grupo').value === "Administrativo" ? "ADM" : (document.getElementById('grupo').value === "Obrero" ? "OBR" : (document.getElementById('grupo').value === "Externo" ? "EXT" : "EST")))),
                 estado: document.getElementById('estado').value,
                 damnificado: document.getElementById('es_damnificado').value,
                 ubicacion: document.getElementById('ubicacion').value.trim() || '-',
@@ -831,7 +860,7 @@
         }
 
         window.eliminarFila = async function(id) {
-            if(confirm('¿Eliminar registro permanente?')) {
+            if(confirm('¿Eliminar registro de la nube permanentemente?')) {
                 await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
                 await cargarDatosDesdeNube();
             }
