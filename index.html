@@ -6,6 +6,7 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -133,7 +134,7 @@
 
         /* Controles de Formulario */
         .form-group { margin-bottom: 1.25rem; }
-        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
+        .form-group label.form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-input, .form-select, .form-textarea {
             width: 100%; padding: 0.65rem 0.875rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
         }
@@ -202,103 +203,20 @@
         .app-view.active { display: block; }
 
         /* Estilos del Menú del Home */
-        .home-hero {
-            text-align: center;
-            padding: 4rem 1.5rem;
-            background: var(--accent); /* Cambiado al Amarillo Oro USB */
-            color: var(--primary);     /* Cambiado a Negro USB para el flujo base */
-            border-radius: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        .home-hero h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.25rem;
-            font-weight: 800;
-            color: var(--primary-dark); /* Título en Negro Puro para máximo contraste */
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
-        .home-hero p {
-            max-width: 750px;
-            margin: 0 auto;
-            color: #111111;             /* Texto del párrafo en negro limpio y legible */
-            font-size: 1.05rem;
-        }
+        .home-hero { text-align: center; padding: 4rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.02em; }
+        .home-hero p { max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.05rem; }
         
-        /* ==========================================================
-           DISEÑO ASIMÉTRICO DIVIDIDO PARA PUNTO DE ACOPIO (UPGRADED)
-           ========================================================== */
-        .acopio-banner-card { 
-            background: #ffffff; 
-            border: 1px solid var(--gray-200); 
-            border-top: 4px solid var(--accent); 
-            border-radius: 12px; 
-            padding: 2rem; 
-            margin-bottom: 2.5rem; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 2rem; 
-        }
-
-        @media (min-width: 768px) {
-            .acopio-banner-card { grid-template-columns: 350px 1fr; }
-        }
-
-        .acopio-info-side {
-            border-right: 1px solid var(--gray-200);
-            padding-right: 1.5rem;
-        }
-
-        @media (max-width: 767px) {
-            .acopio-info-side { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 1.5rem; }
-        }
-
-        .acopio-banner-card h4 { 
-            font-family: 'Montserrat', sans-serif; 
-            font-size: 1.15rem; 
-            font-weight: 800; 
-            color: var(--primary); 
-            margin-bottom: 1.25rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.02em;
-        }
-
-        .acopio-chip {
-            background: var(--gray-100);
-            padding: 0.85rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-            color: var(--gray-700);
-            border-left: 3px solid var(--success);
-            line-height: 1.4;
-        }
-
-        .acopio-list-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-            gap: 1rem; 
-            list-style: none; 
-        }
-
-        .acopio-list-grid li { 
-            background: var(--bg-light);
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: var(--primary);
-            border: 1px solid var(--gray-200);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            line-height: 1.4;
-        }
-
-        .acopio-list-grid li:hover {
-            transform: translateY(-2px);
-            border-color: var(--success);
-            background: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.05);
-        }
+        /* Banner de Acopio de Insumos Físicos Asimétrico */
+        .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-top: 4px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 768px) { .acopio-banner-card { grid-template-columns: 350px 1fr; } }
+        .acopio-info-side { border-right: 1px solid var(--gray-200); padding-right: 1.5rem; }
+        @media (max-width: 767px) { .acopio-info-side { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 1.5rem; } }
+        .acopio-banner-card h4 { font-family: 'Montserrat', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.02em; }
+        .acopio-chip { background: var(--gray-100); padding: 0.85rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--gray-700); border-left: 3px solid var(--success); line-height: 1.4; }
+        .acopio-list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; list-style: none; }
+        .acopio-list-grid li { background: var(--bg-light); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--primary); border: 1px solid var(--gray-200); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); line-height: 1.4; }
+        .acopio-list-grid li:hover { transform: translateY(-3px); border-color: var(--success); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.06); }
 
         /* Rejilla de Navegación 2x2 Balanceada */
         .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
@@ -308,7 +226,7 @@
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
         /* Vista de Donación Premium Estilizada */
-        .donation-hero-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 3rem 2rem; border-radius: 0.5rem; text-align: center; margin-bottom: 2.5rem; border-bottom: 4px solid var(--success); }
+        .donation-hero-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 3rem 2rem; border-radius: 12px; text-align: center; margin-bottom: 2.5rem; border-bottom: 4px solid var(--success); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03); }
         .donation-hero-banner h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); margin-bottom: 0.75rem; text-transform: uppercase; }
         .donation-hero-banner p { max-width: 680px; margin: 0 auto; color: #cbd5e1; font-size: 1.1rem; font-style: italic; }
         
@@ -321,7 +239,7 @@
         .donation-table-info td strong { color: var(--gray-700); font-size: 0.8rem; text-transform: uppercase; display: block; }
         
         /* Pie de Página */
-        .site-footer { background-color: #ffffff; border-top: 1px solid var(--gray-200); padding: 2rem 0; margin-top: 4rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+        .site-footer { background-color: #ffffff; border-top: 1px solid var(--gray-200); padding: 2.5rem 0; margin-top: 4rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); box-shadow: 0 -2px 10px rgba(0,0,0,0.01); }
         .site-footer p { max-width: 850px; margin: 0 auto 0.5rem auto; line-height: 1.6; }
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
@@ -376,6 +294,7 @@
 </head>
 <body>
 
+    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -393,18 +312,21 @@
         </div>
     </div>
 
+    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
+            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
                     <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
+                <!-- PUNTO USB DE RECEPCIÓN FÍSICO DIVIDIDO ASIMÉTRICO (OPCIÓN 1 PREMIUM) -->
                 <div class="acopio-banner-card">
                     <div class="acopio-info-side">
-                        <h4>📍 Centro de Recepción USB</h4>
+                        <h4>📍 Centro de Recepción Física</h4>
                         <div class="acopio-chip">
                             <strong>Dirección de entrega:</strong><br>Centro Venezolano Americano (CVA), Las Mercedes, Caracas.
                         </div>
@@ -451,13 +373,14 @@
                     <div class="action-card" onclick="navegarA('view-donar')">
                         <div>
                             <h3>Quiero Donar</h3>
-                            <p>Apoyo económico para la adquisición de insumos, atención médica, psicológica, para refugio, dotación y logística a Bomberos USB para atender zona cero.</p>
+                            <p>Apoya económicamente la adquisición masiva de insumos médicos y logística para los brigadistas de rescate en las zonas afectadas.</p>
                         </div>
                         <button class="btn btn-success btn-block" style="background-color: var(--success);">Aportar Fondos</button>
                     </div>
                 </div>
             </section>
 
+            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -526,6 +449,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -541,10 +465,12 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
                 <div class="grid-system" id="mallaColaboradores">
+                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
                             <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
@@ -575,6 +501,7 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- NUEVAS COLUMNAS ADICIONALES INTEGRADAS -->
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Lugar de Voluntariado *</label>
@@ -594,14 +521,15 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notes" class="form-input" placeholder="Ej: Fines de semana"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
-                    <div class="right-column" id="panel-tabla-colaboradores" style="display: none;">
+                    <!-- Tabla de Cuadrillas Registradas (SIEMPRE VISIBLE AL PÚBLICO) -->
+                    <div class="right-column" id="panel-tabla-colaboradores">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
                             <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
@@ -616,9 +544,11 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -633,6 +563,7 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -691,6 +622,7 @@
                         </div>
                     </div>
 
+                    <!-- Listado Central Operativo con Filtros Especiales -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -732,6 +664,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 5: PÁGINA PREMIUM DE DONACIONES DIGITALES -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -741,6 +674,7 @@
                 </div>
 
                 <div class="donation-data-row">
+                    <!-- Soporte USD -->
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
                         <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
@@ -749,6 +683,7 @@
                         </div>
                     </div>
 
+                    <!-- Soporte Bs -->
                     <div class="donation-data-card" style="border-top: 4px solid var(--success);">
                         <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
                         <div class="donation-data-body">
@@ -770,6 +705,7 @@
         </div>
     </main>
 
+    <!-- PIE DE PÁGINA INSTITUCIONAL -->
     <footer class="site-footer">
         <div class="container">
             <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
@@ -829,7 +765,6 @@
                     
                     document.getElementById('panel-formulario-afectado').style.display = "block";
                     document.getElementById('panel-tabla-solicitudes').style.display = "block";
-                    const elPanelCol = document.getElementById('panel-tabla-colaboradores'); if(elPanelCol) elPanelCol.style.display = "block";
                     document.getElementById('dropZone').style.display = "block";
                     
                     document.getElementById('btnExportar').style.display = "inline-flex";
@@ -848,7 +783,6 @@
                 
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
-                const elPanelCol = document.getElementById('panel-tabla-colaboradores'); if(elPanelCol) elPanelCol.style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
                 
                 document.getElementById('btnExportar').style.display = "none";
@@ -1007,7 +941,7 @@
             cuerpo.innerHTML = '';
             datos.forEach(a => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = ` 
                     <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                     <td data-label="Afectado"><strong>${a.nombre}</strong></td>
                     <td data-label="Cédula">${a.cedula || '-'}</td>
@@ -1025,7 +959,7 @@
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const nuevaSolicitud = {
+            const nuevaSolicitud = { 
                 nombre: document.getElementById('ayuda_nombre').value.trim(),
                 cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
                 telefono: document.getElementById('ayuda_telefono').value.trim(),
@@ -1067,7 +1001,7 @@
             idEnEdicion = id;
             document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro";
             document.getElementById('nombre').value = reg.nombre;
-            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
+            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad; 
             document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
             document.getElementById('ubicacion').value = reg.ubicacion === '-' ? '' : reg.ubicacion;
             document.getElementById('observaciones').value = reg.observaciones === '-' ? '' : reg.observaciones;
@@ -1111,7 +1045,7 @@
                 observaciones: document.getElementById('observaciones').value.trim() || '-'
             };
 
-            if (idEnEdicion !== null) {
+            if (idEnEdicion !== null) { 
                 await supabaseClient.from('registros_ciudadanos').update(manual).eq('id', idEnEdicion);
                 cancelarEdicion();
             } else {
@@ -1169,11 +1103,11 @@
                     await cargarDatosDesdeNube();
                 } catch (err) { alert('Error.'); }
             };
-            lector.readAsArrayBuffer(file);
+            lector.readAsArrayBuffer(file); 
         });
 
         document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
-        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
+        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero); 
         document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
 
         document.getElementById('btnExportar').addEventListener('click', function() {
@@ -1191,7 +1125,7 @@
         document.getElementById('btnExportarAyuda').addEventListener('click', function() {
             let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Comunidad", "Grupo", "Situacion", "Damnificado", "Ubicacion", "Telefono", "Descripcion Requerimiento"]];
             ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.comunidad || '-', a.grupo || '-', a.estado || '-', a.damnificado || '-', a.ubicacion, a.telefono, a.descripcion_ayuda]));
-            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB");
+            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB"); 
         });
 
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
@@ -1207,7 +1141,7 @@
             }
         };
 
-        supabaseClient.channel('realtime-central-final-bloqueado').on('postgres_changes', { event: '*', schema: 'public', table: '*' }, () => cargarDatosDesdeNube()).subscribe();
+        setInterval(cargarDatosDesdeNube, 15000);
         cargarDatosDesdeNube();
     </script>
 </body>
