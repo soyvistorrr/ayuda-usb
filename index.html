@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Central de Afectados y Contingencia - USB</title>
+    <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -18,7 +19,7 @@
             --text-muted: #64748b;
             --danger: #dc2626;
             --success: #16a34a;
-            --warning: #ca8a04;
+            --warning: #ea580c;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
@@ -46,7 +47,7 @@
 
         .brand-container {
             display: flex;
-            justify-between: space-between;
+            justify-content: space-between;
             align-items: center;
             gap: 1rem;
         }
@@ -70,35 +71,13 @@
             text-transform: uppercase;
         }
 
-        /* Banner de Invitación a Voluntarios */
-        .volunteer-invite-banner {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .volunteer-invite-text strong {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--success);
-            font-size: 0.95rem;
-        }
-
-        .volunteer-invite-text p {
-            font-size: 0.85rem;
-            color: #475569;
-        }
-
-        /* Panel de Indicadores Críticos */
+        /* Panel de Indicadores Críticos (EXCLUSIVO DENTRO DE TABLERO BUSCAR) */
         .dashboard-hero {
             background-color: var(--primary);
             color: #ffffff;
             padding: 2rem 0;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
         }
 
         .hero-context p {
@@ -127,7 +106,7 @@
         .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.5rem; display: block; }
 
         /* Malla Estructural Dinámica */
-        .main-layout { padding: 2rem 0; }
+        .main-layout { padding: 1.5rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
         .grid-system.admin-columns-layout {
@@ -167,8 +146,15 @@
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
         /* Ventana Desplegable Emergente (Modal Voluntarios) */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
-        .modal-box { background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success); animation: fadeIn 0.2s ease-out; }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success);
+            animation: fadeIn 0.2s ease-out;
+        }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         /* Estructura de Tablas Nativas */
@@ -190,7 +176,7 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: #ea580c; color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -198,10 +184,10 @@
         .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
 
         /* SPA Navigation Styles */
-        .app-view { display: none; padding: 2rem 0; }
+        .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos de Tarjetas del Home */
+        /* Estilos de Tarjetas del Home (Fiel a tu captura) */
         .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
@@ -211,9 +197,7 @@
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* ==========================================================
-           CORE UI RESPONSIVO: TARJETAS INTERACTIVAS CON SCROLL VERTICAL
-           ========================================================== */
+        /* Tarjetas Táctiles Interactivas Móviles */
         @media (max-width: 1024px) {
             .grid-system.admin-columns-layout { grid-template-columns: 1fr !important; }
         }
@@ -223,7 +207,6 @@
             .volunteer-invite-banner { flex-direction: column; text-align: center; align-items: stretch; }
             .home-hero h2 { font-size: 1.75rem; }
 
-            /* Conversión de Filas en Tarjetas con Relieve 3D */
             .table-container { border: none; background: transparent; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead { display: none; }
@@ -234,17 +217,13 @@
                 border-radius: 12px; 
                 padding: 1.25rem; 
                 margin-bottom: 1.5rem; 
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.02);
-                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+                transition: all 0.25s ease;
             }
-            
-            /* Animación de feedback al presionar o pasar cursor */
             tr:hover, tr:active {
                 transform: translateY(-3px);
-                box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
-                border-color: #cbd5e1;
+                box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
             }
-            
             td { 
                 display: flex !important;
                 justify-content: space-between;
@@ -252,40 +231,28 @@
                 padding: 0.65rem 0 !important;
                 border-bottom: 1px solid var(--gray-100) !important;
                 white-space: normal; 
-                min-height: 2.25rem;
                 text-align: right;
             }
             td:last-child { border-bottom: none !important; }
-            
-            /* Inyección de etiquetas descriptivas alineadas a la izquierda */
             td::before { 
                 content: attr(data-label); 
                 font-weight: 700; 
                 color: var(--text-muted); 
                 text-transform: uppercase; 
                 font-size: 0.725rem; 
-                letter-spacing: 0.04em;
-                text-align: left;
-                flex-shrink: 0;
                 margin-right: 1rem;
+                text-align: left;
             }
-            
-            /* Modificadores estéticos para campos prioritarios */
             td[data-label="Nombre"] strong, td[data-label="Voluntario"] strong, td[data-label="Solicitante"] strong {
                 font-family: 'Montserrat', sans-serif;
                 font-size: 1.05rem;
                 color: var(--primary);
             }
-            
-            /* Contenedor adaptativo para botones de acción en la base de la tarjeta */
-            td.actions-cell, td[data-label="Acciones"] {
-                flex-direction: row;
+            td.actions-cell {
                 justify-content: flex-end;
-                gap: 0.75rem;
                 padding-top: 1rem !important;
                 margin-top: 0.5rem;
                 border-top: 1px solid var(--gray-200) !important;
-                border-bottom: none !important;
             }
             td.actions-cell::before { display: none !important; }
         }
@@ -293,12 +260,12 @@
             .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
             .form-row { grid-template-columns: 1fr; gap: 0.75rem; }
             .toolbar { flex-direction: column; align-items: stretch; }
-            .search-box { width: 100%; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -316,71 +283,11 @@
         </div>
     </div>
 
-    <div class="container" id="banner-voluntariado">
-        <div class="volunteer-invite-banner">
-            <div class="volunteer-invite-text">
-                <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
-                <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
-            </div>
-            <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme</button>
-        </div>
-    </div>
-
-    <header class="dashboard-hero" style="margin-top: 1.5rem;">
-        <div class="container hero-context">
-            <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
-            <div class="stats-bar">
-                <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
-                <div class="stat-card"><span class="stat-value" id="stat-atrapados">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
-                <div class="stat-card"><span class="stat-value" id="stat-vivos">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
-                <div class="stat-card"><span class="stat-value" id="stat-desaparecidos">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
-                <div class="stat-card"><span class="stat-value" id="stat-fallecidos">0</span><span class="stat-label">FALLECIDOS</span></div>
-            </div>
-        </div>
-    </header>
-
-    <div class="modal-overlay" id="modalVoluntario" onclick="cerrarModalVoluntarioExterno(event)">
-        <div class="modal-box">
-            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="panel-title">Inscripción de Colaborador</div>
-                <span onclick="cancelarVoluntariadoForm()" style="cursor:pointer; font-weight:700; color:var(--text-muted);">✕</span>
-            </div>
-            <div class="panel-body">
-                <form id="colaboradorForm">
-                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
-                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Vínculo con la USB *</label>
-                            <select id="colab_cargo" class="form-select" required>
-                                <option value="Estudiante">Estudiante USB</option>
-                                <option value="Profesor">Profesor USB</option>
-                                <option value="Egresado">Egresado USB</option>
-                                <option value="Administrativo">Administrativo USB</option>
-                                <option value="Obrero">Obrero USB</option>
-                                <option value="Externo">Externo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Área de Apoyo Principal *</label>
-                            <select id="colab_area" class="form-select" required>
-                                <option value="Remoción de Escombros">Remoción de Escombros</option>
-                                <option value="Recolección de Insumos">Recolección de Insumos</option>
-                                <option value="Logística y Transporte">Logística y Transporte</option>
-                                <option value="Primeros Auxilios">Primeros Auxilios</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
-                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <!-- SECCIONES NAVEGABLES DEL PORTAL SPA -->
     <main class="main-layout">
         <div class="container">
             
+            <!-- VISTA 1: HOME MENÚ CENTRAL (Limpio y libre de elementos externos) -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -414,6 +321,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -436,6 +344,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -451,8 +360,12 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar">
+                    <button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button>
+                    <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme como Colaborador</button>
+                </div>
                 <div class="grid-system" id="mallaColaboradores">
                     <div class="right-column" style="grid-column: span 2;">
                         <div class="toolbar">
@@ -461,7 +374,7 @@
                         </div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr></thead>
+                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>NOTAS</th></tr></thead>
                                 <tbody id="tablaColabCuerpo"></tbody>
                             </table>
                         </div>
@@ -469,18 +382,24 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN - AQUÍ VAN LAS ESTADÍSTICAS) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <div class="stats-bar" style="margin-bottom: 2rem;">
-                    <div class="stat-card"><span class="stat-value" id="stat-total-2">0</span><span class="stat-label">TOTAL AFECTADOS</span></div>
-                    <div class="stat-card"><span class="stat-value" id="stat-atrapados-2">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
-                    <div class="stat-card"><span class="stat-value" id="stat-vivos-2">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
-                    <div class="stat-card"><span class="stat-value" id="stat-desaparecidos-2">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
-                    <div class="stat-card"><span class="stat-value" id="stat-fallecidos-2">0</span><span class="stat-label">FALLECIDOS</span></div>
+                <!-- Panel de Indicadores Críticos (Ubicado correctamente aquí) -->
+                <div class="dashboard-hero">
+                    <div class="hero-context"><p>Sistema Integral de Registro y Monitoreo de Afectados</p></div>
+                    <div class="stats-bar">
+                        <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">TOTAL CENTRAL</span></div>
+                        <div class="stat-card"><span class="stat-value" id="stat-atrapados">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
+                        <div class="stat-card"><span class="stat-value" id="stat-vivos">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
+                        <div class="stat-card"><span class="stat-value" id="stat-desaparecidos">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
+                        <div class="stat-card"><span class="stat-value" id="stat-fallecidos">0</span><span class="stat-label">FALLECIDOS</span></div>
+                    </div>
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -539,6 +458,7 @@
                         </div>
                     </div>
 
+                    <!-- Listado Central Operativo -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -582,14 +502,13 @@
         function cancelarVoluntariadoForm() { document.getElementById('modalVoluntario').style.display = "none"; }
         function cerrarModalVoluntarioExterno(e) { if(e.target.id === "modalVoluntario") cancelarVoluntariadoForm(); }
 
-        // MOTOR RESPONSIVO SPA CON HISTORIAL NATIVO (SOPORTE BOTÓN ATRÁS DEL TELÉFONO)
+        // ENRUTADOR SPA SEGURO CON HISTORIAL COMPATIBLE CON EL BOTÓN FÍSICO ATRÁS
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
             const seccionDestino = document.getElementById(idSeccion);
             if (seccionDestino) {
                 seccionDestino.classList.add('active');
             }
-            
             if (!desdeHistorial) {
                 window.history.pushState({ vistaActiva: idSeccion }, "", "#" + idSeccion);
             }
@@ -675,7 +594,6 @@
             actualizarInterfazAyuda(ayudaNube);
         }
 
-        // MOTOR CENTRAL: COMPUTA MÉTRICAS INMUNE A CONGELAMIENTOS
         function actualizarInterfaz(datos) {
             const cuerpo = document.getElementById('tablaCuerpo');
             if (!cuerpo) return;
@@ -684,10 +602,10 @@
             datos.forEach(reg => {
                 let badgeClass = 'badge-info';
                 let est = reg.estado || 'Desaparecido';
-                if (est.startsWith('Desaparecido')) badgeClass = 'badge-warning';
-                if (est.startsWith('Con Vida')) badgeClass = 'badge-success';
-                if (est.startsWith('Atrapado')) badgeClass = 'badge-danger';
-                if (est.startsWith('Fallecido')) badgeClass = 'badge-gray';
+                if (est.trim() === 'Desaparecido') badgeClass = 'badge-warning';
+                if (est.trim() === 'Con Vida') badgeClass = 'badge-success';
+                if (est.trim() === 'Atrapado') badgeClass = 'badge-danger';
+                if (est.trim() === 'Fallecido') badgeClass = 'badge-gray';
 
                 let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
                 let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
@@ -709,25 +627,18 @@
                 cuerpo.appendChild(fila);
             });
 
-            // Procesar conteo con strings sanitizados
+            // Conteo exacto por strings
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && r.estado.trim() === 'Atrapado').length;
             let vivos = registrosNube.filter(r => r.estado && r.estado.trim() === 'Con Vida').length;
             let des = registrosNube.filter(r => r.estado && r.estado.trim() === 'Desaparecido').length;
             let fall = registrosNube.filter(r => r.estado && r.estado.trim() === 'Fallecido').length;
 
-            const mapeoContadores = {
-                'stat-total': total, 'stat-total-2': total,
-                'stat-atrapados': trap, 'stat-atrapados-2': trap,
-                'stat-vivos': vivos, 'stat-vivos-2': vivos,
-                'stat-desaparecidos': des, 'stat-desaparecidos-2': des,
-                'stat-fallecidos': fall, 'stat-fallecidos-2': fall
-            };
-
-            for (let idDom in mapeoContadores) {
-                const el = document.getElementById(idDom);
-                if (el) el.innerText = mapeoContadores[idDom];
-            }
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-atrapados').innerText = trap;
+            document.getElementById('stat-vivos').innerText = vivos;
+            document.getElementById('stat-desaparecidos').innerText = des;
+            document.getElementById('stat-fallecidos').innerText = fall;
         }
 
         function actualizarInterfazColaboradores(datos) {
@@ -741,7 +652,6 @@
                     <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                     <td data-label="Vínculo USB">${grpVoluntario}</td>
                     <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                    <td data-label="Teléfono">${enmascararTelefono(c.telefono)}</td>
                     <td data-label="Notas">${c.disponibilidad || '-'}</td>
                 `;
                 cuerpo.appendChild(fila);
@@ -828,7 +738,7 @@
                 cedula_identidad: document.getElementById('cedula_id').value.trim() || '-',
                 telefono: document.getElementById('telefono_id').value.trim() || '-',
                 cedula: document.getElementById('comunidad').value === "Universidad Simón Bolívar" ? "USB" : "EXT",
-                edad: document.getElementById('grupo').value === "Profesor" ? "PROF" : (document.getElementById('grupo').value === "Egresado" ? "EGR" : (document.getElementById('grupo').value === "Administrativo" ? "ADM" : (document.getElementById('grupo').value === "Obrero" ? "OBR" : (document.getElementById('grupo').value === "Externo" ? "EXT" : "EST")))),
+                edad: document.getElementById('grupo').value,
                 estado: document.getElementById('estado').value,
                 damnificado: document.getElementById('es_damnificado').value,
                 ubicacion: document.getElementById('ubicacion').value.trim() || '-',
@@ -921,7 +831,7 @@
         }
 
         window.eliminarFila = async function(id) {
-            if(confirm('¿Eliminar registro permanente de la nube?')) {
+            if(confirm('¿Eliminar registro permanente?')) {
                 await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
                 await cargarDatosDesdeNube();
             }
@@ -936,4 +846,4 @@
         cargarDatosDesdeNube();
     </script>
 </body>
-</html>\
+</html>
