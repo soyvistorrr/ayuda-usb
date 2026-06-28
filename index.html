@@ -6,6 +6,7 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -18,7 +19,7 @@
             --text-muted: #64748b;
             --danger: #dc2626;
             --success: #16a34a;
-            --warning: #ea580c;
+            --warning: #ca8a04;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
@@ -70,30 +71,6 @@
             text-transform: uppercase;
         }
 
-        /* Banner de Invitación a Voluntarios */
-        .volunteer-invite-banner {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .volunteer-invite-text strong {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--success);
-            font-size: 0.95rem;
-        }
-
-        .volunteer-invite-text p {
-            font-size: 0.85rem;
-            color: #475569;
-        }
-
         /* Panel de Indicadores Críticos */
         .dashboard-hero {
             background-color: var(--primary);
@@ -132,7 +109,7 @@
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        .grid-system.admin-columns-layout {
+        .grid-system.grid-2-columns {
             grid-template-columns: 380px 1fr;
         }
 
@@ -165,15 +142,10 @@
         }
         .import-zone:hover { border-color: var(--primary); background-color: #fffbeb; }
         .toolbar { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
-        .search-box { position: relative; flex: 1; min-width: 280px; }
+        .search-box { position: relative; flex: 1; min-width: 240px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Ventana Desplegable Emergente (Modal Voluntarios) */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
-        .modal-box { background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success); animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* Estructura de Tablas Nativas */
+        /* Componentes de Tabla */
         .table-container { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--gray-200); background: #ffffff; margin-bottom: 2rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
         thead { background: var(--primary); color: #ffffff; }
@@ -192,18 +164,18 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning { background: #ea580c; color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
         .btn-edit-table { background: var(--gray-100); color: var(--primary); border: 1px solid var(--gray-300); padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
         .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
 
-        /* SPA Navigation Styles */
+        /* SPA Layout View Config */
         .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos del Home */
+        /* Estilos del Menú de Entrada Home */
         .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
@@ -213,14 +185,10 @@
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* Conversión de Filas en Tarjetas Táctiles 3D Móviles */
-        @media (max-width: 1024px) {
-            .grid-system.admin-columns-layout { grid-template-columns: 1fr !important; }
-        }
+        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
-            .volunteer-invite-banner { flex-direction: column; text-align: center; align-items: stretch; }
             .home-hero h2 { font-size: 1.75rem; }
 
             .table-container { border: none; background: transparent; }
@@ -272,15 +240,11 @@
             }
             td.actions-cell::before { display: none !important; }
         }
-        @media (max-width: 540px) {
-            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-            .form-row { grid-template-columns: 1fr; gap: 0.75rem; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-        }
     </style>
 </head>
 <body>
 
+    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -298,9 +262,11 @@
         </div>
     </div>
 
+    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
+            <!-- VISTA 1: HOME MENÚ CENTRAL (Fiel a tus capturas) -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -334,6 +300,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -349,13 +316,14 @@
                                         <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
                                     </div>
                                     <div class="form-group"><label class="form-label">Ubicación Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Ej: Res. Los Corales, Torre A"></div>
-                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, rescate por escombros..."></textarea></div>
+                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, rescate..."></textarea></div>
                                     <button type="submit" class="btn btn-warning btn-block">Enviar Requerimiento</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -371,26 +339,57 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR - FORMULARIO ESTABLECIDO DIRECTO) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <div class="volunteer-invite-banner" id="banner-voluntariado">
-                    <div class="volunteer-invite-text">
-                        <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
-                        <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
+                <div class="grid-system grid-2-columns" id="mallaColaboradores">
+                    <!-- Formulario Directo en la Página -->
+                    <div class="left-column">
+                        <div class="panel-card" style="border-top: 4px solid var(--success);">
+                            <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
+                            <div class="panel-body">
+                                <form id="colaboradorForm">
+                                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
+                                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Vínculo con la USB *</label>
+                                            <select id="colab_cargo" class="form-select" required>
+                                                <option value="Estudiante">Estudiante USB</option>
+                                                <option value="Profesor">Profesor USB</option>
+                                                <option value="Egresado">Egresado USB</option>
+                                                <option value="Administrativo">Administrativo USB</option>
+                                                <option value="Obrero">Obrero USB</option>
+                                                <option value="Externo">Externo</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Área de Apoyo Principal *</label>
+                                            <select id="colab_area" class="form-select" required>
+                                                <option value="Remoción de Escombros">Remoción de Escombros</option>
+                                                <option value="Recolección de Insumos">Recolección de Insumos</option>
+                                                <option value="Logística y Transporte">Logística y Transporte</option>
+                                                <option value="Primeros Auxilios">Primeros Auxilios</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme como Colaborador</button>
-                </div>
 
-                <div class="grid-system" id="mallaColaboradores">
-                    <div class="right-column" style="grid-column: span 2;">
+                    <!-- Tabla de Cuadrillas Registradas -->
+                    <div class="right-column">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
                             <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
                         </div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th class="admin-action-header" style="display: none;">TELÉFONO</th><th>NOTAS</th></tr></thead>
+                                <thead id="theadColab"></thead>
                                 <tbody id="tablaColabCuerpo"></tbody>
                             </table>
                         </div>
@@ -398,9 +397,11 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN - AQUÍ VAN FILTROS Y CONTADORES) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -415,6 +416,7 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -473,6 +475,7 @@
                         </div>
                     </div>
 
+                    <!-- Listado Central Operativo con Filtros Completos -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -480,7 +483,27 @@
                         </div>
                         
                         <div class="toolbar">
-                            <div class="search-box"><input type="text" id="buscarInput" placeholder="Filtrar por nombre de afectado..."></div>
+                            <div class="search-box"><input type="text" id="buscarInput" placeholder="Filtrar por nombre..."></div>
+                            
+                            <!-- FILTROS RESTABLECIDOS DE SINOPSIS -->
+                            <select id="filtroEstado" class="form-select" style="width: auto; min-width: 160px;">
+                                <option value="Todos">Todas las Situaciones</option>
+                                <option value="Desaparecido">Desaparecido / Sin Info</option>
+                                <option value="Con Vida">Con Vida / Bien</option>
+                                <option value="Atrapado">Atrapado / Emergencia</option>
+                                <option value="Fallecido">Fallecido</option>
+                            </select>
+                            
+                            <select id="filtroGrupo" class="form-select" style="width: auto; min-width: 160px;">
+                                <option value="Todos">Todos los Grupos</option>
+                                <option value="Estudiante">Estudiantes</option>
+                                <option value="Profesor">Profesores</option>
+                                <option value="Egresado">Egresados</option>
+                                <option value="Administrativo">Administrativos</option>
+                                <option value="Obrero">Obreros</option>
+                                <option value="Externo">Externos</option>
+                            </select>
+
                             <button id="btnExportar" class="btn btn-success" style="display: none;">Descargar Excel Afectados</button>
                         </div>
                         <div class="table-container">
@@ -498,45 +521,6 @@
         </div>
     </main>
 
-    <div class="modal-overlay" id="modalVoluntario" onclick="cerrarModalVoluntarioExterno(event)">
-        <div class="modal-box">
-            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="panel-title">Inscripción de Colaborador</div>
-                <span onclick="cancelarVoluntariadoForm()" style="cursor:pointer; font-weight:700; color:var(--text-muted);">✕</span>
-            </div>
-            <div class="panel-body">
-                <form id="colaboradorForm">
-                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
-                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Vínculo con la USB *</label>
-                            <select id="colab_cargo" class="form-select" required>
-                                <option value="Estudiante">Estudiante USB</option>
-                                <option value="Profesor">Profesor USB</option>
-                                <option value="Egresado">Egresado USB</option>
-                                <option value="Administrativo">Administrativo USB</option>
-                                <option value="Obrero">Obrero USB</option>
-                                <option value="Externo">Externo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Área de Apoyo Principal *</label>
-                            <select id="colab_area" class="form-select" required>
-                                <option value="Remoción de Escombros">Remoción de Escombros</option>
-                                <option value="Recolección de Insumos">Recolección de Insumos</option>
-                                <option value="Logística y Transporte">Logística y Transporte</option>
-                                <option value="Primeros Auxilios">Primeros Auxilios</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
-                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const SUPABASE_KEY = "sb_publishable_ECurpyGW8jSgTMe30r89xA_o-WRwADV";
@@ -551,13 +535,11 @@
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
 
-        // FUNCIONES COMPATIBLES CON HISTORIAL DEL NAVEGADOR (BOTÓN FÍSICO ATRÁS)
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
             const seccionDestino = document.getElementById(idSeccion);
-            if (seccionDestino) {
-                seccionDestino.classList.add('active');
-            }
+            if (seccionDestino) seccionDestino.classList.add('active');
+            
             if (!desdeHistorial) {
                 window.history.pushState({ vistaActiva: idSeccion }, "", "#" + idSeccion);
             }
@@ -574,7 +556,6 @@
 
         window.history.replaceState({ vistaActiva: 'view-home' }, "", "#view-home");
 
-        // GESTIÓN SEGURA DE VISIBILIDAD DE COMPONENTES
         function conmutarAccesoSeguro() {
             const malla = document.getElementById('mallaPrincipal');
             const mallaAyuda = document.getElementById('mallaAyuda');
@@ -587,14 +568,13 @@
                     
                     if (malla) malla.classList.add('admin-columns-layout');
                     if (mallaAyuda) mallaAyuda.classList.add('admin-columns-layout');
+                    document.getElementById('panel-formulario-afectado').style.display = "block";
+                    document.getElementById('panel-tabla-solicitudes').style.display = "block";
+                    document.getElementById('dropZone').style.display = "block";
                     
-                    const elForm = document.getElementById('panel-formulario-afectado'); if(elForm) elForm.style.display = "block";
-                    const elTablaSol = document.getElementById('panel-tabla-solicitudes'); if(elTablaSol) elTablaSol.style.display = "block";
-                    const elDrop = document.getElementById('dropZone'); if(elDrop) elDrop.style.display = "block";
-                    
-                    const ex1 = document.getElementById('btnExportar'); if(ex1) ex1.style.display = "inline-flex";
-                    const ex2 = document.getElementById('btnExportarColab'); if(ex2) ex2.style.display = "inline-flex";
-                    const ex3 = document.getElementById('btnExportarAyuda'); if(ex3) ex3.style.display = "inline-flex";
+                    document.getElementById('btnExportar').style.display = "inline-flex";
+                    document.getElementById('btnExportarColab').style.display = "inline-flex";
+                    document.getElementById('btnExportarAyuda').style.display = "inline-flex";
 
                     document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
                 } else { alert("Clave incorrecta. Acceso denegado."); }
@@ -604,19 +584,18 @@
                 
                 if (malla) malla.classList.remove('admin-columns-layout');
                 if (mallaAyuda) mallaAyuda.classList.remove('admin-columns-layout');
+                document.getElementById('panel-formulario-afectado').style.display = "none";
+                document.getElementById('panel-tabla-solicitudes').style.display = "none";
+                document.getElementById('dropZone').style.display = "none";
                 
-                const elForm = document.getElementById('panel-formulario-afectado'); if(elForm) elForm.style.display = "none";
-                const elTablaSol = document.getElementById('panel-tabla-solicitudes'); if(elTablaSol) elTablaSol.style.display = "none";
-                const elDrop = document.getElementById('dropZone'); if(elDrop) elDrop.style.display = "none";
-                
-                const ex1 = document.getElementById('btnExportar'); if(ex1) ex1.style.display = "none";
-                const ex2 = document.getElementById('btnExportarColab'); if(ex2) ex2.style.display = "none";
-                const ex3 = document.getElementById('btnExportarAyuda'); if(ex3) ex3.style.display = "none";
+                document.getElementById('btnExportar').style.display = "none";
+                document.getElementById('btnExportarColab').style.display = "none";
+                document.getElementById('btnExportarAyuda').style.display = "none";
 
                 document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "none");
                 cancelarEdicion();
             }
-            actualizarInterfaz(registrosNube);
+            filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
             actualizarInterfazAyuda(ayudaNube);
         }
@@ -638,22 +617,48 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Sincronizando tablas."); }
+            } catch(e) { console.log("Tablas preparándose."); }
 
-            actualizarInterfaz(registrosNube);
+            filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
             actualizarInterfazAyuda(ayudaNube);
         }
 
-        function actualizarInterfaz(datos) {
+        function filtrarYActualizarTablero() {
+            const texto = document.getElementById('buscarInput').value.toLowerCase();
+            const filterEst = document.getElementById('filtroEstado').value;
+            const filterGrp = document.getElementById('filtroGrupo').value;
+
+            let registrosFiltrados = registrosNube.filter(r => {
+                const cumpleTexto = r.nombre.toLowerCase().includes(texto);
+                
+                let estStr = String(r.estado || 'Desaparecido').toLowerCase();
+                let cumpleEst = true;
+                if (filterEst !== 'Todos') {
+                    if (filterEst === 'Desaparecido') cumpleEst = estStr.includes('desaparecido') || estStr.includes('informacion') || estStr.includes('información');
+                    if (filterEst === 'Con Vida') cumpleEst = estStr.includes('vida') || estStr.includes('bien');
+                    if (filterEst === 'Atrapado') cumpleEst = estStr.includes('atrapado');
+                    if (filterEst === 'Fallecido') cumpleEst = estStr.includes('fallecido');
+                }
+
+                let grpStr = mapaGrupo[String(r.edad).trim().toLowerCase()] || r.edad || 'Estudiante';
+                let cumpleGrp = (filterGrp === 'Todos') || (grpStr.toLowerCase() === filterGrp.toLowerCase());
+
+                return cumpleTexto && cumpleEst && cumpleGrp;
+            });
+
+            actualizarInterfazTablero(registrosFiltrados);
+        }
+
+        function actualizarInterfazTablero(datosFiltrados) {
             const cuerpo = document.getElementById('tablaCuerpo');
             if (!cuerpo) return;
             cuerpo.innerHTML = '';
             
-            datos.forEach(reg => {
+            datosFiltrados.forEach(reg => {
                 let badgeClass = 'badge-info';
                 let est = String(reg.estado || 'Desaparecido').trim();
-                if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('información') || est.toLowerCase().includes('informacion')) badgeClass = 'badge-warning';
+                if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('informacion') || est.toLowerCase().includes('información')) badgeClass = 'badge-warning';
                 if (est.toLowerCase().includes('vida') || est.toLowerCase().includes('bien')) badgeClass = 'badge-success';
                 if (est.toLowerCase().includes('atrapado')) badgeClass = 'badge-danger';
                 if (est.toLowerCase().includes('fallecido')) badgeClass = 'badge-gray';
@@ -678,6 +683,7 @@
                 cuerpo.appendChild(fila);
             });
 
+            // Conteo global inmune a filtros
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('atrapado')).length;
             let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien'))).length;
@@ -692,19 +698,38 @@
         }
 
         function actualizarInterfazColaboradores(datos) {
+            const thead = document.getElementById('theadColab');
             const cuerpo = document.getElementById('tablaColabCuerpo');
-            if (!cuerpo) return;
+            if (!thead || !cuerpo) return;
+
+            // Renderizado condicional de cabecera seguro contra fallos responsivos
+            if (esAdministrador) {
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
+            } else {
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>NOTAS</th></tr>`;
+            }
+
             cuerpo.innerHTML = '';
             datos.forEach(c => {
                 const fila = document.createElement('tr');
                 let grpVoluntario = mapaGrupo[String(c.cargo_usb).trim().toLowerCase()] || c.cargo_usb || 'Estudiante';
-                fila.innerHTML = `
-                    <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
-                    <td data-label="Vínculo USB">${grpVoluntario}</td>
-                    <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                    <td class="admin-action-header" data-label="Teléfono" style="${esAdministrador ? 'display: table-cell;' : 'display: none;'}">${c.telefono || '-'}</td>
-                    <td data-label="Notas">${c.disponibilidad || '-'}</td>
-                `;
+                
+                if (esAdministrador) {
+                    fila.innerHTML = `
+                        <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
+                        <td data-label="Vínculo USB">${grpVoluntario}</td>
+                        <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="Teléfono">${c.telefono || '-'}</td>
+                        <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                    `;
+                } else {
+                    fila.innerHTML = `
+                        <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
+                        <td data-label="Vínculo USB">${grpVoluntario}</td>
+                        <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                    `;
+                }
                 cuerpo.appendChild(fila);
             });
         }
@@ -752,8 +777,7 @@
                 disponibilidad: document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
-            alert("¡Registro Completado! Gracias por sumarte.");
-            cancelarVoluntariadoForm();
+            alert("¡Registro Completado! Gracias por unirte a las brigadas.");
             document.getElementById('colaboradorForm').reset();
             await cargarDatosDesdeNube();
         });
@@ -869,6 +893,11 @@
             lector.readAsArrayBuffer(file);
         });
 
+        // Eventos vinculados a la matriz de filtros
+        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
+        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
+        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
+
         document.getElementById('btnExportar').addEventListener('click', function() {
             let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
             registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.damnificado || 'No sé', r.ubicacion, r.telefono, r.observaciones]));
@@ -899,11 +928,6 @@
                 await cargarDatosDesdeNube();
             }
         };
-
-        document.getElementById('buscarInput').addEventListener('input', function(e) {
-            const t = e.target.value.toLowerCase();
-            actualizarInterfaz(registrosNube.filter(r => r.nombre.toLowerCase().includes(t)));
-        });
 
         supabaseClient.channel('realtime-central-final-bloqueado').on('postgres_changes', { event: '*', schema: 'public', table: '*' }, () => cargarDatosDesdeNube()).subscribe();
         cargarDatosDesdeNube();
