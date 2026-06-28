@@ -6,7 +6,6 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -110,7 +109,7 @@
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        /* Modificador Admin: Aplica las columnas simétricas fluidas sin desbordes */
+        /* Modificador Admin: Activa las dos columnas en logeo seguro */
         .grid-system.admin-columns-layout {
             grid-template-columns: 380px 1fr;
         }
@@ -151,7 +150,7 @@
         .search-box { position: relative; flex: 1; min-width: 240px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Contenedor de Control con Desplazamiento Dinámico Horizontal/Vertical */
+        /* Contenedor de Control: SCROLL DINÁMICO VERTICAL Y HORIZONTAL */
         .table-container { 
             overflow: auto; 
             max-height: 580px; 
@@ -192,7 +191,7 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: #ea580c; color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -291,7 +290,6 @@
 </head>
 <body>
 
-    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -309,18 +307,15 @@
         </div>
     </div>
 
-    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
-            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
                     <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
-                <!-- PUNTO USB DE RECEPCIÓN FÍSICO DESTACADO -->
                 <div class="acopio-banner-card">
                     <h4>📍 Punto USB para recepción de donativos físicos</h4>
                     <div class="acopio-details">
@@ -371,7 +366,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -440,7 +434,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -456,71 +449,68 @@
                 </div>
             </section>
 
-            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
                 <div class="grid-system" id="mallaColaboradores">
-                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
-                            <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
-                            <div class="panel-body">
-                                <form id="colaboradorForm">
-                                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
-                                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Vínculo con la USB *</label>
-                                            <select id="colab_cargo" class="form-select" required>
-                                                <option value="Estudiante">Estudiante USB</option>
-                                                <option value="Profesor">Profesor USB</option>
-                                                <option value="Egresado">Egresado USB</option>
-                                                <option value="Administrativo">Administrativo USB</option>
-                                                <option value="Obrero">Obrero USB</option>
-                                                <option value="Externo">Externo</option>
-                                            </select>
+                            <div class="panel-card">
+                                <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
+                                <div class="panel-body">
+                                    <form id="colaboradorForm">
+                                        <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
+                                        <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">Vínculo con la USB *</label>
+                                                <select id="colab_cargo" class="form-select" required>
+                                                    <option value="Estudiante">Estudiante USB</option>
+                                                    <option value="Profesor">Profesor USB</option>
+                                                    <option value="Egresado">Egresado USB</option>
+                                                    <option value="Administrativo">Administrativo USB</option>
+                                                    <option value="Obrero">Obrero USB</option>
+                                                    <option value="Externo">Externo</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Área de Apoyo Principal *</label>
+                                                <select id="colab_area" class="form-select" required>
+                                                    <option value="Remoción de Escombros">Remoción de Escombros</option>
+                                                    <option value="Recolección de Insumos">Recolección de Insumos</option>
+                                                    <option value="Logística y Transporte">Logística y Transporte</option>
+                                                    <option value="Primeros Auxilios">Primeros Auxilios</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Área de Apoyo Principal *</label>
-                                            <select id="colab_area" class="form-select" required>
-                                                <option value="Remoción de Escombros">Remoción de Escombros</option>
-                                                <option value="Recolección de Insumos">Recolección de Insumos</option>
-                                                <option value="Logística y Transporte">Logística y Transporte</option>
-                                                <option value="Primeros Auxilios">Primeros Auxilios</option>
-                                            </select>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">Lugar de Operación Destinado *</label>
+                                                <select id="colab_lugar" class="form-select" required>
+                                                    <option value="Punto de Acopio USB">Punto de Acopio USB</option>
+                                                    <option value="Otro lado">Otro lado (Especificar abajo)</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Disponibilidad de Vehículo *</label>
+                                                <select id="colab_vehiculo" class="form-select" required>
+                                                    <option value="No">No poseo vehículo</option>
+                                                    <option value="Moto">Moto</option>
+                                                    <option value="Carro / Sedán">Carro / Sedán</option>
+                                                    <option value="Camioneta / Carga">Camioneta / Carga</option>
+                                                    <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- NUEVAS COLUMNAS ADICIONALES INTEGRADAS -->
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Lugar de Voluntariado *</label>
-                                            <select id="colab_lugar" class="form-select" required>
-                                                <option value="Punto de Acopio USB">Punto de Acopio USB</option>
-                                                <option value="Otro Lugar">Otro Lugar (Especificar en observaciones)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">¿Dispone de Vehículo para Apoyo? *</label>
-                                            <select id="colab_vehiculo" class="form-select" required>
-                                                <option value="No">No poseo vehículo</option>
-                                                <option value="Carro">Sí (Carro)</option>
-                                                <option value="Moto">Sí (Moto)</option>
-                                                <option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
-                                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
-                                </form>
+                                        <div class="form-group"><label class="form-label">Notas Adicionales / Especificar si marcó otro lugar</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana / Apoyo en zona centro"></div>
+                                        <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Cuadrillas Registradas -->
-                    <div class="right-column">
+                    <div class="right-column" id="panel-tabla-colaboradores" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
                             <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
@@ -535,11 +525,9 @@
                 </div>
             </section>
 
-            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -554,7 +542,6 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
-                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -613,7 +600,6 @@
                         </div>
                     </div>
 
-                    <!-- Listado Central Operativo con Filtros Especiales -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -655,7 +641,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 5: PÁGINA PREMIUM DE DONACIONES DIGITALES -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -665,7 +650,6 @@
                 </div>
 
                 <div class="donation-data-row">
-                    <!-- Soporte USD -->
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
                         <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
@@ -674,7 +658,6 @@
                         </div>
                     </div>
 
-                    <!-- Soporte Bs -->
                     <div class="donation-data-card" style="border-top: 4px solid var(--success);">
                         <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
                         <div class="donation-data-body">
@@ -695,14 +678,6 @@
 
         </div>
     </main>
-
-    <!-- PIE DE PÁGINA INSTITUCIONAL -->
-    <footer class="site-footer">
-        <div class="container">
-            <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
-            <p>Para más información, puedes escribirnos por WhatsApp al <a href="https://wa.me/584129267897" target="_blank">+58-412-9267897</a> o seguirnos en Instagram a través de <a href="https://instagram.com/aeusb" target="_blank">@aeusb</a>.</p>
-        </div>
-    </footer>
 
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
@@ -756,6 +731,7 @@
                     
                     document.getElementById('panel-formulario-afectado').style.display = "block";
                     document.getElementById('panel-tabla-solicitudes').style.display = "block";
+                    const elPanelCol = document.getElementById('panel-tabla-colaboradores'); if(elPanelCol) elPanelCol.style.display = "block";
                     document.getElementById('dropZone').style.display = "block";
                     
                     document.getElementById('btnExportar').style.display = "inline-flex";
@@ -774,6 +750,7 @@
                 
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
+                const elPanelCol = document.getElementById('panel-tabla-colaboradores'); if(elPanelCol) elPanelCol.style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
                 
                 document.getElementById('btnExportar').style.display = "none";
@@ -805,7 +782,7 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Tablas preparadas."); }
+            } catch(e) { console.log("Tablas asíncronas cargadas."); }
 
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -978,7 +955,7 @@
                 area_apoyo: document.getElementById('colab_area').value,
                 lugar_voluntariado: document.getElementById('colab_lugar').value,
                 vehiculo: document.getElementById('colab_vehiculo').value,
-                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
+                disponibilidad: document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
             alert("¡Registro Completado! Gracias por sumarte.");
@@ -1096,10 +1073,6 @@
             };
             lector.readAsArrayBuffer(file);
         });
-
-        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
-        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
-        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
 
         document.getElementById('btnExportar').addEventListener('click', function() {
             let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
