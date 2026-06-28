@@ -6,7 +6,6 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -19,7 +18,7 @@
             --text-muted: #64748b;
             --danger: #dc2626;
             --success: #16a34a;
-            --warning: #ea580c;
+            --warning: #ca8a04;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
@@ -169,59 +168,34 @@
         .search-box { position: relative; flex: 1; min-width: 280px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Ventana Desplegable Emergente (Modal Voluntarios) */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
-        .modal-box { background: #ffffff; border-radius: 0.5rem; width: 460px; max-width: 92%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 5px solid var(--success); animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* Estructura de Tablas Nativas */
-        .table-container { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--gray-200); background: #ffffff; margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
-        thead { background: var(--primary); color: #ffffff; }
-        th { padding: 0.875rem 1.25rem; font-weight: 600; color: #ffffff; border-bottom: 1px solid var(--gray-200); font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
-        tbody tr:hover { background-color: var(--gray-100); }
-
+        /* Badges e Interface */
         .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .badge-danger { background: #fef2f2; color: var(--danger); }
         .badge-success { background: #f0fdf4; color: var(--success); }
         .badge-warning { background: #fffbeb; color: var(--warning); }
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
-        /* Botonera */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; letter-spacing: 0.02em; }
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning { background: #ea580c; color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
         .btn-edit-table { background: var(--gray-100); color: var(--primary); border: 1px solid var(--gray-300); padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
         .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
 
-        /* SPA Navigation Styles */
         .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos del Home (Fiel a tu captura) */
-        .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
-        .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
-        .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
-        .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-        .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 2rem; text-align: center; transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
-        .action-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
-        .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
-
-        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
+        /* Malla de Tarjetas Táctiles 3D Móviles */
         @media (max-width: 1024px) {
             .grid-system.admin-columns-layout { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
-            .volunteer-invite-banner { flex-direction: column; text-align: center; align-items: stretch; }
             .home-hero h2 { font-size: 1.75rem; }
 
             .table-container { border: none; background: transparent; }
@@ -273,16 +247,10 @@
             }
             td.actions-cell::before { display: none !important; }
         }
-        @media (max-width: 540px) {
-            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-            .form-row { grid-template-columns: 1fr; gap: 0.75rem; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -300,11 +268,9 @@
         </div>
     </div>
 
-    <!-- SECCIONES NAVEGABLES DEL PORTAL SPA -->
     <main class="main-layout">
         <div class="container">
             
-            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -338,7 +304,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -361,7 +326,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -377,12 +341,12 @@
                 </div>
             </section>
 
-            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar">
+                    <button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button>
+                </div>
                 
-                <!-- Banner de Registro Interno -->
-                <div class="volunteer-invite-banner">
+                <div class="volunteer-invite-banner" id="banner-voluntariado">
                     <div class="volunteer-invite-text">
                         <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
                         <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
@@ -398,7 +362,7 @@
                         </div>
                         <div class="table-container">
                             <table>
-                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th class="admin-action-header" style="display: none;">TELÉFONO</th><th>NOTAS</th></tr></thead>
+                                <thead><tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr></thead>
                                 <tbody id="tablaColabCuerpo"></tbody>
                             </table>
                         </div>
@@ -406,11 +370,9 @@
                 </div>
             </section>
 
-            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- Panel de Indicadores Críticos (Exclusivo de esta sección) -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -425,7 +387,6 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
-                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -466,7 +427,6 @@
                                                 <option value="Fallecido">Fallecido</option>
                                             </select>
                                         </div>
-                                        <!-- CAMPO OFICIAL: Clasificación de Damnificados -->
                                         <div class="form-group">
                                             <label class="form-label">¿Es Damnificado? *</label>
                                             <select id="es_damnificado" class="form-select" required>
@@ -485,7 +445,6 @@
                         </div>
                     </div>
 
-                    <!-- Listado Central Operativo -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -621,7 +580,7 @@
             actualizarInterfazAyuda(ayudaNube);
         }
 
-        // MOTOR CENTRAL: COMPUTA MÉTRICAS INMUNE A CONGELAMIENTOS
+        // MOTOR CENTRAL: COMPUTA MÉTRICAS POR CONTENIDO PARCIAL (PREVIENE FALLOS POR EMOJIS)
         function actualizarInterfaz(datos) {
             const cuerpo = document.getElementById('tablaCuerpo');
             if (!cuerpo) return;
@@ -630,10 +589,10 @@
             datos.forEach(reg => {
                 let badgeClass = 'badge-info';
                 let est = String(reg.estado || 'Desaparecido').trim();
-                if (est.includes('Desaparecido')) badgeClass = 'badge-warning';
-                if (est.includes('Con Vida') || est.includes('Bien')) badgeClass = 'badge-success';
-                if (est.includes('Atrapado')) badgeClass = 'badge-danger';
-                if (est.includes('Fallecido')) badgeClass = 'badge-gray';
+                if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('información') || est.toLowerCase().includes('informacion')) badgeClass = 'badge-warning';
+                if (est.toLowerCase().includes('vida') || est.toLowerCase().includes('bien')) badgeClass = 'badge-success';
+                if (est.toLowerCase().includes('atrapado')) badgeClass = 'badge-danger';
+                if (est.toLowerCase().includes('fallecido')) badgeClass = 'badge-gray';
 
                 let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
                 let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
@@ -655,11 +614,11 @@
                 cuerpo.appendChild(fila);
             });
 
-            // Conteo flexible defensivo contra emojis o caracteres extraños
+            // Conteo flexible tolerante a emojis
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('atrapado')).length;
             let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien'))).length;
-            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion'))).length;
+            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información'))).length;
             let fall = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('fallecido')).length;
 
             const elTotal = document.getElementById('stat-total'); if (elTotal) elTotal.innerText = total;
@@ -680,7 +639,7 @@
                     <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                     <td data-label="Vínculo USB">${grpVoluntario}</td>
                     <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                    <td class="admin-action-header" data-label="Teléfono" style="${esAdministrador ? 'display: table-cell;' : 'display: none;'}">${c.telefono || '-'}</td>
+                    <td data-label="Teléfono">${enmascararTelefono(c.telefono)}</td>
                     <td data-label="Notas">${c.disponibilidad || '-'}</td>
                 `;
                 cuerpo.appendChild(fila);
@@ -727,7 +686,7 @@
                 telefono: document.getElementById('colab_telefono').value.trim(),
                 cargo_usb: document.getElementById('colab_cargo').value,
                 area_apoyo: document.getElementById('colab_area').value,
-                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
+                disponibilidad: document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
             alert("¡Registro Completado! Gracias por sumarte.");
@@ -749,6 +708,18 @@
             document.getElementById('estado').value = reg.estado;
             document.getElementById('es_damnificado').value = reg.damnificado || 'No';
             
+            let cKey = String(reg.cedula).trim().toLowerCase();
+            document.getElementById('comunidad').value = (cKey === 'usb' || cKey.includes('simon')) ? "Universidad Simón Bolívar" : "Externo";
+            
+            let gKey = String(reg.edad).trim().toLowerCase();
+            let grupoMapeado = "Estudiante";
+            if(gKey.includes('prof')) grupoMapeado = "Profesor";
+            if(gKey.includes('egr')) grupoMapeado = "Egresado";
+            if(gKey.includes('adm')) grupoMapeado = "Administrativo";
+            if(gKey.includes('obr')) grupoMapeado = "Obrero";
+            if(gKey.includes('ext')) grupoMapeado = "Externo";
+            document.getElementById('grupo').value = grupoMapeado;
+
             document.getElementById('btn-submit-form').innerText = "Actualizar en la Nube";
             document.getElementById('cancel-edit-container').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicion()">Cancelar</button>`;
         };
@@ -767,7 +738,7 @@
                 cedula_identidad: document.getElementById('cedula_id').value.trim() || '-',
                 telefono: document.getElementById('telefono_id').value.trim() || '-',
                 cedula: document.getElementById('comunidad').value === "Universidad Simón Bolívar" ? "USB" : "EXT",
-                edad: document.getElementById('grupo').value === "Profesor" ? "PROF" : (document.getElementById('grupo').value === "Egresado" ? "EGR" : (document.getElementById('grupo').value === "Administrativo" ? "ADM" : (document.getElementById('grupo').value === "Obrero" ? "OBR" : (document.getElementById('grupo').value === "Externo" ? "EXT" : "EST")))),
+                edad: document.getElementById('grupo').value,
                 estado: document.getElementById('estado').value,
                 damnificado: document.getElementById('es_damnificado').value,
                 ubicacion: document.getElementById('ubicacion').value.trim() || '-',
@@ -860,7 +831,7 @@
         }
 
         window.eliminarFila = async function(id) {
-            if(confirm('¿Eliminar registro de la nube permanentemente?')) {
+            if(confirm('¿Eliminar registro permanente?')) {
                 await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
                 await cargarDatosDesdeNube();
             }
