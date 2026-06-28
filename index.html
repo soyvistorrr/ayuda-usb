@@ -1128,6 +1128,7 @@
             descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB"); 
         });
 
+        
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
             const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
             XLSX.utils.book_append_sheet(wb, ws, "Datos");
