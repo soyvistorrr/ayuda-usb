@@ -24,6 +24,7 @@
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
             --gray-700: #334155;
+            --slate-800: #1e293b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -109,7 +110,7 @@
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        .grid-system.admin-columns-layout {
+        .grid-system.grid-2-columns {
             grid-template-columns: 380px 1fr;
         }
 
@@ -190,7 +191,7 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: #ea580c; color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -200,37 +201,46 @@
         .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos del Módulo Contingencia Home */
+        /* Estilos del Menú del Home */
         .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 2rem; }
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
         
-        .info-contingencia-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .info-contingencia-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .info-contingencia-card h4 { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
-        
-        .info-contingencia-list { list-style: none; padding-left: 0; font-size: 0.875rem; color: var(--gray-700); }
-        .info-contingencia-list li { margin-bottom: 0.4rem; position: relative; padding-left: 1.25rem; }
-        .info-contingencia-list li::before { content: "•"; position: absolute; left: 0; color: var(--warning); font-weight: bold; }
-        
-        .donation-modal-content h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 0.95rem; margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--primary); border-left: 3px solid var(--accent); padding-left: 0.5rem; }
-        .donation-modal-content p { font-size: 0.875rem; color: var(--gray-700); line-height: 1.5; }
-        .donation-link { color: #0284c7; text-decoration: none; font-weight: 600; word-break: break-all; }
-        .donation-link:hover { text-decoration: underline; }
+        /* Banner de Acopio de Insumos Físicos */
+        .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-left: 5px solid var(--success); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .acopio-banner-card h4 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .acopio-details { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 0.75rem; font-size: 0.875rem; background: var(--gray-100); padding: 0.75rem; border-radius: 4px; }
+        .acopio-list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; list-style: none; font-size: 0.85rem; color: var(--gray-700); }
+        .acopio-list-grid li { position: relative; padding-left: 1.25rem; }
+        .acopio-list-grid li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: bold; }
 
-        .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 1rem; }
+        /* Rejilla de Navegación 2x2 Balanceada */
+        .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
         .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 2rem; text-align: center; transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
         .action-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* Pie de Página Institucional */
+        /* Vista de Donación Premium Estilizada */
+        .donation-hero-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 3rem 2rem; border-radius: 0.5rem; text-align: center; margin-bottom: 2.5rem; border-bottom: 4px solid var(--success); }
+        .donation-hero-banner h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); margin-bottom: 0.75rem; text-transform: uppercase; }
+        .donation-hero-banner p { max-width: 680px; margin: 0 auto; color: #cbd5e1; font-size: 1.1rem; font-style: italic; }
+        
+        .donation-data-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; }
+        .donation-data-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 0.5rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .donation-data-header { padding: 1.25rem 1.5rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
+        .donation-data-body { padding: 1.5rem; font-size: 0.9rem; color: var(--gray-700); }
+        .donation-table-info { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .donation-table-info td { padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; color: var(--primary); text-align: left; display: table-cell !important; }
+        .donation-table-info td strong { color: var(--gray-700); font-size: 0.8rem; text-transform: uppercase; display: block; }
+        
+        /* Pie de Página */
         .site-footer { background-color: #ffffff; border-top: 1px solid var(--gray-200); padding: 2rem 0; margin-top: 4rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
         .site-footer p { max-width: 850px; margin: 0 auto 0.5rem auto; line-height: 1.6; }
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
 
-        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
+        /* Conversión en Tarjetas Táctiles 3D Móviles */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
@@ -248,11 +258,8 @@
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
                 transition: all 0.25s ease;
             }
-            tr:hover, tr:active {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
-            }
-            td { 
+            tr:hover, tr:active { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08); }
+            .right-column td { 
                 display: flex !important;
                 justify-content: space-between;
                 align-items: center;
@@ -261,8 +268,8 @@
                 white-space: normal; 
                 text-align: right;
             }
-            td:last-child { border-bottom: none !important; }
-            td::before { 
+            .right-column td:last-child { border-bottom: none !important; }
+            .right-column td::before { 
                 content: attr(data-label); 
                 font-weight: 700; 
                 color: var(--text-muted); 
@@ -276,12 +283,7 @@
                 font-size: 1.05rem;
                 color: var(--primary);
             }
-            td.actions-cell {
-                justify-content: flex-end;
-                padding-top: 1rem !important;
-                margin-top: 0.5rem;
-                border-top: 1px solid var(--gray-200) !important;
-            }
+            td.actions-cell { justify-content: flex-end; padding-top: 1rem !important; margin-top: 0.5rem; border-top: 1px solid var(--gray-200) !important; }
             td.actions-cell::before { display: none !important; }
         }
     </style>
@@ -317,29 +319,23 @@
                     <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
-                <!-- BLOQUE ADICIONAL: PUNTO DE DONACIONES FÍSICAS Y ACCESO ECONÓMICO -->
-                <div class="info-contingencia-container">
-                    <div class="info-contingencia-card">
-                        <h4>📍 Punto USB para recepción de donativos</h4>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: var(--primary);"><strong>Dirección:</strong> Centro Venezolano Americano (CVA), Las Mercedes, Caracas.</p>
-                        <p style="font-size: 0.875rem; margin-bottom: 0.8rem; color: var(--primary);"><strong>Horario:</strong> 9:00 a.m. a 6:00 p.m.</p>
-                        <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--gray-700); margin-bottom: 0.4rem;">Insumos Requeridos con Urgencia:</p>
-                        <ul class="info-contingencia-list">
-                            <li>Pañales para niños y adultos, diferentes tallas.</li>
-                            <li>Carpas, colchonetas, linternas, cobijas, sábanas y pilas.</li>
-                            <li>Artículos de aseo personal: cepillos de dientes, pasta dental, desodorante, jabón para bañarse, shampoo, toallas sanitarias y húmedas.</li>
-                            <li>Juguetes para niños, juegos para adultos (dominó, cartas, etc).</li>
-                        </ul>
+                <!-- PUNTO USB DE RECEPCIÓN FÍSICO DESTACADO -->
+                <div class="acopio-banner-card">
+                    <h4>📍 Punto USB para recepción de donativos físicos</h4>
+                    <div class="acopio-details">
+                        <div><strong>Dirección:</strong> Centro Venezolano Americano (CVA), Las Mercedes, Caracas.</div>
+                        <div><strong>Horario operativo:</strong> 9:00 a.m. a 6:00 p.m.</div>
                     </div>
-                    <div class="info-contingencia-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <h4>💰 Contribuciones Financieras de Apoyo</h4>
-                            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">Si deseas canalizar soporte económico digital para la adquisición masiva de insumos médicos, herramientas de rescate y soporte logístico de los brigadistas en las zonas afectadas, accede de forma directa a la pasarela oficial.</p>
-                        </div>
-                        <button class="btn btn-success btn-block" onclick="abrirModalDonacion()" style="background-color: var(--success); margin-top: 1rem;">Interesado en donar accede aquí para obtener mas informacion</button>
-                    </div>
+                    <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--gray-700); margin-top: 0.5rem;">Insumos Críticos Solicitados:</p>
+                    <ul class="acopio-list-grid">
+                        <li>Pañales para niños y adultos (todas las tallas).</li>
+                        <li>Carpas, colchonetas, cobijas, sábanas, linternas y pilas.</li>
+                        <li>Kits de aseo: cepillos, pasta dental, desodorante, jabón, shampoo, toallas sanitarias y húmedas.</li>
+                        <li>Juguetes para niños y juegos de mesa para adultos (dominó, cartas).</li>
+                    </ul>
                 </div>
                 
+                <!-- REJILLA PERFECTAMENTE SIMÉTRICA DE 4 COLUMNAS -->
                 <div class="home-grid-buttons">
                     <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
                         <div>
@@ -363,6 +359,15 @@
                             <p>Consulta el tablero central en tiempo real para rastrear la localización, salud y condiciones de familiares y compañeros uesebistas.</p>
                         </div>
                         <button class="btn btn-primary btn-block">Ver Tablero General</button>
+                    </div>
+
+                    <!-- NUEVA TARJETA OFICIAL FINANCIERA -->
+                    <div class="action-card" onclick="navegarA('view-donar')">
+                        <div>
+                            <h3>Quiero Donar</h3>
+                            <p>Apoya económicamente la adquisición masiva de insumos médicos y logística para los brigadistas de rescate en las zonas afectadas.</p>
+                        </div>
+                        <button class="btn btn-success btn-block" style="background-color: var(--success);">Aportar Fondos</button>
                     </div>
                 </div>
             </section>
@@ -630,32 +635,46 @@
                 </div>
             </section>
 
+            <!-- VISTA 5: NUEVA PÁGINA PREMIUM DE DONACIONES DIGITALES (SPA MODE) -->
+            <section class="app-view" id="view-donar">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                
+                <div class="donation-hero-banner">
+                    <h2>¡Con tu apoyo ayudaremos a la comunidad uesebista!</h2>
+                    <p>Cada aporte financiero se traduce de forma inmediata en la compra centralizada de medicinas críticas, raciones de comida y equipamiento táctico de rescate para las cuadrillas de voluntarios de la USB.</p>
+                </div>
+
+                <div class="donation-data-row">
+                    <!-- Soporte USD -->
+                    <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
+                        <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
+                        <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
+                            <p style="line-height:1.6; margin-bottom:1rem;">Canaliza tu soporte financiero de forma digital desde el exterior utilizando tarjetas de crédito internacionales <strong>Visa, Mastercard, pasarela PayPal o cuentas Zelle</strong> directamente respaldadas por la Asociación.</p>
+                            <a href="https://www.aeusb.org/product/unidos-por-nuestra-comunidad-usbista" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none;">Acceder a Pasarela AEUSB</a>
+                        </div>
+                    </div>
+
+                    <!-- Soporte Bs -->
+                    <div class="donation-data-card" style="border-top: 4px solid var(--success);">
+                        <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
+                        <div class="donation-data-body">
+                            <table class="donation-table-info">
+                                <tr><td><strong>Beneficiario</strong>Asociación de Egresados USB</td></tr>
+                                <tr><td><strong>Identificación (RIF)</strong>J-30167233-0</td></tr>
+                                <tr><td><strong>🏦 Entidad Bancaria</strong>Banco Mercantil (Cuenta Corriente)</td></tr>
+                                <tr><td><strong>Número de Cuenta</strong>0105 0024 9210 2427 9154</td></tr>
+                                <tr><td><strong>📱 Pago Móvil Interbancario</strong>0412-4038790 (Mercantil)</td></tr>
+                            </table>
+                            <div style="font-size:0.8rem; background-color:var(--gray-100); padding:0.65rem; border-radius:4px; border-left:3px solid var(--warning); color:var(--gray-700); margin-top:1rem; font-weight:500;">
+                                ⚠️ <strong>Concepto Requerido:</strong> "Ayuda USB y Nº de Cédula".
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
-
-    <!-- VENTANA EMERGENTE: MODAL OFICIAL DE DONACIONES -->
-    <div class="modal-overlay" id="modalDonacion" onclick="cerrarModalDonacionExterno(event)">
-        <div class="modal-box" style="border-top: 5px solid var(--accent); max-width: 520px; width: 95%;">
-            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="panel-title">Información Oficial de Donaciones</div>
-                <span onclick="cerrarModalDonacion()" style="cursor:pointer; font-weight:700; color:var(--text-muted);">✕</span>
-            </div>
-            <div class="panel-body donation-modal-content" style="max-height: 480px; overflow-y: auto;">
-                <h4>🔗 Donaciones en USD (Visa/Mastercard, PayPal, Zelle):</h4>
-                <p style="margin-bottom: 0.5rem;">Canaliza tu aporte de forma internacional y segura a través de la AEUSB:</p>
-                <p style="margin-bottom: 1.25rem;"><a href="https://www.aeusb.org/product/unidos-por-nuestra-comunidad-usbista" target="_blank" class="donation-link">👉 Click Aquí para Donar en Línea</a></p>
-                
-                <h4>🇻🇪 Donaciones en Bolívares (Bs):</h4>
-                <p style="font-weight: 600; margin-bottom: 0.4rem; color: var(--primary);">Asociación de Egresados USB | Rif: J-30167233-0</p>
-                <p style="margin-bottom: 0.25rem;"><strong>🏦 Banco:</strong> Banco Mercantil</p>
-                <p style="margin-bottom: 0.25rem;"><strong>Cuenta Corriente:</strong> 0105 0024 9210 2427 9154</p>
-                <p style="margin-bottom: 0.75rem;"><strong>📱 Pago Móvil:</strong> 0412-4038790 (Mercantil)</p>
-                <p style="font-size: 0.85rem; background-color: var(--gray-100); padding: 0.65rem; border-radius: 4px; border-left: 3px solid var(--warning); color: var(--gray-700);">
-                    <strong>📝 Concepto Obligatorio:</strong> "Ayuda USB y Nº de Cédula".
-                </p>
-            </div>
-        </div>
-    </div>
 
     <!-- PIE DE PÁGINA INSTITUCIONAL -->
     <footer class="site-footer">
@@ -678,11 +697,6 @@
 
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
-
-        // MODAL DE DONACIONES
-        function abrirModalDonacion() { document.getElementById('modalDonacion').style.display = "flex"; }
-        function cerrarModalDonacion() { document.getElementById('modalDonacion').style.display = "none"; }
-        function cerrarModalDonacionExterno(e) { if(e.target.id === "modalDonacion") cerrarModalDonacion(); }
 
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
