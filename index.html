@@ -6,6 +6,7 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -209,11 +210,10 @@
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* Conversión en Tarjetas Táctiles 3D Móviles */
+        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
-            .home-hero h2 { font-size: 1.75rem; }
 
             .table-container { border: none; background: transparent; max-height: none; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
@@ -268,6 +268,7 @@
 </head>
 <body>
 
+    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -278,16 +279,18 @@
             </div>
             
             <div>
-                <button class="btn btn-primary" id="btn-toggle-role" onclick="conmutarAccAccessoSeguro()">Acceso Admin</button>
+                <button class="btn btn-primary" id="btn-toggle-role" onclick="conmutarAccesoSeguro()">Acceso Admin</button>
             </div>
 
             <img src="Logo-AEUSB-fondo-blanco.png" alt="Logo AEUSB" class="logo-aeusb">
         </div>
     </div>
 
+    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
+            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -321,6 +324,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -343,6 +347,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -358,10 +363,12 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
                 <div class="grid-system grid-2-columns" id="mallaColaboradores">
+                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
                             <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
@@ -398,6 +405,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Cuadrillas Registradas -->
                     <div class="right-column">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
@@ -413,9 +421,11 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -430,6 +440,7 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -488,6 +499,7 @@
                         </div>
                     </div>
 
+                    <!-- Listado Central Operativo con Filtros Combinados -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -641,15 +653,15 @@
             const filterGrp = document.getElementById('filtroGrupo').value;
 
             let registrosFiltrados = registrosNube.filter(r => {
-                const cumpleTexto = r.nombre.toLowerCase().includes(texto);
+                const cumpleTexto = String(r.nombre || '').toLowerCase().includes(texto);
                 
                 let estStr = String(r.estado || 'Desaparecido').toLowerCase();
                 let cumpleEst = true;
                 if (filterEst !== 'Todos') {
-                    if (filterEst === 'Desaparecido') cumpleEst = estStr.includes('desaparecido') || estStr.includes('informacion') || estStr.includes('información');
-                    if (filterEst === 'Con Vida') cumpleEst = estStr.includes('vida') || estStr.includes('bien');
-                    if (filterEst === 'Atrapado') cumpleEst = estStr.includes('atrapado');
-                    if (filterEst === 'Fallecido') cumpleEst = estStr.includes('fallecido');
+                    if (filterEst === 'Desaparecido') cumpleEst = estStr.includes('desaparecido') || estStr.includes('informacion') || estStr.includes('información') || estStr.includes('❓');
+                    if (filterEst === 'Con Vida') cumpleEst = estStr.includes('vida') || estStr.includes('bien') || estStr.includes('✅');
+                    if (filterEst === 'Atrapado') cumpleEst = estStr.includes('atrapado') || estStr.includes('emergencia') || estStr.includes('⚠️');
+                    if (filterEst === 'Fallecido') cumpleEst = estStr.includes('fallecido') || estStr.includes('🕊️');
                 }
 
                 let grpStr = mapaGrupo[String(r.edad).trim().toLowerCase()] || r.edad || 'Estudiante';
@@ -669,10 +681,10 @@
             datosFiltrados.forEach(reg => {
                 let badgeClass = 'badge-info';
                 let est = String(reg.estado || 'Desaparecido').trim();
-                if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('informacion') || est.toLowerCase().includes('información')) badgeClass = 'badge-warning';
-                if (est.toLowerCase().includes('vida') || est.toLowerCase().includes('bien')) badgeClass = 'badge-success';
-                if (est.toLowerCase().includes('atrapado')) badgeClass = 'badge-danger';
-                if (est.toLowerCase().includes('fallecido')) badgeClass = 'badge-gray';
+                if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('informacion') || est.toLowerCase().includes('información') || est.includes('❓')) badgeClass = 'badge-warning';
+                if (est.toLowerCase().includes('vida') || est.toLowerCase().includes('bien') || est.includes('✅')) badgeClass = 'badge-success';
+                if (est.toLowerCase().includes('atrapado') || est.toLowerCase().includes('emergencia') || est.includes('⚠️')) badgeClass = 'badge-danger';
+                if (est.toLowerCase().includes('fallecido') || est.includes('🕊️')) badgeClass = 'badge-gray';
 
                 let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
                 let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
@@ -682,7 +694,7 @@
                 fila.innerHTML = `
                     <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
                     <td data-label="Cédula">${reg.cedula_identidad || '-'}</td>
-                    <td data-label="Nombre"><strong>${reg.nombre}</strong></td>
+                    <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
                     <td data-label="Comunidad">${comLimpia}</td>
                     <td data-label="Grupo">${grpLimpio}</td>
                     <td data-label="Damnificado">${damLimpio}</td>
@@ -695,10 +707,10 @@
             });
 
             let total = registrosNube.length;
-            let trap = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('atrapado')).length;
-            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien'))).length;
-            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información'))).length;
-            let fall = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('fallecido')).length;
+            let trap = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('atrapado') || String(r.estado).includes('⚠️'))).length;
+            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).includes('✅'))).length;
+            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información') || String(r.estado).includes('❓'))).length;
+            let fall = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('fallecido') || String(r.estado).includes('🕊️'))).length;
 
             const elTotal = document.getElementById('stat-total'); if (elTotal) elTotal.innerText = total;
             const elTrap = document.getElementById('stat-atrapados'); if (elTrap) elTrap.innerText = trap;
@@ -727,15 +739,15 @@
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
-                        <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
-                        <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                        <td data-label="Notes">${c.disponibilidad || '-'}</td>
                     `;
                 } else {
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
-                        <td data-label="Área Apoyo"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
                         <td data-label="Notas">${c.disponibilidad || '-'}</td>
                     `;
                 }
@@ -901,6 +913,10 @@
             };
             lector.readAsArrayBuffer(file);
         });
+
+        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
+        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
+        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
 
         document.getElementById('btnExportar').addEventListener('click', function() {
             let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
