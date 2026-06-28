@@ -6,7 +6,6 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -71,6 +70,30 @@
             text-transform: uppercase;
         }
 
+        /* Banner de Invitación a Voluntarios */
+        .volunteer-invite-banner {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .volunteer-invite-text strong {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--success);
+            font-size: 0.95rem;
+        }
+
+        .volunteer-invite-text p {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
         /* Panel de Indicadores Críticos */
         .dashboard-hero {
             background-color: var(--primary);
@@ -105,12 +128,17 @@
         .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
         .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.5rem; display: block; }
 
-        /* Malla Estructural Dinámica */
+        /* Malla Estructural Dinámica Avanzada */
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        .grid-system.grid-2-columns {
+        .grid-system.admin-columns-layout {
             grid-template-columns: 380px 1fr;
+        }
+
+        /* Prevención de desbordamiento en celdas de rejilla de datos */
+        .left-column, .right-column {
+            min-width: 0;
         }
 
         .panel-card {
@@ -145,11 +173,36 @@
         .search-box { position: relative; flex: 1; min-width: 240px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Componentes de Tabla */
-        .table-container { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--gray-200); background: #ffffff; margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left; }
-        thead { background: var(--primary); color: #ffffff; }
-        th { padding: 0.875rem 1.25rem; font-weight: 600; color: #ffffff; border-bottom: 1px solid var(--gray-200); font-size: 0.75rem; text-transform: uppercase; }
+        /* ==========================================================
+           CONTENEDOR DE CONTROL: SCROLL DINÁMICO VERTICAL Y HORIZONTAL
+           ========================================================== */
+        .table-container { 
+            overflow: auto; 
+            max-height: 580px; /* Altura fija adaptativa para scroll vertical */
+            border-radius: 0.5rem; 
+            border: 1px solid var(--gray-200); 
+            background: #ffffff; 
+            margin-bottom: 2rem;
+            position: relative;
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; }
+        
+        /* Cabecera Fija Avanzada (Sticky Header) */
+        thead th { 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            background: var(--primary); 
+            color: #ffffff; 
+            padding: 0.875rem 1.25rem; 
+            font-weight: 600; 
+            font-size: 0.75rem; 
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--gray-300);
+        }
+        
         td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
         tbody tr:hover { background-color: var(--gray-100); }
 
@@ -171,11 +224,11 @@
         .btn-edit-table { background: var(--gray-100); color: var(--primary); border: 1px solid var(--gray-300); padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
         .btn-delete { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 0.3rem 0.6rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
 
-        /* SPA Layout View Config */
+        /* SPA Navigation Presentation */
         .app-view { display: none; padding: 1rem 0; }
         .app-view.active { display: block; }
 
-        /* Estilos del Menú de Entrada Home */
+        /* Estilos del Home */
         .home-hero { text-align: center; padding: 4rem 1.5rem; background: radial-gradient(circle, #1f1f1f 0%, #111111 100%); color: #ffffff; border-radius: 0.5rem; margin-bottom: 3rem; }
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
@@ -185,13 +238,14 @@
         .action-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; text-transform: uppercase; }
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; }
 
-        /* Conversión de Filas en Tarjetas con Relieve 3D para Móvil */
+        /* Conversión de Filas en Tarjetas Táctiles 3D Móviles */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
+            .volunteer-invite-banner { flex-direction: column; text-align: center; align-items: stretch; }
             .home-hero h2 { font-size: 1.75rem; }
 
-            .table-container { border: none; background: transparent; }
+            .table-container { border: none; background: transparent; max-height: none; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead { display: none; }
             
@@ -244,7 +298,6 @@
 </head>
 <body>
 
-    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -262,11 +315,9 @@
         </div>
     </div>
 
-    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
-            <!-- VISTA 1: HOME MENÚ CENTRAL (Fiel a tus capturas) -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
@@ -300,7 +351,6 @@
                 </div>
             </section>
 
-            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -323,7 +373,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabla de Auxilio (SÓLO ADMIN) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
@@ -339,12 +388,18 @@
                 </div>
             </section>
 
-            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR - FORMULARIO ESTABLECIDO DIRECTO) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <div class="volunteer-invite-banner" id="banner-voluntariado">
+                    <div class="volunteer-invite-text">
+                        <strong>¿QUIERES SER VOLUNTARIO? REGÍSTRATE AQUÍ PARA COORDINAR</strong>
+                        <p>Únete a las cuadrillas comunitarias para remoción de escombros, logística de transporte o recolección de insumos de emergencia.</p>
+                    </div>
+                    <button class="btn btn-success" onclick="abrirModalVoluntario()">Inscribirme como Colaborador</button>
+                </div>
+
                 <div class="grid-system grid-2-columns" id="mallaColaboradores">
-                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
                             <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
@@ -374,14 +429,13 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notes" class="form-input" placeholder="Ej: Fines de semana"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Cuadrillas Registradas -->
                     <div class="right-column">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
@@ -397,11 +451,9 @@
                 </div>
             </section>
 
-            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN - AQUÍ VAN FILTROS Y CONTADORES) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -416,7 +468,6 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
-                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -475,7 +526,6 @@
                         </div>
                     </div>
 
-                    <!-- Listado Central Operativo con Filtros Completos -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -485,7 +535,6 @@
                         <div class="toolbar">
                             <div class="search-box"><input type="text" id="buscarInput" placeholder="Filtrar por nombre..."></div>
                             
-                            <!-- FILTROS RESTABLECIDOS DE SINOPSIS -->
                             <select id="filtroEstado" class="form-select" style="width: auto; min-width: 160px;">
                                 <option value="Todos">Todas las Situaciones</option>
                                 <option value="Desaparecido">Desaparecido / Sin Info</option>
@@ -534,6 +583,10 @@
 
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
+
+        function abrirModalVoluntario() { document.getElementById('modalVoluntario').style.display = "flex"; }
+        function cancelarVoluntariadoForm() { document.getElementById('modalVoluntario').style.display = "none"; }
+        function cerrarModalVoluntarioExterno(e) { if(e.target.id === "modalVoluntario") cancelarVoluntariadoForm(); }
 
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
@@ -617,7 +670,7 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Tablas preparándose."); }
+            } catch(e) { console.log("Tablas en preparación."); }
 
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -683,7 +736,6 @@
                 cuerpo.appendChild(fila);
             });
 
-            // Conteo global inmune a filtros
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('atrapado')).length;
             let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien'))).length;
@@ -702,7 +754,6 @@
             const cuerpo = document.getElementById('tablaColabCuerpo');
             if (!thead || !cuerpo) return;
 
-            // Renderizado condicional de cabecera seguro contra fallos responsivos
             if (esAdministrador) {
                 thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
             } else {
@@ -777,7 +828,7 @@
                 disponibilidad: document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
-            alert("¡Registro Completado! Gracias por unirte a las brigadas.");
+            alert("¡Registro Completado! Gracias por unirte.");
             document.getElementById('colaboradorForm').reset();
             await cargarDatosDesdeNube();
         });
@@ -893,7 +944,6 @@
             lector.readAsArrayBuffer(file);
         });
 
-        // Eventos vinculados a la matriz de filtros
         document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
         document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
         document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
