@@ -106,11 +106,12 @@
         .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
         .stat-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 0.5rem; display: block; }
 
-        /* Malla Estructural Dinámica Avanzada */
+        /* Malla Estructural Dinámica Avanzada (Adaptable según Rol) */
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        .grid-system.grid-2-columns {
+        /* Modificador Admin: Aplica las columnas simétricas fluidas sin desbordes */
+        .grid-system.admin-columns-layout {
             grid-template-columns: 380px 1fr;
         }
 
@@ -150,7 +151,7 @@
         .search-box { position: relative; flex: 1; min-width: 240px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Contenedor de Control: SCROLL DINÁMICO VERTICAL Y HORIZONTAL */
+        /* Contenedor de Control con Desplazamiento Dinámico Horizontal/Vertical */
         .table-container { 
             overflow: auto; 
             max-height: 580px; 
@@ -191,7 +192,7 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning { background: #ea580c; color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -240,7 +241,7 @@
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
 
-        /* Conversión en Tarjetas Táctiles 3D Móviles */
+        /* Estructuras Responsivas de Tarjetas Táctiles */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
@@ -335,7 +336,6 @@
                     </ul>
                 </div>
                 
-                <!-- REJILLA PERFECTAMENTE SIMÉTRICA DE 4 COLUMNAS -->
                 <div class="home-grid-buttons">
                     <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
                         <div>
@@ -361,7 +361,6 @@
                         <button class="btn btn-primary btn-block">Ver Tablero General</button>
                     </div>
 
-                    <!-- NUEVA TARJETA OFICIAL FINANCIERA -->
                     <div class="action-card" onclick="navegarA('view-donar')">
                         <div>
                             <h3>Quiero Donar</h3>
@@ -376,7 +375,7 @@
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <div class="grid-system grid-2-columns" id="mallaAyuda">
+                <div class="grid-system" id="mallaAyuda">
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--warning);">
                             <div class="panel-header"><div class="panel-title">Formulario de Solicitud de Auxilio</div></div>
@@ -461,7 +460,7 @@
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <div class="grid-system grid-2-columns" id="mallaColaboradores">
+                <div class="grid-system" id="mallaColaboradores">
                     <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
@@ -492,7 +491,28 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    
+                                    <!-- NUEVAS COLUMNAS ADICIONALES INTEGRADAS -->
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Lugar de Voluntariado *</label>
+                                            <select id="colab_lugar" class="form-select" required>
+                                                <option value="Punto de Acopio USB">Punto de Acopio USB</option>
+                                                <option value="Otro Lugar">Otro Lugar (Especificar en observaciones)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">¿Dispone de Vehículo para Apoyo? *</label>
+                                            <select id="colab_vehiculo" class="form-select" required>
+                                                <option value="No">No poseo vehículo</option>
+                                                <option value="Carro">Sí (Carro)</option>
+                                                <option value="Moto">Sí (Moto)</option>
+                                                <option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
                             </div>
@@ -635,7 +655,7 @@
                 </div>
             </section>
 
-            <!-- VISTA 5: NUEVA PÁGINA PREMIUM DE DONACIONES DIGITALES (SPA MODE) -->
+            <!-- VISTA 5: PÁGINA PREMIUM DE DONACIONES DIGITALES -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -722,6 +742,7 @@
         function conmutarAccesoSeguro() {
             const malla = document.getElementById('mallaPrincipal');
             const mallaAyuda = document.getElementById('mallaAyuda');
+            const mallaColab = document.getElementById('mallaColaboradores');
 
             if (!esAdministrador) {
                 let pass = prompt("Introduzca la clave de seguridad de Administrador de la USB:");
@@ -731,6 +752,8 @@
                     
                     if (malla) malla.classList.add('admin-columns-layout');
                     if (mallaAyuda) mallaAyuda.classList.add('admin-columns-layout');
+                    if (mallaColab) mallaColab.classList.add('admin-columns-layout');
+                    
                     document.getElementById('panel-formulario-afectado').style.display = "block";
                     document.getElementById('panel-tabla-solicitudes').style.display = "block";
                     document.getElementById('dropZone').style.display = "block";
@@ -747,6 +770,8 @@
                 
                 if (malla) malla.classList.remove('admin-columns-layout');
                 if (mallaAyuda) mallaAyuda.classList.remove('admin-columns-layout');
+                if (mallaColab) mallaColab.classList.remove('admin-columns-layout');
+                
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
@@ -780,7 +805,7 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Tablas en preparación."); }
+            } catch(e) { console.log("Tablas preparadas."); }
 
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -865,21 +890,25 @@
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>LUGAR</th><th>VEHÍCULO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
             } else {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>LUGAR</th><th>VEHÍCULO</th><th>NOTAS</th></tr>`;
             }
 
             cuerpo.innerHTML = '';
             datos.forEach(c => {
                 const fila = document.createElement('tr');
                 let grpVoluntario = mapaGrupo[String(c.cargo_usb).trim().toLowerCase()] || c.cargo_usb || 'Estudiante';
+                let lugar = c.lugar_voluntariado || 'Punto de Acopio USB';
+                let vehiculo = c.vehiculo || 'No';
                 
                 if (esAdministrador) {
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="Lugar">${lugar}</td>
+                        <td data-label="Vehículo">${vehiculo}</td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
                         <td data-label="Notas">${c.disponibilidad || '-'}</td>
                     `;
@@ -888,6 +917,8 @@
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
+                        <td data-label="Lugar">${lugar}</td>
+                        <td data-label="Vehículo">${vehiculo}</td>
                         <td data-label="Notas">${c.disponibilidad || '-'}</td>
                     `;
                 }
@@ -945,7 +976,9 @@
                 telefono: document.getElementById('colab_telefono').value.trim(),
                 cargo_usb: document.getElementById('colab_cargo').value,
                 area_apoyo: document.getElementById('colab_area').value,
-                disponibilidad: document.getElementById('colab_notas').value.trim()
+                lugar_voluntariado: document.getElementById('colab_lugar').value,
+                vehiculo: document.getElementById('colab_vehiculo').value,
+                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
             alert("¡Registro Completado! Gracias por sumarte.");
@@ -1075,8 +1108,8 @@
         });
 
         document.getElementById('btnExportarColab').addEventListener('click', function() {
-            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Telefono", "Disponibilidad / Notas"]];
-            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.telefono, c.disponibilidad]));
+            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Lugar Voluntariado", "Vehiculo", "Telefono", "Disponibilidad / Notas"]];
+            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.telefono, c.disponibilidad]));
             descargarMatrizComoExcel(matriz, "Cuadrillas_Voluntarios_USB");
         });
 
