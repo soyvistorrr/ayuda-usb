@@ -28,22 +28,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Fondo interactivo animado sutil con los colores de la página */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, #f8fafc, #f1f5f9, #fffdf0, #f4fbf7);
-            background-size: 400% 400%;
-            animation: gradientBackground 12s ease infinite;
+            background-color: var(--bg-light);
             color: var(--text-main);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-
-        @keyframes gradientBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .container { max-width: 1440px; margin: 0 auto; padding: 0 1.5rem; }
@@ -53,7 +43,6 @@
             background-color: #ffffff;
             border-bottom: 4px solid var(--accent);
             padding: 1rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
         .brand-container {
@@ -89,7 +78,6 @@
             padding: 2rem 0;
             border-radius: 0.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 16px rgba(251, 192, 45, 0.15);
         }
 
         .hero-context p {
@@ -111,7 +99,7 @@
             background: #1e1e1e;
             border-radius: 0.5rem;
             padding: 1.25rem;
-            border-left: 4px solid var(--primary-dark);
+            border-left: 4px solid var(--accent);
         }
 
         .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
@@ -132,8 +120,8 @@
 
         .panel-card {
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.02);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             border: 1px solid var(--gray-200);
             overflow: hidden;
             margin-bottom: 1.5rem;
@@ -143,14 +131,14 @@
         .panel-title { font-size: 0.95rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
         .panel-body { padding: 1.5rem; }
 
-        /* Controles de Formulario e Interacciones */
+        /* Controles de Formulario */
         .form-group { margin-bottom: 1.25rem; }
         .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-input, .form-select, .form-textarea {
-            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.2s ease;
+            width: 100%; padding: 0.65rem 0.875rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.2); }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         /* Carga Masiva y Filtros */
@@ -166,13 +154,12 @@
         .table-container { 
             overflow: auto; 
             max-height: 580px; 
-            border-radius: 12px; 
+            border-radius: 0.5rem; 
             border: 1px solid var(--gray-200); 
             background: #ffffff; 
             margin-bottom: 2rem;
             position: relative;
-            -webkit-overflow-scrolling: touch;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
+            -webkit-overflow-scrolling: touch; 
         }
         
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; }
@@ -193,21 +180,18 @@
         td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
         tbody tr:hover { background-color: var(--gray-100); }
 
-        .badge { display: inline-flex; align-items: center; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
         .badge-danger { background: #fef2f2; color: var(--danger); }
         .badge-success { background: #f0fdf4; color: var(--success); }
         .badge-warning { background: #fffbeb; color: var(--warning); }
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
-        /* Botonera Avanzada */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
-        .btn:active { transform: scale(0.96); }
+        /* Botonera */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; letter-spacing: 0.02em; }
         .btn-primary { background: var(--accent); color: var(--primary); }
-        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.25); transform: translateY(-1px); }
+        .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); transform: translateY(-1px); }
         .btn-warning { background: #ea580c; color: white; }
-        .btn-warning:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -222,7 +206,7 @@
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.02em; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.05rem; }
         
-        /* Diseño Asimétrico Dividido para Punto de Acopio */
+        /* Banner de Acopio de Insumos Físicos */
         .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-top: 4px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 768px) { .acopio-banner-card { grid-template-columns: 350px 1fr; } }
         .acopio-info-side { border-right: 1px solid var(--gray-200); padding-right: 1.5rem; }
@@ -233,7 +217,7 @@
         .acopio-list-grid li { background: var(--bg-light); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--primary); border: 1px solid var(--gray-200); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); line-height: 1.4; }
         .acopio-list-grid li:hover { transform: translateY(-3px); border-color: var(--success); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.06); }
 
-        /* Rejilla Flexbox Autocentrada para Fila Extra Encajada */
+        /* Rejilla de Navegación Flexible Centrada e Interactiva */
         .home-grid-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
         .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 2.25rem 2rem; text-align: center; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); flex: 1 1 280px; max-width: 340px; }
         .action-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 25px -5px rgba(251, 192, 45, 0.15), 0 10px 10px -5px rgba(251, 192, 45, 0.04); }
@@ -489,7 +473,7 @@
                                         <div class="form-group"><label class="form-label">¿Dispone de Vehículo para Apoyo? *</label><select id="colab_vehiculo" class="form-select" required><option value="No">No poseo vehículo</option><option value="Carro">Sí (Carro)</option><option value="Moto">Sí (Moto)</option><option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option></select></div>
                                     </div>
                                     
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notes" class="form-input" placeholder="Ej: Fines de semana"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
                             </div>
@@ -1073,6 +1057,41 @@
             };
             lector.readAsArrayBuffer(file);
         });
+
+        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
+        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
+        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
+
+        document.getElementById('btnExportar').addEventListener('click', function() {
+            let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
+            registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.damnificado || 'No sé', r.ubicacion, r.telefono, r.observaciones]));
+            descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
+        });
+
+        document.getElementById('btnExportarColab').addEventListener('click', function() {
+            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Lugar Voluntariado", "Vehiculo", "Telefono", "Disponibilidad / Notas"]];
+            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.telefono, c.disponibilidad]));
+            descargarMatrizComoExcel(matriz, "Cuadrillas_Voluntarios_USB");
+        });
+
+        document.getElementById('btnExportarAyuda').addEventListener('click', function() {
+            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Comunidad", "Grupo", "Situacion", "Damnificado", "Ubicacion", "Telefono", "Descripcion Requerimiento"]];
+            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.comunidad || '-', a.grupo || '-', a.estado || '-', a.damnificado || '-', a.ubicacion, a.telefono, a.descripcion_ayuda]));
+            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB");
+        });
+
+        function descargarMatrizComoExcel(matriz, nombreArchivo) {
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
+            XLSX.utils.book_append_sheet(wb, ws, "Datos");
+            XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        window.eliminarFila = async function(id) {
+            if(confirm('¿Eliminar registro permanente?')) {
+                await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
 
         setInterval(cargarDatosDesdeNube, 15000);
         cargarDatosDesdeNube();
