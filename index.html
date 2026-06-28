@@ -28,18 +28,19 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* Fondo interactivo animado sutil con los colores de la página */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, #f8fafc, #f1f5f9, #fffbeb, #f0fdf4);
+            background: linear-gradient(-45deg, #f8fafc, #f1f5f9, #fffdf0, #f4fbf7);
             background-size: 400% 400%;
-            animation: gradientBg 15s ease infinite;
+            animation: gradientBackground 12s ease infinite;
             color: var(--text-main);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
 
-        @keyframes gradientBg {
+        @keyframes gradientBackground {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
@@ -52,7 +53,7 @@
             background-color: #ffffff;
             border-bottom: 4px solid var(--accent);
             padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
         .brand-container {
@@ -88,7 +89,7 @@
             padding: 2rem 0;
             border-radius: 0.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 16px rgba(251, 192, 45, 0.15);
         }
 
         .hero-context p {
@@ -110,7 +111,7 @@
             background: #1e1e1e;
             border-radius: 0.5rem;
             padding: 1.25rem;
-            border-left: 4px solid var(--accent);
+            border-left: 4px solid var(--primary-dark);
         }
 
         .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
@@ -132,25 +133,24 @@
         .panel-card {
             background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.02);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.02);
             border: 1px solid var(--gray-200);
             overflow: hidden;
             margin-bottom: 1.5rem;
-            transition: transform 0.2s ease;
         }
 
         .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); background-color: var(--gray-100); }
         .panel-title { font-size: 0.95rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
         .panel-body { padding: 1.5rem; }
 
-        /* Controles de Formulario */
+        /* Controles de Formulario e Interacciones */
         .form-group { margin-bottom: 1.25rem; }
         .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.4rem; text-transform: uppercase; }
         .form-input, .form-select, .form-textarea {
-            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.15s ease;
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; background-color: #ffffff; color: var(--text-main); transition: all 0.2s ease;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.25); }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.2); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         /* Carga Masiva y Filtros */
@@ -171,7 +171,7 @@
             background: #ffffff; 
             margin-bottom: 2rem;
             position: relative;
-            -webkit-overflow-scrolling: touch; 
+            -webkit-overflow-scrolling: touch;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
         }
         
@@ -199,14 +199,15 @@
         .badge-warning { background: #fffbeb; color: var(--warning); }
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
-        /* Botonera */
+        /* Botonera Avanzada */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--accent); color: var(--primary); }
-        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.2); }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.25); transform: translateY(-1px); }
         .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2); }
+        .btn-success:hover { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); transform: translateY(-1px); }
         .btn-warning { background: #ea580c; color: white; }
+        .btn-warning:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -221,7 +222,7 @@
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.02em; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.05rem; }
         
-        /* Banner de Acopio de Insumos Físicos */
+        /* Diseño Asimétrico Dividido para Punto de Acopio */
         .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-top: 4px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 768px) { .acopio-banner-card { grid-template-columns: 350px 1fr; } }
         .acopio-info-side { border-right: 1px solid var(--gray-200); padding-right: 1.5rem; }
@@ -232,7 +233,7 @@
         .acopio-list-grid li { background: var(--bg-light); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: var(--primary); border: 1px solid var(--gray-200); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); line-height: 1.4; }
         .acopio-list-grid li:hover { transform: translateY(-3px); border-color: var(--success); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.06); }
 
-        /* Rejilla de Navegación Flexible Centrada e Interactiva */
+        /* Rejilla Flexbox Autocentrada para Fila Extra Encajada */
         .home-grid-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
         .action-card { background: #ffffff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 2.25rem 2rem; text-align: center; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); flex: 1 1 280px; max-width: 340px; }
         .action-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 25px -5px rgba(251, 192, 45, 0.15), 0 10px 10px -5px rgba(251, 192, 45, 0.04); }
@@ -258,49 +259,25 @@
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
 
-        /* Estructuras Responsivas de Tarjetas Táctiles */
         @media (max-width: 768px) {
             .brand-container { flex-direction: column; text-align: center; gap: 1.25rem; }
             .brand-left { flex-direction: column; gap: 0.75rem; }
-
             .table-container { border: none; background: transparent; max-height: none; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead { display: none; }
             
             tr { 
-                background: #ffffff; 
-                border: 1px solid var(--gray-200); 
-                border-radius: 12px; 
-                padding: 1.25rem; 
-                margin-bottom: 1.5rem; 
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
-                transition: all 0.25s ease;
+                background: #ffffff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); transition: all 0.25s ease;
             }
             tr:hover, tr:active { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08); }
             .right-column td { 
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.65rem 0 !important;
-                border-bottom: 1px solid var(--gray-100) !important;
-                white-space: normal; 
-                text-align: right;
+                display: flex !important; justify-content: space-between; align-items: center; padding: 0.65rem 0 !important; border-bottom: 1px solid var(--gray-100) !important; white-space: normal; text-align: right;
             }
             .right-column td:last-child { border-bottom: none !important; }
             .right-column td::before { 
-                content: attr(data-label); 
-                font-weight: 700; 
-                color: var(--text-muted); 
-                text-transform: uppercase; 
-                font-size: 0.725rem; 
-                margin-right: 1rem;
-                text-align: left;
+                content: attr(data-label); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.725rem; margin-right: 1rem; text-align: left;
             }
-            td[data-label="Nombre"] strong, td[data-label="Voluntario"] strong, td[data-label="Solicitante"] strong {
-                font-family: 'Montserrat', sans-serif;
-                font-size: 1.05rem;
-                color: var(--primary);
-            }
+            td[data-label="Nombre"] strong, td[data-label="Voluntario"] strong, td[data-label="Solicitante"] strong { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; color: var(--primary); }
             td.actions-cell { justify-content: flex-end; padding-top: 1rem !important; margin-top: 0.5rem; border-top: 1px solid var(--gray-200) !important; }
             td.actions-cell::before { display: none !important; }
         }
@@ -512,7 +489,7 @@
                                         <div class="form-group"><label class="form-label">¿Dispone de Vehículo para Apoyo? *</label><select id="colab_vehiculo" class="form-select" required><option value="No">No poseo vehículo</option><option value="Carro">Sí (Carro)</option><option value="Moto">Sí (Moto)</option><option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option></select></div>
                                     </div>
                                     
-                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notes" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
                             </div>
@@ -776,7 +753,7 @@
             }
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
-            actualizarInterfazAyuda(ayubeNube || ayudaNube);
+            actualizarInterfazAyuda(ayudaNube);
         }
 
         function enmascararTelefono(tlf) {
@@ -952,7 +929,12 @@
                 estado: document.getElementById('ayuda_estado').value,
                 damnificado: document.getElementById('ayuda_damnificado').value
             };
-            await supabaseClient.from('solicitudes_ayuda').insert([nuevaSolicitud]);
+            const { error } = await supabaseClient.from('solicitudes_ayuda').insert([nuevaSolicitud]);
+            if (error) {
+                console.error(error);
+                alert("Fallo de Base de Datos al guardar reporte: " + error.message);
+                return;
+            }
             alert("Tu solicitud de asistencia ha sido enviada con éxito.");
             document.getElementById('ayudaForm').reset();
             await cargarDatosDesdeNube();
@@ -970,7 +952,12 @@
                 vehiculo: document.getElementById('colab_vehiculo').value,
                 disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
             };
-            await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
+            const { error } = await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
+            if (error) {
+                console.error(error);
+                alert("Fallo de Base de Datos al guardar colaborador: " + error.message);
+                return;
+            }
             alert("¡Registro Completado! Gracias por sumarte.");
             document.getElementById('colaboradorForm').reset();
             await cargarDatosDesdeNube();
@@ -982,7 +969,7 @@
             idEnEdicion = id;
             document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro";
             document.getElementById('nombre').value = reg.nombre;
-            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad; 
+            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
             document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
             document.getElementById('ubicacion').value = reg.ubicacion === '-' ? '' : reg.ubicacion;
             document.getElementById('observaciones').value = reg.observaciones === '-' ? '' : reg.observaciones;
@@ -1026,7 +1013,7 @@
                 observaciones: document.getElementById('observaciones').value.trim() || '-'
             };
 
-            if (idEnEdicion !== null) { 
+            if (idEnEdicion !== null) {
                 await supabaseClient.from('registros_ciudadanos').update(manual).eq('id', idEnEdicion);
                 cancelarEdicion();
             } else {
@@ -1084,43 +1071,8 @@
                     await cargarDatosDesdeNube();
                 } catch (err) { alert('Error.'); }
             };
-            lector.readAsArrayBuffer(file); 
+            lector.readAsArrayBuffer(file);
         });
-
-        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
-        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero); 
-        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
-
-        document.getElementById('btnExportar').addEventListener('click', function() {
-            let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
-            registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.damnificado || 'No sé', r.ubicacion, r.telefono, r.observaciones]));
-            descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
-        });
-
-        document.getElementById('btnExportarColab').addEventListener('click', function() {
-            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Lugar Voluntariado", "Vehiculo", "Telefono", "Disponibilidad / Notas"]];
-            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.telefono, c.disponibilidad]));
-            descargarMatrizComoExcel(matriz, "Cuadrillas_Voluntarios_USB");
-        });
-
-        document.getElementById('btnExportarAyuda').addEventListener('click', function() {
-            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Comunidad", "Grupo", "Situacion", "Damnificado", "Ubicacion", "Telefono", "Descripcion Requerimiento"]];
-            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.comunidad || '-', a.grupo || '-', a.estado || '-', a.damnificado || '-', a.ubicacion, a.telefono, a.descripcion_ayuda]));
-            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB"); 
-        });
-
-        function descargarMatrizComoExcel(matriz, nombreArchivo) {
-            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
-            XLSX.utils.book_append_sheet(wb, ws, "Datos");
-            XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
-        }
-
-        window.eliminarFila = async function(id) {
-            if(confirm('¿Eliminar registro permanente?')) {
-                await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
-                await cargarDatosDesdeNube();
-            }
-        };
 
         setInterval(cargarDatosDesdeNube, 15000);
         cargarDatosDesdeNube();
