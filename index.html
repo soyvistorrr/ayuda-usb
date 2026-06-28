@@ -73,8 +73,8 @@
 
         /* Panel de Indicadores Críticos */
         .dashboard-hero {
-            background-color: var(--primary);
-            color: #ffffff;
+            background-color: var(--accent);
+            color: var(--primary);
             padding: 2rem 0;
             border-radius: 0.5rem;
             margin-bottom: 2rem;
@@ -84,7 +84,7 @@
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--accent);
+            color: var(--primary-dark);
             font-weight: 600;
         }
 
@@ -109,7 +109,7 @@
         .main-layout { padding: 2rem 0; }
         .grid-system { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
         
-        /* Modificador Admin: Activa las dos columnas en logeo seguro */
+        /* Modificador Admin: Aplica las columnas simétricas fluidas sin desbordes */
         .grid-system.admin-columns-layout {
             grid-template-columns: 380px 1fr;
         }
@@ -150,7 +150,7 @@
         .search-box { position: relative; flex: 1; min-width: 240px; }
         .search-box input { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 0.875rem; }
 
-        /* Contenedor de Control: SCROLL DINÁMICO VERTICAL Y HORIZONTAL */
+        /* Contenedor de Control con Desplazamiento Dinámico Horizontal/Vertical */
         .table-container { 
             overflow: auto; 
             max-height: 580px; 
@@ -191,7 +191,7 @@
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning { background: #ea580c; color: white; }
         .btn-block { width: 100%; }
         
         .actions-cell { display: flex; gap: 0.5rem; }
@@ -206,13 +206,80 @@
         .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
         .home-hero p { max-width: 750px; margin: 0 auto; color: #cbd5e1; font-size: 1.05rem; }
         
-        /* Banner de Acopio de Insumos Físicos */
-        .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-left: 5px solid var(--success); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .acopio-banner-card h4 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; }
-        .acopio-details { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 0.75rem; font-size: 0.875rem; background: var(--gray-100); padding: 0.75rem; border-radius: 4px; }
-        .acopio-list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; list-style: none; font-size: 0.85rem; color: var(--gray-700); }
-        .acopio-list-grid li { position: relative; padding-left: 1.25rem; }
-        .acopio-list-grid li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: bold; }
+        /* ==========================================================
+           DISEÑO ASIMÉTRICO DIVIDIDO PARA PUNTO DE ACOPIO (UPGRADED)
+           ========================================================== */
+        .acopio-banner-card { 
+            background: #ffffff; 
+            border: 1px solid var(--gray-200); 
+            border-top: 4px solid var(--accent); 
+            border-radius: 12px; 
+            padding: 2rem; 
+            margin-bottom: 2.5rem; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 2rem; 
+        }
+
+        @media (min-width: 768px) {
+            .acopio-banner-card { grid-template-columns: 350px 1fr; }
+        }
+
+        .acopio-info-side {
+            border-right: 1px solid var(--gray-200);
+            padding-right: 1.5rem;
+        }
+
+        @media (max-width: 767px) {
+            .acopio-info-side { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 1.5rem; }
+        }
+
+        .acopio-banner-card h4 { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin-bottom: 1.25rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.02em;
+        }
+
+        .acopio-chip {
+            background: var(--gray-100);
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            color: var(--gray-700);
+            border-left: 3px solid var(--success);
+            line-height: 1.4;
+        }
+
+        .acopio-list-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 1rem; 
+            list-style: none; 
+        }
+
+        .acopio-list-grid li { 
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.4;
+        }
+
+        .acopio-list-grid li:hover {
+            transform: translateY(-2px);
+            border-color: var(--success);
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.05);
+        }
 
         /* Rejilla de Navegación 2x2 Balanceada */
         .home-grid-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
@@ -317,25 +384,31 @@
                 </div>
 
                 <div class="acopio-banner-card">
-                    <h4>📍 Punto USB para recepción de donativos físicos</h4>
-                    <div class="acopio-details">
-                        <div><strong>Dirección:</strong> Centro Venezolano Americano (CVA), Las Mercedes, Caracas.</div>
-                        <div><strong>Horario operativo:</strong> 9:00 a.m. a 6:00 p.m.</div>
+                    <div class="acopio-info-side">
+                        <h4>📍 Centro de Recepción Física</h4>
+                        <div class="acopio-chip">
+                            <strong>Dirección de entrega:</strong><br>Centro Venezolano Americano (CVA), Las Mercedes, Caracas.
+                        </div>
+                        <div class="acopio-chip" style="border-left-color: var(--accent);">
+                            <strong>Horario operativo:</strong><br>Lunes a Domingo — 9:00 a.m. a 6:00 p.m.
+                        </div>
                     </div>
-                    <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--gray-700); margin-top: 0.5rem;">Insumos Críticos Solicitados:</p>
-                    <ul class="acopio-list-grid">
-                        <li>Pañales para niños y adultos (todas las tallas).</li>
-                        <li>Carpas, colchonetas, cobijas, sábanas, linternas y pilas.</li>
-                        <li>Kits de aseo: cepillos, pasta dental, desodorante, jabón, shampoo, toallas sanitarias y húmedas.</li>
-                        <li>Juguetes para niños y juegos de mesa para adultos (dominó, cartas).</li>
-                    </ul>
+                    <div>
+                        <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; letter-spacing: 0.05em;">Insumos Críticos Solicitados en Campaña:</p>
+                        <ul class="acopio-list-grid">
+                            <li><strong>🍼 Cuidado Infantil y Adulto:</strong> Pañales para niños y adultos (todas las tallas).</li>
+                            <li><strong>⛺ Refugio y Emergencia:</strong> Carpas, colchonetas, cobijas, sábanas, linternas y pilas operativas.</li>
+                            <li><strong>🧼 Higiene e Higienización:</strong> Cepillos, pasta dental, desodorante, jabón, shampoo, toallas sanitarias y húmedas.</li>
+                            <li><strong>🧸 Apoyo y Recreación:</strong> Juguetes para niños y juegos de mesa para adultos (dominó, cartas).</li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <div class="home-grid-buttons">
                     <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
                         <div>
                             <h3>Necesito Ayuda</h3>
-                            <p>Registra requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate) directamente para la mesa de administración central.</p>
+                            <p>Registra directamente tus requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate).</p>
                         </div>
                         <button class="btn btn-warning btn-block">Registrar Solicitud</button>
                     </div>
@@ -351,9 +424,9 @@
                     <div class="action-card" onclick="navegarA('view-buscar')">
                         <div>
                             <h3>Busco a Alguien</h3>
-                            <p>Consulta el tablero central en tiempo real para rastrear la localización, salud y condiciones de familiares y compañeros uesebistas.</p>
+                            <p>Consulta el registro general en tiempo real para rastrear la localización, salud y condiciones de familiares y compañeros uesebistas.</p>
                         </div>
-                        <button class="btn btn-primary btn-block">Ver Tablero General</button>
+                        <button class="btn btn-primary btn-block">Ver Registro General</button>
                     </div>
 
                     <div class="action-card" onclick="navegarA('view-donar')">
@@ -455,57 +528,56 @@
                 <div class="grid-system" id="mallaColaboradores">
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
-                            <div class="panel-card">
-                                <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
-                                <div class="panel-body">
-                                    <form id="colaboradorForm">
-                                        <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
-                                        <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <label class="form-label">Vínculo con la USB *</label>
-                                                <select id="colab_cargo" class="form-select" required>
-                                                    <option value="Estudiante">Estudiante USB</option>
-                                                    <option value="Profesor">Profesor USB</option>
-                                                    <option value="Egresado">Egresado USB</option>
-                                                    <option value="Administrativo">Administrativo USB</option>
-                                                    <option value="Obrero">Obrero USB</option>
-                                                    <option value="Externo">Externo</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label">Área de Apoyo Principal *</label>
-                                                <select id="colab_area" class="form-select" required>
-                                                    <option value="Remoción de Escombros">Remoción de Escombros</option>
-                                                    <option value="Recolección de Insumos">Recolección de Insumos</option>
-                                                    <option value="Logística y Transporte">Logística y Transporte</option>
-                                                    <option value="Primeros Auxilios">Primeros Auxilios</option>
-                                                </select>
-                                            </div>
+                            <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
+                            <div class="panel-body">
+                                <form id="colaboradorForm">
+                                    <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
+                                    <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="colab_telefono" class="form-input" required></div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Vínculo con la USB *</label>
+                                            <select id="colab_cargo" class="form-select" required>
+                                                <option value="Estudiante">Estudiante USB</option>
+                                                <option value="Profesor">Profesor USB</option>
+                                                <option value="Egresado">Egresado USB</option>
+                                                <option value="Administrativo">Administrativo USB</option>
+                                                <option value="Obrero">Obrero USB</option>
+                                                <option value="Externo">Externo</option>
+                                            </select>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <label class="form-label">Lugar de Operación Destinado *</label>
-                                                <select id="colab_lugar" class="form-select" required>
-                                                    <option value="Punto de Acopio USB">Punto de Acopio USB</option>
-                                                    <option value="Otro lado">Otro lado (Especificar abajo)</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label">Disponibilidad de Vehículo *</label>
-                                                <select id="colab_vehiculo" class="form-select" required>
-                                                    <option value="No">No poseo vehículo</option>
-                                                    <option value="Moto">Moto</option>
-                                                    <option value="Carro / Sedán">Carro / Sedán</option>
-                                                    <option value="Camioneta / Carga">Camioneta / Carga</option>
-                                                    <option value="Maquinaria Pesada">Maquinaria Pesada</option>
-                                                </select>
-                                            </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Área de Apoyo Principal *</label>
+                                            <select id="colab_area" class="form-select" required>
+                                                <option value="Remoción de Escombros">Remoción de Escombros</option>
+                                                <option value="Recolección de Insumos">Recolección de Insumos</option>
+                                                <option value="Logística y Transporte">Logística y Transporte</option>
+                                                <option value="Primeros Auxilios">Primeros Auxilios</option>
+                                            </select>
                                         </div>
-                                        <div class="form-group"><label class="form-label">Notas Adicionales / Especificar si marcó otro lugar</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana / Apoyo en zona centro"></div>
-                                        <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
-                                    </form>
-                                </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Lugar de Voluntariado *</label>
+                                            <select id="colab_lugar" class="form-select" required>
+                                                <option value="Punto de Acopio USB">Punto de Acopio USB</option>
+                                                <option value="Otro Lugar">Otro Lugar (Especificar en observaciones)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">¿Dispone de Vehículo para Apoyo? *</label>
+                                            <select id="colab_vehiculo" class="form-select" required>
+                                                <option value="No">No poseo vehículo</option>
+                                                <option value="Carro">Sí (Carro)</option>
+                                                <option value="Moto">Sí (Moto)</option>
+                                                <option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana"></div>
+                                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -679,6 +751,13 @@
         </div>
     </main>
 
+    <footer class="site-footer">
+        <div class="container">
+            <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
+            <p>Para más información, puedes escribirnos por WhatsApp al <a href="https://wa.me/584129267897" target="_blank">+58-412-9267897</a> o seguirnos en Instagram a través de <a href="https://instagram.com/aeusb" target="_blank">@aeusb</a>.</p>
+        </div>
+    </footer>
+
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const SUPABASE_KEY = "sb_publishable_ECurpyGW8jSgTMe30r89xA_o-WRwADV";
@@ -782,7 +861,7 @@
 
                 const { data: ayudas } = await supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false });
                 if (ayudas) ayudaNube = ayudas;
-            } catch(e) { console.log("Tablas asíncronas cargadas."); }
+            } catch(e) { console.log("Tablas preparadas."); }
 
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -955,7 +1034,7 @@
                 area_apoyo: document.getElementById('colab_area').value,
                 lugar_voluntariado: document.getElementById('colab_lugar').value,
                 vehiculo: document.getElementById('colab_vehiculo').value,
-                disponibilidad: document.getElementById('colab_notas').value.trim()
+                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim()
             };
             await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
             alert("¡Registro Completado! Gracias por sumarte.");
@@ -1073,6 +1152,10 @@
             };
             lector.readAsArrayBuffer(file);
         });
+
+        document.getElementById('buscarInput').addEventListener('input', filtrarYActualizarTablero);
+        document.getElementById('filtroEstado').addEventListener('change', filtrarYActualizarTablero);
+        document.getElementById('filtroGrupo').addEventListener('change', filtrarYActualizarTablero);
 
         document.getElementById('btnExportar').addEventListener('click', function() {
             let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
