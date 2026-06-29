@@ -1129,7 +1129,7 @@
                         let rawEst = String(row[iEst] || '').trim();
                         let estadoFinal = 'Desaparecido';
                         if (rawEst.includes('⚠️') || rawEst.toLowerCase().includes('atrapado')) estadoFinal = 'Atrapado';
-                        if (rawEst.includes('✅') || rawEst.toLowerCase().includes('bien')) estadoFinal = 'Con Vida';
+                        if (rawEst.includes('✅') || rawEst.toLowerCase().includes('vida')) estadoFinal = 'Con Vida';
                         if (rawEst.includes('🕊️') || rawEst.includes('💀') || rawEst.toLowerCase().includes('fallecido')) estadoFinal = 'Fallecido';
 
                         await supabaseClient.from('registros_ciudadanos').insert([{
