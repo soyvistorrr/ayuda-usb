@@ -180,7 +180,6 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
         }
         
-        /* OPTIMIZACIÓN CLÁSICA EXCEL CON AJUSTE HASTA 3-4 LÍNEAS */
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; }
         
         thead th { 
@@ -206,7 +205,7 @@
         }
         tbody tr:hover { background-color: var(--gray-100); }
 
-        /* CONTENEDOR ELÁSTICO LIMITADO A MAX 4 LÍNEAS CON SCROLL DINÁMICO */
+        /* CONTENEDOR ELÁSTICO LIMITADO A MAX 4 LÍNEAS CON SCROLL DINÁMICO REQUERIDO */
         .text-truncate-clamp {
             display: -webkit-box;
             -webkit-line-clamp: 4; 
@@ -473,7 +472,7 @@
                 <div class="grid-system" id="mallaAyuda">
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--warning);">
-                            <div class="panel-header"><div class="panel-title">Formulario de Solicitud de Auxilio</div></div>
+                            <div class="panel-header"><div class="panel-title" id="form-mode-title-ayuda">Formulario de Solicitud de Auxilio</div></div>
                             <div class="panel-body">
                                 <form id="ayudaForm">
                                     <div class="form-group">
@@ -489,7 +488,6 @@
                                         <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
                                     </div>
                                     
-                                    <!-- EXPANSIÓN DE CAMPOS CONFORMES AL EXCEL REQUERIDO -->
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Sede USB Vinculada *</label>
@@ -529,7 +527,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Estado Residencial *</label>
-                                            <select id="ayuda_estado_res" class="form-select" required>
+                                            <select id="ayuda_state_res" class="form-select" required>
                                                 <option value="La Guaira">La Guaira</option>
                                                 <option value="Miranda">Miranda</option>
                                                 <option value="Distrito Capital">Distrito Capital</option>
@@ -617,7 +615,8 @@
 
                                     <div class="form-group"><label class="form-label">Ubicación Física Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Donde se encuentra físicamente hoy"></div>
                                     <div class="form-group"><label class="form-label">Descripción de lo que Necesitas / Observación *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, rescate..."></textarea></div>
-                                    <button type="submit" class="btn btn-warning btn-block">Enviar Requerimiento</button>
+                                    <button type="submit" class="btn btn-warning btn-block" id="btn-submit-ayuda">Enviar Requerimiento</button>
+                                    <div id="cancel-edit-container-ayuda"></div>
                                 </form>
                             </div>
                         </div>
@@ -647,7 +646,7 @@
                     <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
-                            <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
+                            <div class="panel-header"><div class="panel-title" id="form-mode-title-colab">Inscripción de Voluntarios</div></div>
                             <div class="panel-body">
                                 <form id="colaboradorForm">
                                     <div class="form-group"><label class="form-label">Nombre y Apellido *</label><input type="text" id="colab_nombre" class="form-input" required></div>
@@ -676,7 +675,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- ADICIONES CONGRUENTES CON HOJA DE OFRECIMIENTOS -->
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Ubicación Residencial Base *</label>
@@ -697,7 +695,6 @@
                                         <div class="form-group"><label class="form-label">¿Dispone de Vehículo de Apoyo? *</label><select id="colab_vehiculo" class="form-select" required><option value="No">No poseo vehículo</option><option value="Carro">Sí (Carro)</option><option value="Moto">Sí (Moto)</option><option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option></select></div>
                                     </div>
                                     
-                                    <!-- LISTA DESPLEGABLE EN LUGAR DE TEXTO LIBRE -->
                                     <div class="form-group">
                                         <label class="form-label">Tipo de Ofrecimiento Detallado *</label>
                                         <select id="colab_ofrecimiento_det" class="form-select" required>
@@ -709,7 +706,8 @@
                                     </div>
 
                                     <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana enteros"></div>
-                                    <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
+                                    <button type="submit" class="btn btn-success btn-block" id="btn-submit-colab">Registrarse como Voluntario</button>
+                                    <div id="cancel-edit-container-colab"></div>
                                 </form>
                             </div>
                         </div>
@@ -861,7 +859,6 @@
                 </div>
 
                 <div class="donation-data-row">
-                    <!-- Soporte USD -->
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
                         <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
@@ -870,7 +867,6 @@
                         </div>
                     </div>
 
-                    <!-- Soporte Bs -->
                     <div class="donation-data-card" style="border-top: 4px solid var(--success);">
                         <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
                         <div class="donation-data-body">
@@ -899,12 +895,17 @@
                 </div>
 
                 <div class="links-grid">
-                    <!-- TARJETA DEL EXCEL CENTRAL CON LA DESCRIPCIÓN EXIGIDA -->
                     <div class="link-resource-card">
                         <div>
                             <h4>Directorio de Profesores y Profesionales de Salud Solidarios</h4>
                             <p style="font-style: normal; font-weight: 400; color: var(--text-muted); margin-bottom: 1rem;">
-                                Aporte voluntario de profesionales de la salud y el bienestar que han puesto a disposición su tiempo y conocimiento para atenderte de forma gratuita o solidaria tras la emergencia.<br><br>  
+                                ¡Hola! Si estás acá, queremos que sepas que no estás solo. Esta lista es un aporte voluntario de profesionales de la salud y el bienestar que han puesto a disposición su tiempo y conocimiento para atenderte de forma gratuita o solidaria tras la emergencia.<br><br>
+                                Esta pestaña está en modo lectura para proteger la información, pero puedes revisar todas las filas para buscar el especialista que necesitas.<br><br>
+                                🔍 <strong>¿Cómo usar este directorio?</strong><br>
+                                Puedes buscar atención si eres afectado directo, o si eres un familiar/allegado buscando asesoría para alguien que lo necesita.<br>
+                                <strong>Contacto directo:</strong> Revisa la especialidad que requieres, copia el número de contacto o correo del profesional y comunícate directamente con él o ella para coordinar tu consulta.<br><br>
+                                📢 <strong>Ayúdanos a hacer eco:</strong><br>
+                                Si conoces a otros pacientes, familiares o vecinos afectados por el terremoto que necesiten asistencia médica, comparte el enlace de este Excel con ellos. Mucha gente lo va a necesitar.
                             </p>
                         </div>
                         <a href="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/edit?usp=sharing" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Abrir Directorio de Especialistas</a>
@@ -963,11 +964,11 @@
         </div>
     </main>
 
-    <!-- PIE DE PÁGINA INSTITUCIONAL RESTAURADO COMPLETO -->
+    <!-- PIE DE PÁGINA INSTITUCIONAL RESTAURADO -->
     <footer class="site-footer">
         <div class="container">
-            <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
-            <p>Para más información, puedes escribirnos por WhatsApp al <a href="https://wa.me/584129267897" target="_blank">+58-412-9267897</a> o seguirnos en Instagram a través de <a href="https://instagram.com/aeusb" target="_blank">@aeusb</a>.</p>
+            <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>[cite: 1].</p>
+            <p>Para más información, puedes escribirnos por WhatsApp al <a href="https://wa.me/584129267897" target="_blank">+58-412-9267897</a> o seguirnos en Instagram a través de <a href="https://instagram.com/aeusb" target="_blank">@aeusb</a>[cite: 1].</p>
         </div>
     </footer>
 
@@ -980,7 +981,11 @@
         let colaboradoresNube = [];
         let ayudaNube = [];
         let esAdministrador = false; 
+        
+        // Identificadores de fila para control CRUD de edición avanzada
         let idEnEdicion = null;
+        let idEdicionAyuda = null;
+        let idEdicionColab = null;
 
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
@@ -1049,6 +1054,8 @@
 
                 document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "none");
                 cancelarEdicion();
+                cancelarEdicionAyuda();
+                cancelarEdicionColab();
             }
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -1150,14 +1157,13 @@
             const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
         }
 
-        /* ACTUALIZACIÓN DINÁMICA DE COLABORADORES CON CLAMP FLEXIBLE */
         function actualizarInterfazColaboradores(datos) {
             const thead = document.getElementById('theadColab');
             const cuerpo = document.getElementById('tablaColabCuerpo');
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO</th><th>TELÉFONO</th><th>NOTAS</th><th class="admin-action-header">ACCIONES</th></tr>`;
             } else {
                 thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO</th><th>NOTAS</th></tr>`;
             }
@@ -1185,6 +1191,7 @@
                         <td data-label="Ofrecimiento Detallado"><div class="text-truncate-clamp">${ofr}</div></td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
                         <td data-label="Notas"><div class="text-truncate-clamp">${notas}</div></td>
+                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionColab(${c.id})">Editar</button><button class="btn-delete" onclick="eliminarColab(${c.id})">Eliminar</button></td>
                     `;
                 } else {
                     fila.innerHTML = `
@@ -1203,14 +1210,13 @@
             });
         }
 
-        /* ACTUALIZACIÓN DINÁMICA DE SOLICITUDES CON CLAMP FLEXIBLE */
         function actualizarInterfazAyuda(datos) {
             const thead = document.getElementById('theadAyuda');
             const cuerpo = document.getElementById('tablaAyudaCuerpo');
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>CÉDULA</th><th>TELÉFONO</th><th>CORREO</th><th>SEDE</th><th>CARNET</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>DIRECCIÓN</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th></tr>`;
+                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>CÉDULA</th><th>TELÉFONO</th><th>CORREO</th><th>SEDE</th><th>CARNET</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>DIRECCIÓN</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th><th class="admin-action-header">ACCIONES</th></tr>`;
             } else {
                 thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>SEDE</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th></tr>`;
             }
@@ -1262,6 +1268,7 @@
                         <td data-label="Damnificado">${damn}</td>
                         <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${ubiAct}</div></td>
                         <td data-label="Requerimiento"><div class="text-truncate-clamp">${req}</div></td>
+                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda(${a.id})">Editar</button><button class="btn-delete" onclick="eliminarAyuda(${a.id})">Eliminar</button></td>
                     `;
                 } else {
                     fila.innerHTML = `
@@ -1286,80 +1293,102 @@
             });
         }
 
-        document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // --- SISTEMA CRUD INTEGRADO PARA SOLICITUDES DE AYUDA ---
+        window.activarEdicionAyuda = function(id) {
+            const reg = ayudaNube.find(r => r.id === id);
+            if (!reg) return;
+            idEdicionAyuda = id;
             
-            let serviciosMarcados = [];
-            document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
-                serviciosMarcados.push(cb.value);
+            document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio";
+            document.getElementById('ayuda_tipo').value = reg.tipo_reporte || 'Para mí';
+            document.getElementById('ayuda_nombre').value = reg.nombre || '';
+            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : (reg.cedula || '');
+            document.getElementById('ayuda_telefono').value = reg.telefono || '';
+            document.getElementById('ayuda_sede_usb').value = reg.sede_usb || 'Sartenejas';
+            document.getElementById('ayuda_carnet').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
+            document.getElementById('comunidad_ayuda').value = reg.comunidad || 'Universidad Simón Bolívar';
+            document.getElementById('grupo_ayuda').value = reg.grupo || 'Estudiante';
+            document.getElementById('ayuda_estado_res').value = reg.estado_residencial || 'La Guaira';
+            document.getElementById('ayuda_eje').value = reg.eje_logistico || 'Eje 1. Naiguatá-Camurí Grande';
+            document.getElementById('ayuda_direccion_res').value = reg.direccion_residencial || '';
+            document.getElementById('ayuda_afectacion_viv').value = reg.afectacion_vivienda || 'Afectación parcial';
+            document.getElementById('ayuda_refugio').value = reg.requiere_refugio || 'No';
+            document.getElementById('ayuda_estado').value = reg.estado || 'Desaparecido';
+            document.getElementById('ayuda_lesiones').value = reg.lesiones_fisicas || 'No';
+            document.getElementById('ayuda_damnificado').value = reg.damnificado || 'No';
+            document.getElementById('ayuda_correo').value = reg.correo || '';
+            document.getElementById('ayuda_ubicacion').value = reg.ubicacion || '';
+            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda || '';
+
+            // Limpiar y restaurar checkboxes de servicios
+            let servs = reg.servicios_afectados ? reg.servicios_afectados.split(', ') : [];
+            document.querySelectorAll('input[name="servicio_afectado"]').forEach(cb => {
+                cb.checked = servs.includes(cb.value);
             });
 
-            const nuevaSolicitud = {
-                nombre: document.getElementById('ayuda_nombre').value.trim(),
-                cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
-                telefono: document.getElementById('ayuda_telefono').value.trim(),
-                ubicacion: document.getElementById('ayuda_ubicacion').value.trim(),
-                descripcion_ayuda: document.getElementById('ayuda_descripcion').value.trim(),
-                tipo_reporte: document.getElementById('ayuda_tipo').value,
-                comunidad: document.getElementById('comunidad_ayuda').value,
-                grupo: document.getElementById('grupo_ayuda').value,
-                estado: document.getElementById('ayuda_estado').value,
-                damnificado: document.getElementById('ayuda_damnificado').value,
-                sede_usb: document.getElementById('ayuda_sede_usb').value,
-                carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
-                estado_residencial: document.getElementById('ayuda_estado_res').value,
-                eje_logistico: document.getElementById('ayuda_eje').value,
-                direccion_residencial: document.getElementById('ayuda_direccion_res').value.trim(),
-                afectacion_vivienda: document.getElementById('ayuda_afectacion_viv').value,
-                requiere_refugio: document.getElementById('ayuda_refugio').value,
-                lesiones_fisicas: document.getElementById('ayuda_lesiones').value,
-                servicios_afectados: serviciosMarcados.join(', ') || 'Ninguno',
-                correo: document.getElementById('ayuda_correo').value.trim()
-            };
+            document.getElementById('btn-submit-ayuda').innerText = "Actualizar Solicitud en Nube";
+            document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar Edición</button>`;
+            window.scrollTo({ top: document.getElementById('ayudaForm').offsetTop, behavior: 'smooth' });
+        };
 
-            const { error } = await supabaseClient.from('solicitudes_ayuda').insert([nuevaSolicitud]);
-            if (error) {
-                console.error(error);
-                alert("Fallo de Base de Datos al guardar reporte: " + error.message);
-                return;
-            }
-            alert("Tu solicitud de asistencia ha sido enviada con éxito.");
+        window.cancelarEdicionAyuda = function() {
+            idEdicionAyuda = null;
             document.getElementById('ayudaForm').reset();
-            await cargarDatosDesdeNube();
-            navegarA('view-home');
-        });
+            document.getElementById('form-mode-title-ayuda').innerText = "Formulario de Solicitud de Auxilio";
+            document.getElementById('btn-submit-ayuda').innerText = "Enviar Requerimiento";
+            document.getElementById('cancel-edit-container-ayuda').innerHTML = '';
+        };
 
-        document.getElementById('colaboradorForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const nuevoVoluntario = {
-                nombre: document.getElementById('colab_nombre').value.trim(),
-                telefono: document.getElementById('colab_telefono').value.trim(),
-                cargo_usb: document.getElementById('colab_cargo').value,
-                area_apoyo: document.getElementById('colab_area').value,
-                lugar_voluntariado: document.getElementById('colab_lugar').value,
-                vehiculo: document.getElementById('colab_vehiculo').value,
-                disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim(),
-                ubicacion_geografica: document.getElementById('colab_ubicacion_geo').value.trim(),
-                traslado_logistico: document.getElementById('colab_traslado').value,
-                ofrecimiento_detallado: document.getElementById('colab_ofrecimiento_det').value
-            };
-
-            const { error } = await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
-            if (error) {
-                console.error(error);
-                alert("Fallo de Base de Datos al guardar colaborador: " + error.message);
-                return;
+        window.eliminarAyuda = async function(id) {
+            if(confirm('¿Deseas eliminar permanentemente esta solicitud de ayuda?')) {
+                await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
+                await cargarDatosDesdeNube();
             }
-            alert("¡Registro Completado! Gracias por sumarte.");
+        };
+
+        // --- SISTEMA CRUD INTEGRADO PARA COLABORADORES ---
+        window.activarEdicionColab = function(id) {
+            const reg = colaboradoresNube.find(r => r.id === id);
+            if (!reg) return;
+            idEdicionColab = id;
+
+            document.getElementById('form-mode-title-colab').innerText = "Modificar Ficha de Voluntario";
+            document.getElementById('colab_nombre').value = reg.nombre || '';
+            document.getElementById('colab_telefono').value = reg.telefono || '';
+            document.getElementById('colab_cargo').value = reg.cargo_usb || 'Estudiante USB';
+            document.getElementById('colab_area').value = reg.area_apoyo || 'Remoción de Escombros';
+            document.getElementById('colab_ubicacion_geo').value = reg.ubicacion_geografica || '';
+            document.getElementById('colab_traslado').value = reg.traslado_logistico || 'Dispone de transporte propio';
+            document.getElementById('colab_lugar').value = reg.lugar_voluntariado || 'Punto de Acopio USB';
+            document.getElementById('colab_vehiculo').value = reg.vehiculo || 'No';
+            document.getElementById('colab_ofrecimiento_det').value = reg.ofrecimiento_detallado || 'Alimentos, Ropa, Art. Higiene, Colchonetas';
+            document.getElementById('colab_notas').value = reg.disponibilidad || '';
+
+            document.getElementById('btn-submit-colab').innerText = "Actualizar Voluntario en Nube";
+            document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar Edición</button>`;
+            window.scrollTo({ top: document.getElementById('colaboradorForm').offsetTop, behavior: 'smooth' });
+        };
+
+        window.cancelarEdicionColab = function() {
+            idEdicionColab = null;
             document.getElementById('colaboradorForm').reset();
-            await cargarDatosDesdeNube();
-        });
+            document.getElementById('form-mode-title-colab').innerText = "Inscripción de Voluntarios";
+            document.getElementById('btn-submit-colab').innerText = "Registrarse como Voluntario";
+            document.getElementById('cancel-edit-container-colab').innerHTML = '';
+        };
+
+        window.eliminarColab = async function(id) {
+            if(confirm('¿Deseas dar de baja a este colaborador permanentemente?')) {
+                await supabaseClient.from('colaboradores').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
 
         window.activarEdiciónEnPagina = function(id) {
             const reg = registrosNube.find(r => r.id === id);
             if (!reg) return;
             idEnEdicion = id;
-            document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro";
+            document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro Afectado";
             document.getElementById('nombre').value = reg.nombre;
             document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
             document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
@@ -1380,13 +1409,13 @@
             if(gKey.includes('ext')) grupoMapeado = "Externo";
             document.getElementById('grupo').value = grupoMapeado;
 
-            document.getElementById('btn-submit-form').innerText = "Actualizar en la Nube";
+            document.getElementById('btn-submit-form').innerText = "Actualizar Estatus en la Nube";
             document.getElementById('cancel-edit-container').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicion()">Cancelar</button>`;
         };
 
         window.cancelarEdicion = function() {
             idEnEdicion = null; document.getElementById('registroForm').reset();
-            document.getElementById('form-mode-title-afectado').innerText = "Registro Individual";
+            document.getElementById('form-mode-title-afectado').innerText = "Registro Afectado";
             document.getElementById('btn-submit-form').innerText = "Guardar en la Nube";
             document.getElementById('cancel-edit-container').innerHTML = '';
         };
@@ -1476,7 +1505,6 @@
             descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
         });
 
-        /* EXCEL EXPORT TOTAL CON CAMPOS EXPANDIDOS PERSONALIZADOS */
         document.getElementById('btnExportarColab').addEventListener('click', function() {
             let matriz = [["Voluntario", "Cargo/Vinculo", "Ubicación Residencial Base", "Area de Apoyo", "Logística Traslado", "Lugar Voluntariado Destinado", "Vehiculo", "Ofrecimiento Detallado", "Telefono Móvil", "Disponibilidad / Notas"]];
             colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.ubicacion_geografica || '-', c.area_apoyo, c.traslado_logistico || '-', c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.ofrecimiento_detallado || '-', c.telefono, c.disponibilidad]));
