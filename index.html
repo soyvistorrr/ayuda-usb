@@ -156,7 +156,7 @@
 
         /* Estilos de Checkboxes para Servicios */
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
-        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
+        .checkbox-grid label.checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
         .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent); }
 
         /* Carga Masiva y Filtros */
@@ -181,7 +181,7 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
         }
         
-        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; text-align: left; table-layout: fixed; }
         
         thead th { 
             position: sticky; 
@@ -196,8 +196,19 @@
             border-bottom: 2px solid var(--gray-300);
         }
         
-        td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; }
+        td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--text-main); vertical-align: middle; word-wrap: break-word; }
         tbody tr:hover { background-color: var(--gray-100); }
+
+        /* Estilos de Control de Textos Largos */
+        .text-scroll-cell {
+            max-height: 75px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .text-scroll-cell::-webkit-scrollbar { width: 4px; }
+        .text-scroll-cell::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
 
         .badge { display: inline-flex; align-items: center; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
         .badge-danger { background: #fef2f2; color: var(--danger); }
@@ -300,6 +311,7 @@
 
             /* Transformación Global de Tablas Horizontales Apachurradas a Tarjetas Verticales */
             .table-container { border: none; background: transparent; max-height: none; overflow: visible; }
+            table { table-layout: auto !important; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead { display: none !important; } /* Ocultar cabecera rígida horizontal */
             
@@ -314,7 +326,7 @@
             }
             tr:hover, tr:active { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08); }
             
-            /* Inyección Dinámica de Atributos CSS de Fila */
+            /* Inyección Dinámica de Atributos CSS de Fila responsiva */
             td, .right-column td { 
                 display: flex !important;
                 justify-content: space-between;
@@ -327,7 +339,6 @@
             }
             td:last-child, .right-column td:last-child { border-bottom: none !important; }
             
-            /* Generación automatizada de títulos de celda responsivos */
             td::before, .right-column td::before { 
                 content: attr(data-label); 
                 font-weight: 700; 
@@ -344,6 +355,10 @@
                 font-size: 1.05rem;
                 color: var(--primary);
             }
+            
+            /* Desactivar el scroll forzado interno en la vista móvil */
+            .text-scroll-cell { max-height: none !important; overflow-y: visible !important; padding-right: 0 !important; }
+
             td.actions-cell { justify-content: flex-end; padding-top: 1rem !important; margin-top: 0.5rem; border-top: 1px solid var(--gray-200) !important; gap: 0.5rem; }
             td.actions-cell::before { display: none !important; }
             td.actions-cell button { padding: 0.5rem 1rem; font-size: 0.8rem; }
@@ -432,7 +447,7 @@
                     <div class="action-card" onclick="navegarA('view-enlaces')">
                         <div>
                             <h3>Enlaces y Listas Oficiales</h3>
-                            <p>Accede a las páginas de búsquedas unificadas, listas de hospitales y la hoja de cálculo general compartida en vivo.</p>
+                            <p>Accede a las listas oficiales de personas hospitalizadas, censos vecinales y el directorio de profesionales de la salud solidarios.</p>
                         </div>
                         <button class="btn btn-primary btn-block" style="background-color: #0284c7; color: white;">Ver Enlaces</button>
                     </div>
@@ -607,11 +622,11 @@
                     <!-- Tabla de Auxilio Dinámica (PÚBLICA O ADMIN COMPLETA) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
-                            <div id="titulo-casos-ayuda" style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos</div>
+                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos</div>
                             <button id="btnExportarAyuda" class="btn btn-success" style="display: none;">Descargar Excel Ayuda</button>
                         </div>
                         <div class="table-container">
-                            <table id="tablaAyudaMaster">
+                            <table>
                                 <thead id="theadAyuda"></thead>
                                 <tbody id="tablaAyudaCuerpo"></tbody>
                             </table>
@@ -625,6 +640,7 @@
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
                 <div class="grid-system" id="mallaColaboradores">
+                    <!-- Formulario Directo en la Página -->
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
                             <div class="panel-header"><div class="panel-title">Inscripción de Voluntarios</div></div>
@@ -677,7 +693,17 @@
                                         <div class="form-group"><label class="form-label">¿Dispone de Vehículo de Apoyo? *</label><select id="colab_vehiculo" class="form-select" required><option value="No">No poseo vehículo</option><option value="Carro">Sí (Carro)</option><option value="Moto">Sí (Moto)</option><option value="Maquinaria / Camión">Sí (Maquinaria / Camión)</option></select></div>
                                     </div>
                                     
-                                    <div class="form-group"><label class="form-label">Tipo de Ofrecimiento Detallado / Recursos a Donar</label><input type="text" id="colab_ofrecimiento_det" class="form-input" placeholder="Ej: Alimentos, Medicinas, Ropa, Colchonetas, Inspecciones..."></div>
+                                    <!-- CAMBIO SOLICITADO: LISTA DESPLEGABLE EN LUGAR DE TEXTO LIBRE -->
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo de Ofrecimiento Detallado *</label>
+                                        <select id="colab_ofrecimiento_det" class="form-select" required>
+                                            <option value="Alimentos, Ropa, Art. Higiene, Colchonetas">Alimentos, Ropa, Art. Higiene, Colchonetas</option>
+                                            <option value="Medicinas">Medicinas</option>
+                                            <option value="Inspecciones">Inspecciones Técnicas</option>
+                                            <option value="Otro">Otro (Especificar detalles en las notas adicionales)</option>
+                                        </select>
+                                    </div>
+
                                     <div class="form-group"><label class="form-label">Disponibilidad / Notas Adicionales</label><input type="text" id="colab_notas" class="form-input" placeholder="Ej: Fines de semana enteros"></div>
                                     <button type="submit" class="btn btn-success btn-block">Registrarse como Voluntario</button>
                                 </form>
@@ -857,7 +883,7 @@
                 </div>
             </section>
 
-            <!-- VISTA 6: ENLACES DE INTERÉS REORGANIZADO (SIN VISOR NI RESALTADO EXTRA) -->
+            <!-- VISTA 6: ENLACES DE INTERÉS REORGANIZADO SIN VISOR INTERNO -->
             <section class="app-view" id="view-enlaces">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -867,19 +893,27 @@
                 </div>
 
                 <div class="links-grid">
-                    <!-- ENLACE ADAPTADO A TARJETA ESTÁNDAR UNIFORME -->
+                    <!-- TARJETA DEL EXCEL CENTRAL CON LA NUEVA DESCRIPCIÓN SOLICITADA -->
                     <div class="link-resource-card">
                         <div>
-                            <h4>Hoja de Control Central en Vivo</h4>
-                            <p>Acceso directo y completo a la hoja de cálculo general compartida y actualizada en tiempo real por el equipo coordinador con el estatus detallado de habitabilidad, censos y asignación logística.</p>
+                            <h4>Directorio de Profesores y Profesionales de Salud Solidarios</h4>
+                            <p style="font-style: normal; font-weight: 400; color: var(--text-muted); margin-bottom: 1rem;">
+                                ¡Hola! Si estás acá, queremos que sepas que no estás solo. Esta lista es un aporte voluntario de profesionales de la salud y el bienestar que han puesto a disposición su tiempo y conocimiento para atenderte de forma gratuita o solidaria tras la emergencia.<br><br>
+                                Esta pestaña está en modo lectura para proteger la información, pero puedes revisar todas las filas para buscar el especialista que necesitas.<br><br>
+                                🔍 <strong>¿Cómo usar este directorio?</strong><br>
+                                Puedes buscar atención si eres afectado directo, o si eres un familiar/allegado buscando asesoría para alguien que lo necesita.<br>
+                                <strong>Contacto directo:</strong> Revisa la especialidad que requieres, copia el número de contacto o correo del profesional y comunícate directamente con él o ella para coordinar tu consulta.<br><br>
+                                📢 <strong>Ayúdanos a hacer eco:</strong><br>
+                                Si conoces a otros pacientes, familiares o vecinos afectados por el terremoto que necesiten asistencia médica, comparte el enlace de este Excel con ellos. Mucha gente lo va a necesitar.
+                            </p>
                         </div>
-                        <a href="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/edit?usp=sharing" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Abrir Documento</a>
+                        <a href="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/edit?usp=sharing" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Abrir Directorio de Especialistas</a>
                     </div>
                     
                     <div class="link-resource-card">
                         <div>
                             <h4>Hospitales en Venezuela</h4>
-                            <p>Plataforma nacional unificada para consultar la capacidad operativa de las salas de emergencia y reportes de ingreso de personas afectadas.</p>
+                            <p>Plataforma para consultar el estatus, capacidad y reportes de ingreso inmediato en la red hospitalaria nacional.</p>
                         </div>
                         <a href="https://hospitalesenvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
@@ -887,7 +921,7 @@
                     <div class="link-resource-card">
                         <div>
                             <h4>Red Ayuda Venezuela</h4>
-                            <p>Monitoreo civil voluntario para localizar solicitudes de soporte humanitario y mapeo de centros de acopio activos.</p>
+                            <p>Mapa de calor comunitario para localizar centros de acopio activos y solicitudes de soporte en tiempo real.</p>
                         </div>
                         <a href="https://redayudavenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
@@ -895,15 +929,15 @@
                     <div class="link-resource-card">
                         <div>
                             <h4>Reencuentro Help</h4>
-                            <p>Base de datos abierta orientada a cruzar información de núcleos familiares localizados en refugios institucionales.</p>
+                            <p>Base de datos civil para reportar y cruzar información de personas localizadas en refugios institucionales.</p>
                         </div>
                         <a href="https://reencuentro.help/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
                     
                     <div class="link-resource-card">
                         <div>
-                            <h4>Desaparecidos Terremoto Venezuela</h4>
-                            <p>Registro de filiación y carga de fotografías para procesar búsquedas de personas incomunicadas en zonas sin conectividad.</p>
+                            <h4>Desaparecidos Terremoto</h4>
+                            <p>Registro fotográfico y de filiación de ciudadanos incomunicados en las zones con fallas de infraestructura eléctrica.</p>
                         </div>
                         <a href="https://desaparecidosterremotovenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
@@ -911,7 +945,7 @@
                     <div class="link-resource-card">
                         <div>
                             <h4>Encuentra tu Familiar Hospitales</h4>
-                            <p>Filtro de contingencia para la ubicación y reconocimiento de identidades de pacientes trasladados sin documentación.</p>
+                            <p>Canal de verificación de identidades para pacientes trasladados de emergencia sin documentación a las capitales.</p>
                         </div>
                         <a href="https://encuentratufamiliarhospitalvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
@@ -919,7 +953,7 @@
                     <div class="link-resource-card">
                         <div>
                             <h4>Encuentra tu Familiar General</h4>
-                            <p>Motor central de búsqueda con soporte de redes de telecomunicaciones para la unificación internacional de listados civiles.</p>
+                            <p>Motor de búsqueda centralizado con soporte internacional para unificar listados de sobrevivientes civiles.</p>
                         </div>
                         <a href="https://www.encuentratufamiliar.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
@@ -1108,16 +1142,16 @@
             const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
         }
 
-        /* RENDERIZADO DE TABLA DE COLABORADORES CON FILTRADO DE SEGURIDAD PÚBLICA */
+        /* ACTUALIZACIÓN DINÁMICA DE COLABORADORES CON TEXT SCROLL */
         function actualizarInterfazColaboradores(datos) {
             const thead = document.getElementById('theadColab');
             const cuerpo = document.getElementById('tablaColabCuerpo');
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO DETALLADO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th style="width:14%">VOLUNTARIO</th><th style="width:10%">VÍNCULO</th><th style="width:12%">UBICACIÓN</th><th style="width:12%">APOYO BASE</th><th style="width:12%">TRASLADO</th><th style="width:12%">DESTINO</th><th style="width:8%">VEHÍCULO</th><th style="width:14%">OFRECIMIENTO</th><th style="width:10%">TELÉFONO</th><th style="width:14%">NOTAS</th></tr>`;
             } else {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO DETALLADO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th style="width:15%">VOLUNTARIO</th><th style="width:12%">VÍNCULO</th><th style="width:12%">UBICACIÓN</th><th style="width:15%">APOYO BASE</th><th style="width:15%">TRASLADO</th><th style="width:15%">DESTINO</th><th style="width:10%">VEHÍCULO</th><th style="width:20%">OFRECIMIENTO</th><th style="width:18%">NOTAS</th></tr>`;
             }
 
             cuerpo.innerHTML = '';
@@ -1129,6 +1163,7 @@
                 let geo = c.ubicacion_geografica || '-';
                 let traslado = c.traslado_logistico || 'No especifica';
                 let ofr = c.ofrecimiento_detallado || '-';
+                let notas = c.disponibilidad || '-';
                 
                 if (esAdministrador) {
                     fila.innerHTML = `
@@ -1139,9 +1174,9 @@
                         <td data-label="Logística Traslado">${traslado}</td>
                         <td data-label="Lugar Destino">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
-                        <td data-label="Ofrecimiento Detallado">${ofr}</td>
+                        <td data-label="Ofrecimiento Detallado"><div class="text-scroll-cell">${ofr}</div></td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
-                        <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                        <td data-label="Notas"><div class="text-scroll-cell">${notas}</div></td>
                     `;
                 } else {
                     fila.innerHTML = `
@@ -1152,15 +1187,15 @@
                         <td data-label="Logística Traslado">${traslado}</td>
                         <td data-label="Lugar Destino">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
-                        <td data-label="Ofrecimiento Detallado">${ofr}</td>
-                        <td data-label="Notas">${c.disponibilidad || '-'}</td>
+                        <td data-label="Ofrecimiento Detallado"><div class="text-scroll-cell">${ofr}</div></td>
+                        <td data-label="Notas"><div class="text-scroll-cell">${notas}</div></td>
                     `;
                 }
                 cuerpo.appendChild(fila);
             });
         }
 
-        /* RENDERIZADO DE TABLA DE SOLICITUDES CON FILTRADO DE SEGURIDAD PÚBLICA */
+        /* ACTUALIZACIÓN DINÁMICA DE SOLICITUDES CON SEGURIDAD Y TEXT SCROLLCELL */
         function actualizarInterfazAyuda(datos) {
             const thead = document.getElementById('theadAyuda');
             const cuerpo = document.getElementById('tablaAyudaCuerpo');
@@ -1210,15 +1245,15 @@
                         <td data-label="Grupo">${grp}</td>
                         <td data-label="Estado Res.">${estRes}</td>
                         <td data-label="Eje">${eje}</td>
-                        <td data-label="Dirección">${dir}</td>
+                        <td data-label="Dirección"><div class="text-scroll-cell">${dir}</div></td>
                         <td data-label="Afectación Viv.">${afViv}</td>
                         <td data-label="Refugio">${ref}</td>
                         <td data-label="Servicios">${serv}</td>
                         <td data-label="Situación">${estSalud}</td>
                         <td data-label="Lesiones">${les}</td>
                         <td data-label="Damnificado">${damn}</td>
-                        <td data-label="Ubicación Actual">${ubiAct}</td>
-                        <td data-label="Requerimiento">${req}</td>
+                        <td data-label="Ubicación Actual"><div class="text-scroll-cell">${ubiAct}</div></td>
+                        <td data-label="Requerimiento"><div class="text-scroll-cell">${req}</div></td>
                     `;
                 } else {
                     fila.innerHTML = `
@@ -1235,25 +1270,12 @@
                         <td data-label="Situación">${estSalud}</td>
                         <td data-label="Lesiones">${les}</td>
                         <td data-label="Damnificado">${damn}</td>
-                        <td data-label="Ubicación Actual">${ubiAct}</td>
-                        <td data-label="Requerimiento">${req}</td>
+                        <td data-label="Ubicación Actual"><div class="text-scroll-cell">${ubiAct}</div></td>
+                        <td data-label="Requerimiento"><div class="text-scroll-cell">${req}</div></td>
                     `;
                 }
                 cuerpo.appendChild(fila);
             });
-        }
-
-        function cambiarTabEnlaces(tabName) {
-            document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            if(tabName === 'recursos') {
-                document.querySelectorAll('.tab-link')[0].classList.add('active');
-                document.getElementById('tab-enlaces-recursos').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab-link')[1].classList.add('active');
-                document.getElementById('tab-enlaces-visor').classList.add('active');
-            }
         }
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
@@ -1275,7 +1297,6 @@
                 grupo: document.getElementById('grupo_ayuda').value,
                 estado: document.getElementById('ayuda_estado').value,
                 damnificado: document.getElementById('ayuda_damnificado').value,
-                // NUEVAS COLUMNAS CONFORMADAS CON EL EXCEL DE CONTINGENCIA
                 sede_usb: document.getElementById('ayuda_sede_usb').value,
                 carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
                 estado_residencial: document.getElementById('ayuda_estado_res').value,
@@ -1310,10 +1331,9 @@
                 lugar_voluntariado: document.getElementById('colab_lugar').value,
                 vehiculo: document.getElementById('colab_vehiculo').value,
                 disponibilidad: document.getElementById('colab_notes') ? document.getElementById('colab_notes').value.trim() : document.getElementById('colab_notas').value.trim(),
-                // ENRIQUECIMIENTO LOGÍSTICO MAPEADO DEL EXCEL
                 ubicacion_geografica: document.getElementById('colab_ubicacion_geo').value.trim(),
                 traslado_logistico: document.getElementById('colab_traslado').value,
-                ofrecimiento_detallado: document.getElementById('colab_ofrecimiento_det').value.trim() || 'No especifica'
+                ofrecimiento_detallado: document.getElementById('colab_ofrecimiento_det').value
             };
 
             const { error } = await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
