@@ -6,6 +6,7 @@
     <title>Uesebistas Te Necesitamos - Centro de Control Central</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Cliente oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -111,7 +112,7 @@
             background: #1e1e1e;
             border-radius: 0.5rem;
             padding: 1.25rem;
-            border-left: 4px solid var(--primary-dark);
+            border-left: 4px solid var(--accent);
         }
 
         .stat-value { font-size: 2.25rem; font-weight: 700; display: block; line-height: 1; color: #ffffff; }
@@ -153,7 +154,7 @@
         .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.2); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-        /* Estilos de Checkboxes para Selección de Servicios */
+        /* Estilos de Checkboxes para Servicios */
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
         .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
         .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent); }
@@ -205,7 +206,7 @@
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
         /* Botonera Avanzada */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.25); transform: translateY(-1px); }
@@ -246,13 +247,8 @@
         .action-card p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; flex: 1; line-height: 1.6; }
 
         /* Contenedor de Enlaces de Interés */
-        .enlaces-tabs { display: flex; gap: 1rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 1.5rem; }
-        .tab-link { padding: 0.75rem 1.5rem; border: none; background: transparent; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; text-transform: uppercase; }
-        .tab-link.active { color: var(--primary); border-bottom-color: var(--accent); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
         .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .link-resource-card { background: white; border: 1px solid var(--gray-200); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; }
+        .link-resource-card { background: white; border: 1px solid var(--gray-200); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; border-left: 4px solid #0284c7; }
         .link-resource-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 18px rgba(0,0,0,0.04); }
         .link-resource-card h4 { font-family: 'Montserrat', sans-serif; font-size: 1rem; color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700; }
         .link-resource-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5; }
@@ -276,9 +272,6 @@
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
 
-        /* ==========================================================
-           HOJA DE ESTILOS AVANZADA PARA OPTIMIZACIÓN MÓVIL DIRECTA
-           ========================================================== */
         @media (max-width: 768px) {
             /* Anular mallas de doble columna forzada en administrador */
             .grid-system.admin-columns-layout {
@@ -359,6 +352,7 @@
 </head>
 <body>
 
+    <!-- Barra de Marca Institucional USB -->
     <div class="brand-bar">
         <div class="container brand-container">
             <div class="brand-left" onclick="navegarA('view-home')">
@@ -376,15 +370,18 @@
         </div>
     </div>
 
+    <!-- SECCIONES DE CONTENIDO (SPA MODE) -->
     <main class="main-layout">
         <div class="container">
             
+            <!-- VISTA 1: HOME MENÚ CENTRAL -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Uesebistas te necesitamos</h2>
                     <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
+                <!-- PUNTO USB DE RECEPCIÓN FÍSICO DIVIDIDO ASIMÉTRICO -->
                 <div class="acopio-banner-card">
                     <div class="acopio-info-side">
                         <h4>📍 Centro de Recepción Física</h4>
@@ -431,10 +428,11 @@
                         <button class="btn btn-primary btn-block">Ver Registro General</button>
                     </div>
 
+                    <!-- TARJETA EN HOME PARA ENLACES DE INTERÉS -->
                     <div class="action-card" onclick="navegarA('view-enlaces')">
                         <div>
                             <h3>Enlaces y Listas Oficiales</h3>
-                            <p>Accede a las listas oficiales en vivo de personas hospitalizadas, censos vecinales y hojas de control de casos comunitarios.</p>
+                            <p>Accede a las páginas de búsquedas unificadas, listas de hospitales y la hoja de cálculo general compartida en vivo.</p>
                         </div>
                         <button class="btn btn-primary btn-block" style="background-color: #0284c7; color: white;">Ver Enlaces</button>
                     </div>
@@ -449,6 +447,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 2: ASISTENCIA Y SOLICITUDES (NECESITO AYUDA) -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -471,6 +470,7 @@
                                         <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
                                     </div>
                                     
+                                    <!-- EXPANSIÓN DE CAMPOS CONFORMES AL EXCEL REQUERIDO -->
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Sede USB Vinculada *</label>
@@ -597,21 +597,22 @@
                                     </div>
 
                                     <div class="form-group"><label class="form-label">Ubicación Física Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Donde se encuentra físicamente hoy"></div>
-                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas / Observación *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, sábanas..."></textarea></div>
+                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas / Observación *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, rescate..."></textarea></div>
                                     <button type="submit" class="btn btn-warning btn-block">Enviar Requerimiento</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Tabla de Auxilio Dinámica (PÚBLICA O ADMIN COMPLETA) -->
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         <div class="toolbar">
-                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos (Admin)</div>
+                            <div id="titulo-casos-ayuda" style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos</div>
                             <button id="btnExportarAyuda" class="btn btn-success" style="display: none;">Descargar Excel Ayuda</button>
                         </div>
                         <div class="table-container">
-                            <table>
-                                <thead><tr><th>TIPO</th><th>AFECTADO</th><th>CÉDULA</th><th>TELÉFONO</th><th>COMUNIDAD</th><th>GRUPO</th><th>SITUACIÓN</th><th>DAMNIFICADO</th><th>UBICACIÓN</th><th>REQUERIMIENTO</th></tr></thead>
+                            <table id="tablaAyudaMaster">
+                                <thead id="theadAyuda"></thead>
                                 <tbody id="tablaAyudaCuerpo"></tbody>
                             </table>
                         </div>
@@ -619,6 +620,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 3: VOLUNTARIOS (QUIERO SER COLABORADOR) -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -654,6 +656,7 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- ADICIONES CONGRUENTES CON HOJA DE OFRECIMIENTOS -->
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Ubicación Residencial Base *</label>
@@ -682,6 +685,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Cuadrillas Registradas (DINÁMICA PÚBLICA / ADMIN) -->
                     <div class="right-column" id="panel-tabla-colaboradores">
                         <div class="toolbar">
                             <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
@@ -697,9 +701,11 @@
                 </div>
             </section>
 
+            <!-- VISTA 4: TABLERO CENTRAL DE AFECTADOS (BUSCO A ALGUIEN) -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
+                <!-- Panel de Indicadores Críticos -->
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -714,6 +720,7 @@
                 </div>
 
                 <div class="grid-system" id="mallaPrincipal">
+                    <!-- Formulario de Modificaciones Manuales (SÓLO ADMIN) -->
                     <div class="left-column" id="panel-formulario-afectado" style="display: none;">
                         <div class="panel-card">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-afectado">Registro Afectado</div></div>
@@ -772,6 +779,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla de Afectados Central -->
                     <div class="right-column" id="panel-tabla-afectados">
                         <div class="import-zone" id="dropZone" onclick="document.getElementById('excelFile').click()" style="display: none;">
                             <p><strong>Haz clic o arrastra la Plantilla de Excel Oficial de la USB</strong></p>
@@ -813,6 +821,7 @@
                 </div>
             </section>
 
+            <!-- VISTA 5: PÁGINA PREMIUM DE DONACIONES DIGITALES -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -848,83 +857,77 @@
                 </div>
             </section>
 
+            <!-- VISTA 6: ENLACES DE INTERÉS REORGANIZADO (SIN VISOR NI RESALTADO EXTRA) -->
             <section class="app-view" id="view-enlaces">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <div class="enlaces-tabs">
-                    <button class="tab-link active" onclick="cambiarTabEnlaces('recursos')">🗂️ Páginas de Búsquedas</button>
-                    <button class="tab-link" onclick="cambiarTabEnlaces('visor')">👁️ Hoja de Control en Vivo</button>
+                <div style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">🗂️ Enlaces y Listas Oficiales</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Accede de forma directa a las herramientas de rastreo unificado, bases de datos médicas y a la hoja oficial de control de la contingencia comunitaria.</p>
                 </div>
 
-                <div id="tab-enlaces-recursos" class="tab-content active">
-                    <div class="links-grid">
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Hospitales en Venezuela</h4>
-                                <p>Plataforma para consultar el estatus, capacidad y reportes de ingreso inmediato en la red hospitalaria nacional.</p>
-                            </div>
-                            <a href="https://hospitalesenvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                <div class="links-grid">
+                    <!-- ENLACE ADAPTADO A TARJETA ESTÁNDAR UNIFORME -->
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Hoja de Control Central en Vivo</h4>
+                            <p>Acceso directo y completo a la hoja de cálculo general compartida y actualizada en tiempo real por el equipo coordinador con el estatus detallado de habitabilidad, censos y asignación logística.</p>
                         </div>
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Red Ayuda Venezuela</h4>
-                                <p>Mapa de calor comunitario para localizar centros de acopio activos y solicitudes de soporte en tiempo real.</p>
-                            </div>
-                            <a href="https://redayudavenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
-                        </div>
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Reencuentro Help</h4>
-                                <p>Base de datos civil para reportar y cruzar información de personas localizadas en refugios institucionales.</p>
-                            </div>
-                            <a href="https://reencuentro.help/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
-                        </div>
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Desaparecidos Terremoto</h4>
-                                <p>Registro fotográfico y de filiación de ciudadanos incomunicados en las zonas con fallas de infraestructura eléctrica.</p>
-                            </div>
-                            <a href="https://desaparecidosterremotovenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
-                        </div>
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Encuentra tu Familiar Hospitales</h4>
-                                <p>Canal de verificación de identidades para pacientes trasladados de emergencia sin documentación a las capitales.</p>
-                            </div>
-                            <a href="https://encuentratufamiliarhospitalvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
-                        </div>
-                        <div class="link-resource-card">
-                            <div>
-                                <h4>Encuentra tu Familiar General</h4>
-                                <p>Motor de búsqueda centralizado con soporte internacional para unificar listados de sobrevivientes civiles.</p>
-                            </div>
-                            <a href="https://www.encuentratufamiliar.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
-                        </div>
+                        <a href="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/edit?usp=sharing" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Abrir Documento</a>
                     </div>
-                </div>
-
-                <div id="tab-enlaces-visor" class="tab-content">
-                    <div class="panel-card" style="padding:1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                            <p style="font-size:0.85rem; color:var(--text-muted);">📋 Visualización en vivo de la base de control centralizada de Google Sheets.</p>
-                            <a href="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/edit?usp=sharing" target="_blank" class="btn btn-success" style="font-size:0.8rem; padding:0.5rem 1rem;">Abrir en Pantalla Completa ↗</a>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Hospitales en Venezuela</h4>
+                            <p>Plataforma nacional unificada para consultar la capacidad operativa de las salas de emergencia y reportes de ingreso de personas afectadas.</p>
                         </div>
-                        <div style="width:100%; height:650px; border:1px solid var(--gray-300); border-radius:8px; overflow:hidden;">
-                            <iframe src="https://docs.google.com/spreadsheets/d/105wYcisfAzrDk2cNJff42RYtPl98z-T3hDCVlih6B3w/preview" style="width:100%; height:100%; border:none;"></iframe>
+                        <a href="https://hospitalesenvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                    </div>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Red Ayuda Venezuela</h4>
+                            <p>Monitoreo civil voluntario para localizar solicitudes de soporte humanitario y mapeo de centros de acopio activos.</p>
                         </div>
+                        <a href="https://redayudavenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                    </div>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Reencuentro Help</h4>
+                            <p>Base de datos abierta orientada a cruzar información de núcleos familiares localizados en refugios institucionales.</p>
+                        </div>
+                        <a href="https://reencuentro.help/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                    </div>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Desaparecidos Terremoto Venezuela</h4>
+                            <p>Registro de filiación y carga de fotografías para procesar búsquedas de personas incomunicadas en zonas sin conectividad.</p>
+                        </div>
+                        <a href="https://desaparecidosterremotovenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                    </div>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Encuentra tu Familiar Hospitales</h4>
+                            <p>Filtro de contingencia para la ubicación y reconocimiento de identidades de pacientes trasladados sin documentación.</p>
+                        </div>
+                        <a href="https://encuentratufamiliarhospitalvenezuela.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
+                    </div>
+                    
+                    <div class="link-resource-card">
+                        <div>
+                            <h4>Encuentra tu Familiar General</h4>
+                            <p>Motor central de búsqueda con soporte de redes de telecomunicaciones para la unificación internacional de listados civiles.</p>
+                        </div>
+                        <a href="https://www.encuentratufamiliar.com/" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none; text-align:center;">Visitar Sitio</a>
                     </div>
                 </div>
             </section>
 
         </div>
     </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>Esta página web está respaldada y organizada por la <strong>Asociación de Egresados de la Universidad Simón Bolívar (AEUSB)</strong> y la <strong>Federación de Centros de Estudiantes de la Universidad Simón Bolívar (FCEUSB)</strong>.</p>
-            <p>Para más información, puedes escribirnos por WhatsApp al <a href="https://wa.me/584129267897" target="_blank">+58-412-9267897</a> o seguirnos en Instagram a través de <a href="https://instagram.com/aeusb" target="_blank">@aeusb</a>.</p>
-        </div>
-    </footer>
 
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
@@ -1105,15 +1108,16 @@
             const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
         }
 
+        /* RENDERIZADO DE TABLA DE COLABORADORES CON FILTRADO DE SEGURIDAD PÚBLICA */
         function actualizarInterfazColaboradores(datos) {
             const thead = document.getElementById('theadColab');
             const cuerpo = document.getElementById('tablaColabCuerpo');
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>LUGAR</th><th>VEHÍCULO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO DETALLADO</th><th>TELÉFONO</th><th>NOTAS</th></tr>`;
             } else {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>ÁREA DE APOYO</th><th>LUGAR</th><th>VEHÍCULO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO USB</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO DETALLADO</th><th>NOTAS</th></tr>`;
             }
 
             cuerpo.innerHTML = '';
@@ -1122,14 +1126,20 @@
                 let grpVoluntario = mapaGrupo[String(c.cargo_usb).trim().toLowerCase()] || c.cargo_usb || 'Estudiante';
                 let lugar = c.lugar_voluntariado || 'Punto de Acopio USB';
                 let vehiculo = c.vehiculo || 'No';
+                let geo = c.ubicacion_geografica || '-';
+                let traslado = c.traslado_logistico || 'No especifica';
+                let ofr = c.ofrecimiento_detallado || '-';
                 
                 if (esAdministrador) {
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
+                        <td data-label="Ubicación Base">${geo}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                        <td data-label="Lugar">${lugar}</td>
+                        <td data-label="Logística Traslado">${traslado}</td>
+                        <td data-label="Lugar Destino">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
+                        <td data-label="Ofrecimiento Detallado">${ofr}</td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
                         <td data-label="Notas">${c.disponibilidad || '-'}</td>
                     `;
@@ -1137,9 +1147,12 @@
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
+                        <td data-label="Ubicación Base">${geo}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                        <td data-label="Lugar">${lugar}</td>
+                        <td data-label="Logística Traslado">${traslado}</td>
+                        <td data-label="Lugar Destino">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
+                        <td data-label="Ofrecimiento Detallado">${ofr}</td>
                         <td data-label="Notas">${c.disponibilidad || '-'}</td>
                     `;
                 }
@@ -1147,24 +1160,85 @@
             });
         }
 
+        /* RENDERIZADO DE TABLA DE SOLICITUDES CON FILTRADO DE SEGURIDAD PÚBLICA */
         function actualizarInterfazAyuda(datos) {
+            const thead = document.getElementById('theadAyuda');
             const cuerpo = document.getElementById('tablaAyudaCuerpo');
-            if (!cuerpo) return;
+            if (!thead || !cuerpo) return;
+
+            if (esAdministrador) {
+                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>CÉDULA</th><th>TELÉFONO</th><th>CORREO</th><th>SEDE</th><th>CARNET</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>DIRECCIÓN</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th></tr>`;
+            } else {
+                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>SEDE</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th></tr>`;
+            }
+
             cuerpo.innerHTML = '';
             datos.forEach(a => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
-                    <td data-label="Afectado"><strong>${a.nombre}</strong></td>
-                    <td data-label="Cédula">${a.cedula || '-'}</td>
-                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
-                    <td data-label="Comunidad">${a.comunidad || '-'}</td>
-                    <td data-label="Grupo">${a.grupo || '-'}</td>
-                    <td data-label="Situación">${a.estado || '-'}</td>
-                    <td data-label="Damnificado">${a.damnificado || '-'}</td>
-                    <td data-label="Ubicación">${a.ubicacion || '-'}</td>
-                    <td data-label="Requerimiento">${a.descripcion_ayuda || '-'}</td>
-                `;
+                
+                let tipo = a.tipo_reporte || '-';
+                let nom = a.nombre || '-';
+                let ci = a.cedula || '-';
+                let tlf = a.telefono || '-';
+                let email = a.correo || '-';
+                let Sede = a.sede_usb || '-';
+                let Carnet = a.carnet_estudiante || '-';
+                let com = a.comunidad || '-';
+                let grp = a.grupo || '-';
+                let estRes = a.estado_residencial || '-';
+                let eje = a.eje_logistico || '-';
+                let dir = a.direccion_residencial || '-';
+                let afViv = a.afectacion_vivienda || '-';
+                let ref = a.requiere_refugio || '-';
+                let serv = a.servicios_afectados || '-';
+                let estSalud = a.estado || '-';
+                let les = a.lesiones_fisicas || '-';
+                let damn = a.damnificado || '-';
+                let ubiAct = a.ubicacion || '-';
+                let req = a.descripcion_ayuda || '-';
+
+                if (esAdministrador) {
+                    fila.innerHTML = `
+                        <td data-label="Tipo">${tipo}</td>
+                        <td data-label="Afectado"><strong>${nom}</strong></td>
+                        <td data-label="Cédula">${ci}</td>
+                        <td data-label="Teléfono">${tlf}</td>
+                        <td data-label="Correo">${email}</td>
+                        <td data-label="Sede">${Sede}</td>
+                        <td data-label="Carnet">${Carnet}</td>
+                        <td data-label="Comunidad">${com}</td>
+                        <td data-label="Grupo">${grp}</td>
+                        <td data-label="Estado Res.">${estRes}</td>
+                        <td data-label="Eje">${eje}</td>
+                        <td data-label="Dirección">${dir}</td>
+                        <td data-label="Afectación Viv.">${afViv}</td>
+                        <td data-label="Refugio">${ref}</td>
+                        <td data-label="Servicios">${serv}</td>
+                        <td data-label="Situación">${estSalud}</td>
+                        <td data-label="Lesiones">${les}</td>
+                        <td data-label="Damnificado">${damn}</td>
+                        <td data-label="Ubicación Actual">${ubiAct}</td>
+                        <td data-label="Requerimiento">${req}</td>
+                    `;
+                } else {
+                    fila.innerHTML = `
+                        <td data-label="Tipo">${tipo}</td>
+                        <td data-label="Afectado"><strong>${nom}</strong></td>
+                        <td data-label="Sede">${Sede}</td>
+                        <td data-label="Comunidad">${com}</td>
+                        <td data-label="Grupo">${grp}</td>
+                        <td data-label="Estado Res.">${estRes}</td>
+                        <td data-label="Eje">${eje}</td>
+                        <td data-label="Afectación Viv.">${afViv}</td>
+                        <td data-label="Refugio">${ref}</td>
+                        <td data-label="Servicios">${serv}</td>
+                        <td data-label="Situación">${estSalud}</td>
+                        <td data-label="Lesiones">${les}</td>
+                        <td data-label="Damnificado">${damn}</td>
+                        <td data-label="Ubicación Actual">${ubiAct}</td>
+                        <td data-label="Requerimiento">${req}</td>
+                    `;
+                }
                 cuerpo.appendChild(fila);
             });
         }
@@ -1185,7 +1259,6 @@
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Recolectar servicios seleccionados en un string
             let serviciosMarcados = [];
             document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
                 serviciosMarcados.push(cb.value);
@@ -1202,7 +1275,7 @@
                 grupo: document.getElementById('grupo_ayuda').value,
                 estado: document.getElementById('ayuda_estado').value,
                 damnificado: document.getElementById('ayuda_damnificado').value,
-                // NUEVAS VARIACIONES MAPEADAS DEL EXCEL DE CONTROL
+                // NUEVAS COLUMNAS CONFORMADAS CON EL EXCEL DE CONTINGENCIA
                 sede_usb: document.getElementById('ayuda_sede_usb').value,
                 carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
                 estado_residencial: document.getElementById('ayuda_estado_res').value,
@@ -1274,9 +1347,9 @@
             let grupoMapeado = "Estudiante";
             if(gKey.includes('prof')) grupoMapeado = "Profesor";
             if(gKey.includes('egr')) grupoMapeado = "Egresado";
-            if(gKey.includes('adm')) groupMapeado = "Administrativo";
+            if(gKey.includes('adm')) grupoMapeado = "Administrativo";
             if(gKey.includes('obr')) grupoMapeado = "Obrero";
-            if(gKey.includes('ext')) groupMapeado = "Externo";
+            if(gKey.includes('ext')) grupoMapeado = "Externo";
             document.getElementById('grupo').value = grupoMapeado;
 
             document.getElementById('btn-submit-form').innerText = "Actualizar en la Nube";
@@ -1375,16 +1448,17 @@
             descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
         });
 
+        /* EXCEL EXPORT TOTAL CON CAMPOS EXPANDIDOS PERSONALIZADOS */
         document.getElementById('btnExportarColab').addEventListener('click', function() {
-            let matriz = [["Voluntario", "Cargo/Vinculo", "Area de Apoyo", "Lugar Voluntariado", "Vehiculo", "Telefono", "Disponibilidad / Notas"]];
-            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.area_apoyo, c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.telefono, c.disponibilidad]));
-            descargarMatrizComoExcel(matriz, "Cuadrillas_Voluntarios_USB");
+            let matriz = [["Voluntario", "Cargo/Vinculo", "Ubicación Residencial Base", "Area de Apoyo", "Logística Traslado", "Lugar Voluntariado Destinado", "Vehiculo", "Ofrecimiento Detallado", "Telefono Móvil", "Disponibilidad / Notas"]];
+            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.ubicacion_geografica || '-', c.area_apoyo, c.traslado_logistico || '-', c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.ofrecimiento_detallado || '-', c.telefono, c.disponibilidad]));
+            descargarMatrizComoExcel(matriz, "Data_Ofrecimientos_Colaboradores_USB");
         });
 
         document.getElementById('btnExportarAyuda').addEventListener('click', function() {
-            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Comunidad", "Grupo", "Situacion", "Damnificado", "Ubicacion", "Telefono", "Descripcion Requerimiento"]];
-            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.comunidad || '-', a.grupo || '-', a.estado || '-', a.damnificado || '-', a.ubicacion, a.telefono, a.descripcion_ayuda]));
-            descargarMatrizComoExcel(matriz, "Solicitudes_Asistencia_Directa_USB");
+            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Teléfono Móvil", "Correo Electrónico", "Sede USB", "Carnet", "Comunidad", "Grupo", "Estado Residencial", "Eje Logístico", "Dirección Completa", "Afectación Vivienda", "Requieres Refugio", "Servicios Afectados", "Situación Actual", "Lesiones Físicas", "Damnificado", "Ubicacion Actual Exacta", "Descripción Requerimiento"]];
+            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.telefono || '-', a.correo || '-', a.sede_usb || '-', a.carnet_estudiante || '-', a.comunidad || '-', a.grupo || '-', a.estado_residencial || '-', a.eje_logistico || '-', a.direccion_residencial || '-', a.afectacion_vivienda || '-', a.requiere_refugio || '-', a.servicios_afectados || '-', a.estado || '-', a.lesiones_fisicas || '-', a.damnificado || '-', a.ubicacion, a.descripcion_ayuda]));
+            descargarMatrizComoExcel(matriz, "Data_Ayudas_Afectados_Vivienda_USB");
         });
 
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
