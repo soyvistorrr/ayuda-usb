@@ -152,6 +152,11 @@
         .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.2); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
+        /* Estilos de Checkboxes para Servicios */
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
+        .checkbox-grid label.checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
+        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent); }
+
         /* Carga Masiva y Filtros */
         .import-zone {
             border: 2px dashed var(--gray-300); background-color: #ffffff; border-radius: 0.5rem; padding: 2rem; text-align: center; margin-bottom: 1.75rem; cursor: pointer;
@@ -199,7 +204,7 @@
         }
         tbody tr:hover { background-color: var(--gray-100); }
 
-        /* CONTENEDOR ELÁSTICO LIMITADO A MAX 4 LÍNEAS CON SCROLL DINÁMICO */
+        /* CONTENEDOR ELÁSTICO LIMITADO A MAX 4 LÍNEAS CON SCROLL DINÁMICO REQUERIDO */
         .text-truncate-clamp {
             display: -webkit-box;
             -webkit-line-clamp: 4; 
@@ -826,15 +831,15 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th id="sort-af-estado" onclick="ordenarTablaAfectados('estado')" style="cursor:pointer">SITUACIÓN ↕</th>
-                                        <th id="sort-af-cedula_identidad" onclick="ordenarTablaAfectados('cedula_identidad')" style="cursor:pointer">CÉDULA ↕</th>
-                                        <th id="sort-af-nombre" onclick="ordenarTablaAfectados('nombre')" style="cursor:pointer">NOMBRE ↕</th>
-                                        <th id="sort-af-cedula" onclick="ordenarTablaAfectados('cedula')" style="cursor:pointer">COMUNIDAD ↕</th>
-                                        <th id="sort-af-edad" onclick="ordenarTablaAfectados('edad')" style="cursor:pointer">GRUPO ↕</th>
-                                        <th id="sort-af-damnificado" onclick="ordenarTablaAfectados('damnificado')" style="cursor:pointer">DAMNIFICADO ↕</th>
-                                        <th id="sort-af-ubicacion" onclick="ordenarTablaAfectados('ubicacion')" style="cursor:pointer">UBICACIÓN ↕</th>
-                                        <th id="sort-af-telefono" onclick="ordenarTablaAfectados('telefono')" style="cursor:pointer">TELÉFONO ↕</th>
-                                        <th id="sort-af-observaciones" onclick="ordenarTablaAfectados('observaciones')" style="cursor:pointer">OBSERVACIÓN ↕</th>
+                                        <th onclick="ordenarTablaAfectados('estado')" style="cursor:pointer">SITUACIÓN <span id="sort-af-estado">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('cedula_identidad')" style="cursor:pointer">CÉDULA <span id="sort-af-cedula_identidad">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('nombre')" style="cursor:pointer">NOMBRE <span id="sort-af-nombre">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('cedula')" style="cursor:pointer">COMUNIDAD <span id="sort-af-cedula">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('edad')" style="cursor:pointer">GRUPO <span id="sort-af-edad">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('damnificado')" style="cursor:pointer">DAMNIFICADO <span id="sort-af-damnificado">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('ubicacion')" style="cursor:pointer">UBICACIÓN <span id="sort-af-ubicacion">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('telefono')" style="cursor:pointer">TELÉFONO <span id="sort-af-telefono">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('observaciones')" style="cursor:pointer">OBSERVACIÓN <span id="sort-af-observaciones">↕</span></th>
                                         <th class="admin-action-header" style="display: none;">ACCIONES</th>
                                     </tr>
                                 </thead>
@@ -1048,16 +1053,15 @@
                 'cedula': 'sort-af-cedula', 'edad': 'sort-af-edad', 'damnificado': 'sort-af-damnificado',
                 'ubicacion': 'sort-af-ubicacion', 'telefono': 'sort-af-telefono', 'observaciones': 'sort-af-observaciones'
             };
-            // 1. Agrega este objeto con los nombres fijos de tus columnas
             const nombresBase = {
                 'estado': 'SITUACIÓN', 'cedula_identidad': 'CÉDULA', 'nombre': 'NOMBRE',
                 'cedula': 'COMUNIDAD', 'edad': 'GRUPO', 'damnificado': 'DAMNIFICADO',
                 'ubicacion': 'UBICACIÓN', 'telefono': 'TELÉFONO', 'observaciones': 'OBSERVACIÓN'
             };
             for (let k in mapaIds) {
-            const el = document.getElementById(mapaIds[k]);
-            if (el) el.innerText = obtenerSimboloOrden(sortConfigAfectados, k);
-        }
+                const el = document.getElementById(mapaIds[k]);
+                if (el) el.innerText = `${nombresBase[k]} ${obtenerSimboloOrden(sortConfigAfectados, k)}`;
+            }
             filtrarYActualizarTablero();
         };
 
@@ -1191,8 +1195,8 @@
         function actualizarInterfazTablero(datosFiltrados) {
             const cuerpo = document.getElementById('tablaCuerpo');
             if (!cuerpo) return;
-            cuerpo.innerHTML = '';
             
+            let htmlFinal = '';
             let datosOrdenados = ordenarColeccion(datosFiltrados, sortConfigAfectados);
             
             datosOrdenados.forEach(reg => {
@@ -1207,25 +1211,27 @@
                 let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
                 let damLimpio = reg.damnificado || 'No sé';
 
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
-                    <td data-label="Cédula">${reg.cedula_identidad || '-'}</td>
-                    <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
-                    <td data-label="Comunidad">${comLimpia}</td>
-                    <td data-label="Grupo">${grpLimpio}</td>
-                    <td data-label="Damnificado">${damLimpio}</td>
-                    <td data-label="Ubicación"><div class="text-truncate-clamp">${reg.ubicacion || '-'}</div></td>
-                    <td data-label="Teléfono">${enmascararTelefono(reg.telefono)}</td>
-                    <td data-label="Observación"><div class="text-truncate-clamp">${reg.observaciones || '-'}</div></td>
-                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina(${reg.id})">Editar</button><button class="btn-delete" onclick="eliminarFila(${reg.id}, this)">Eliminar</button></td>` : ''}
+                htmlFinal += `
+                    <tr>
+                        <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
+                        <td data-label="Cédula">${reg.cedula_identidad || '-'}</td>
+                        <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
+                        <td data-label="Comunidad">${comLimpia}</td>
+                        <td data-label="Grupo">${grpLimpio}</td>
+                        <td data-label="Damnificado">${damLimpio}</td>
+                        <td data-label="Ubicación"><div class="text-truncate-clamp">${reg.ubicacion || '-'}</div></td>
+                        <td data-label="Teléfono">${enmascararTelefono(reg.telefono)}</td>
+                        <td data-label="Observación"><div class="text-truncate-clamp">${reg.observaciones || '-'}</div></td>
+                        ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina('${reg.id}')">Editar</button><button class="btn-delete" onclick="eliminarFila('${reg.id}', this)">Eliminar</button></td>` : ''}
+                    </tr>
                 `;
-                cuerpo.appendChild(fila);
             });
+            
+            cuerpo.innerHTML = htmlFinal;
 
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('atrapado') || String(r.estado).includes('⚠️'))).length;
-            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).toLowerCase().includes('✅'))).length;
+            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).includes('✅'))).length;
             let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información') || String(r.estado).includes('❓'))).length;
             let fall = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('fallecido') || String(r.estado).includes('🕊️'))).length;
 
@@ -1263,17 +1269,16 @@
                 </tr>`;
             }
 
-            cuerpo.innerHTML = '';
+            let htmlFinal = '';
             let datosOrdenados = ordenarColeccion(datos, sortConfigColab);
 
             datosOrdenados.forEach(c => {
-                const fila = document.createElement('tr');
                 let grpVoluntario = mapaGrupo[String(c.cargo_usb).trim().toLowerCase()] || c.cargo_usb || 'Estudiante';
                 let lugar = c.lugar_voluntariado || 'Punto de Acopio USB';
                 let vehiculo = c.vehiculo || 'No';
                 
                 if (esAdministrador) {
-                    fila.innerHTML = `
+                    htmlFinal += `<tr>
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
@@ -1281,20 +1286,20 @@
                         <td data-label="Vehículo">${vehiculo}</td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
                         <td data-label="Notas"><div class="text-truncate-clamp">${c.disponibilidad || '-'}</div></td>
-                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionColab(${c.id})">Editar</button><button class="btn-delete" onclick="eliminarColab(${c.id}, this)">Eliminar</button></td>
-                    `;
+                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionColab('${c.id}')">Editar</button><button class="btn-delete" onclick="eliminarColab('${c.id}', this)">Eliminar</button></td>
+                    </tr>`;
                 } else {
-                    fila.innerHTML = `
+                    htmlFinal += `<tr>
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
                         <td data-label="Lugar">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
                         <td data-label="Notas"><div class="text-truncate-clamp">${c.disponibilidad || '-'}</div></td>
-                    `;
+                    </tr>`;
                 }
-                cuerpo.appendChild(fila);
             });
+            cuerpo.innerHTML = htmlFinal;
         }
 
         function actualizarInterfazAyuda(datos) {
@@ -1331,30 +1336,44 @@
                 </tr>`;
             }
 
-            cuerpo.innerHTML = '';
+            let htmlFinal = '';
             let datosOrdenados = ordenarColeccion(datos, sortConfigAyuda);
 
             datosOrdenados.forEach(a => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
-                    <td data-label="Afectado"><strong>${a.nombre}</strong></td>
-                    <td data-label="Cédula">${a.cedula || '-'}</td>
-                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
-                    <td data-label="Comunidad">${a.comunidad || '-'}</td>
-                    <td data-label="Grupo">${a.grupo || '-'}</td>
-                    <td data-label="Situación">${a.estado || '-'}</td>
-                    <td data-label="Damnificado">${a.damnificado || '-'}</td>
-                    <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
-                    <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
-                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda(${a.id})">Editar</button><button class="btn-delete" onclick="eliminarAyuda(${a.id}, this)">Eliminar</button></td>` : ''}
-                `;
-                cuerpo.appendChild(fila);
+                if (esAdministrador) {
+                    htmlFinal += `<tr>
+                        <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
+                        <td data-label="Afectado"><strong>${a.nombre}</strong></td>
+                        <td data-label="Cédula">${a.cedula || '-'}</td>
+                        <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                        <td data-label="Comunidad">${a.comunidad || '-'}</td>
+                        <td data-label="Grupo">${a.grupo || '-'}</td>
+                        <td data-label="Situación">${a.estado || '-'}</td>
+                        <td data-label="Damnificado">${a.damnificado || '-'}</td>
+                        <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                        <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
+                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button><button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button></td>
+                    </tr>`;
+                } else {
+                    htmlFinal += `<tr>
+                        <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
+                        <td data-label="Afectado"><strong>${a.nombre}</strong></td>
+                        <td data-label="Cédula">${a.cedula || '-'}</td>
+                        <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                        <td data-label="Comunidad">${a.comunidad || '-'}</td>
+                        <td data-label="Grupo">${a.grupo || '-'}</td>
+                        <td data-label="Situación">${a.estado || '-'}</td>
+                        <td data-label="Damnificado">${a.damnificado || '-'}</td>
+                        <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                        <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
+                    </tr>`;
+                }
             });
+            cuerpo.innerHTML = htmlFinal;
         }
 
         window.activarEdicionAyuda = function(id) {
-            const reg = ayudaNube.find(r => r.id === id);
+            const reg = ayudaNube.find(r => r.id == id);
             if (!reg) return;
             idEdicionAyuda = id;
             document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio";
@@ -1371,7 +1390,8 @@
 
             document.getElementById('btn-submit-ayuda').innerText = "Actualizar Solicitud";
             document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar</button>`;
-            navegarA('view-necesito-ayuda');
+            
+            window.scrollTo({ top: document.getElementById('ayudaForm').offsetTop - 20, behavior: 'smooth' });
         };
 
         function cancelarEdicionAyuda() {
@@ -1383,7 +1403,7 @@
         }
 
         window.activarEdicionColab = function(id) {
-            const reg = colaboradoresNube.find(r => r.id === id);
+            const reg = colaboradoresNube.find(r => r.id == id);
             if (!reg) return;
             idEdicionColab = id;
             document.getElementById('form-mode-title-colab').innerText = "Modificar Ficha Voluntario";
@@ -1394,9 +1414,11 @@
             document.getElementById('colab_lugar').value = reg.lugar_voluntariado;
             document.getElementById('colab_vehiculo').value = reg.vehiculo;
             document.getElementById('colab_notas').value = reg.disponibilidad;
+
             document.getElementById('btn-submit-colab').innerText = "Actualizar Voluntario";
             document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar</button>`;
-            navegarA('view-colaborar');
+            
+            window.scrollTo({ top: document.getElementById('colaboradorForm').offsetTop - 20, behavior: 'smooth' });
         };
 
         function cancelarEdicionColab() {
@@ -1440,7 +1462,7 @@
                 area_apoyo: document.getElementById('colab_area').value,
                 lugar_voluntariado: document.getElementById('colab_lugar').value,
                 vehiculo: document.getElementById('colab_vehiculo').value,
-                disponibilidad: document.getElementById('colab_notes').value.trim()
+                disponibilidad: document.getElementById('colab_notas').value.trim()
             };
             if (idEdicionColab !== null) {
                 await supabaseClient.from('colaboradores').update(payload).eq('id', idEdicionColab);
@@ -1451,6 +1473,44 @@
             }
             await cargarDatosDesdeNube();
         });
+
+        window.activarEdiciónEnPagina = function(id) {
+            const reg = registrosNube.find(r => r.id == id);
+            if (!reg) return;
+            idEnEdicion = id;
+            document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro Afectado";
+            document.getElementById('nombre').value = reg.nombre;
+            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
+            document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
+            document.getElementById('ubicacion').value = reg.ubicacion === '-' ? '' : reg.ubicacion;
+            document.getElementById('observaciones').value = reg.observaciones === '-' ? '' : reg.observaciones;
+            document.getElementById('estado').value = reg.estado;
+            document.getElementById('es_damnificado').value = reg.damnificado || 'No';
+            
+            let cKey = String(reg.cedula).trim().toLowerCase();
+            document.getElementById('comunidad').value = (cKey === 'usb' || cKey.includes('simon')) ? "Universidad Simón Bolívar" : "Externo";
+            
+            let gKey = String(reg.edad).trim().toLowerCase();
+            let grupoMapeado = "Estudiante";
+            if(gKey.includes('prof')) grupoMapeado = "Profesor";
+            if(gKey.includes('egr')) grupoMapeado = "Egresado";
+            if(gKey.includes('adm')) grupoMapeado = "Administrativo";
+            if(gKey.includes('obr')) grupoMapeado = "Obrero";
+            if(gKey.includes('ext')) grupoMapeado = "Externo";
+            document.getElementById('grupo').value = grupoMapeado;
+
+            document.getElementById('btn-submit-form').innerText = "Actualizar Estatus en la Nube";
+            document.getElementById('cancel-edit-container').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicion()">Cancelar</button>`;
+            
+            window.scrollTo({ top: document.getElementById('registroForm').offsetTop - 20, behavior: 'smooth' });
+        };
+
+        window.cancelarEdicion = function() {
+            idEnEdicion = null; document.getElementById('registroForm').reset();
+            document.getElementById('form-mode-title-afectado').innerText = "Registro Afectado";
+            document.getElementById('btn-submit-form').innerText = "Guardar en la Nube";
+            document.getElementById('cancel-edit-container').innerHTML = '';
+        };
 
         document.getElementById('registroForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1555,9 +1615,48 @@
             lector.readAsArrayBuffer(file);
         });
 
-        document.getElementById('filtroDuplicados').addEventListener('change', filtrarYActualizarTablero);
+        let temporizadorBusqueda;
+        document.getElementById('buscarInput').addEventListener('input', function() {
+            document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--primary);"><strong>⏳ Buscando registros...</strong></td></tr>';
+            clearTimeout(temporizadorBusqueda);
+            temporizadorBusqueda = setTimeout(() => {
+                filtrarYActualizarTablero();
+            }, 300);
+        });
 
-        /* SISTEMA INMUNE A BLOQUEOS DE NAVEGACIÓN EN DOS PASOS */
+        function mostrarCargaYFiltrar() {
+            document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--primary);"><strong>⏳ Aplicando filtros...</strong></td></tr>';
+            setTimeout(filtrarYActualizarTablero, 50);
+        }
+
+        document.getElementById('filtroEstado').addEventListener('change', mostrarCargaYFiltrar);
+        document.getElementById('filtroGrupo').addEventListener('change', mostrarCargaYFiltrar);
+        document.getElementById('filtroDuplicados').addEventListener('change', mostrarCargaYFiltrar);
+
+        document.getElementById('btnExportar').addEventListener('click', function() {
+            let matriz = [["Situacion", "Cedula", "Nombre", "Comunidad", "Grupo", "Damnificado", "Ubicacion", "Telefono", "Observacion"]];
+            registrosNube.forEach(r => matriz.push([r.estado, r.cedula_identidad || '-', r.nombre, r.cedula, r.edad, r.damnificado || 'No sé', r.ubicacion, r.telefono, r.observaciones]));
+            descargarMatrizComoExcel(matriz, "Reporte_USB_Afectados");
+        });
+
+        document.getElementById('btnExportarColab').addEventListener('click', function() {
+            let matriz = [["Voluntario", "Cargo/Vinculo", "Ubicación Residencial Base", "Area de Apoyo", "Logística Traslado", "Lugar Voluntariado Destinado", "Vehiculo", "Ofrecimiento Detallado", "Telefono Móvil", "Disponibilidad / Notas"]];
+            colaboradoresNube.forEach(c => matriz.push([c.nombre, c.cargo_usb, c.ubicacion_geografica || '-', c.area_apoyo, c.traslado_logistico || '-', c.lugar_voluntariado || 'Punto de Acopio USB', c.vehiculo || 'No', c.ofrecimiento_detallado || '-', c.telefono, c.disponibilidad]));
+            descargarMatrizComoExcel(matriz, "Data_Ofrecimientos_Colaboradores_USB");
+        });
+
+        document.getElementById('btnExportarAyuda').addEventListener('click', function() {
+            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Teléfono Móvil", "Correo Electrónico", "Sede USB", "Carnet", "Comunidad", "Grupo", "Estado Residencial", "Eje Logístico", "Dirección Completa", "Afectación Vivienda", "Requieres Refugio", "Servicios Afectados", "Situación Actual", "Lesiones Físicas", "Damnificado", "Ubicacion Actual Exacta", "Descripción Requerimiento"]];
+            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.telefono || '-', a.correo || '-', a.sede_usb || '-', a.carnet_estudiante || '-', a.comunidad || '-', a.grupo || '-', a.estado_residencial || '-', a.eje_logistico || '-', a.direccion_residencial || '-', a.afectacion_vivienda || '-', a.requiere_refugio || '-', a.servicios_afectados || '-', a.estado || '-', a.lesiones_fisicas || '-', a.damnificado || '-', a.ubicacion, a.descripcion_ayuda]));
+            descargarMatrizComoExcel(matriz, "Data_Ayudas_Afectados_Vivienda_USB");
+        });
+
+        function descargarMatrizComoExcel(matriz, nombreArchivo) {
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(matriz);
+            XLSX.utils.book_append_sheet(wb, ws, "Datos");
+            XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
         window.eliminarFila = async function(id, boton) {
             if (!boton) return;
             if (boton.innerText === "Eliminar") {
