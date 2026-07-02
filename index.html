@@ -1053,14 +1053,9 @@
                 'cedula': 'sort-af-cedula', 'edad': 'sort-af-edad', 'damnificado': 'sort-af-damnificado',
                 'ubicacion': 'sort-af-ubicacion', 'telefono': 'sort-af-telefono', 'observaciones': 'sort-af-observaciones'
             };
-            const nombresBase = {
-                'estado': 'SITUACIÓN', 'cedula_identidad': 'CÉDULA', 'nombre': 'NOMBRE',
-                'cedula': 'COMUNIDAD', 'edad': 'GRUPO', 'damnificado': 'DAMNIFICADO',
-                'ubicacion': 'UBICACIÓN', 'telefono': 'TELÉFONO', 'observaciones': 'OBSERVACIÓN'
-            };
             for (let k in mapaIds) {
                 const el = document.getElementById(mapaIds[k]);
-                if (el) el.innerText = `${nombresBase[k]} ${obtenerSimboloOrden(sortConfigAfectados, k)}`;
+                if (el) el.innerText = obtenerSimboloOrden(sortConfigAfectados, k);
             }
             filtrarYActualizarTablero();
         };
