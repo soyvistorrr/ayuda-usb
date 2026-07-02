@@ -1052,9 +1052,16 @@
                 'cedula': 'sort-af-cedula', 'edad': 'sort-af-edad', 'damnificado': 'sort-af-damnificado',
                 'ubicacion': 'sort-af-ubicacion', 'telefono': 'sort-af-telefono', 'observaciones': 'sort-af-observaciones'
             };
+            // 1. Agrega este objeto con los nombres fijos de tus columnas
+            const nombresBase = {
+                'estado': 'SITUACIÓN', 'cedula_identidad': 'CÉDULA', 'nombre': 'NOMBRE',
+                'cedula': 'COMUNIDAD', 'edad': 'GRUPO', 'damnificado': 'DAMNIFICADO',
+                'ubicacion': 'UBICACIÓN', 'telefono': 'TELÉFONO', 'observaciones': 'OBSERVACIÓN'
+            };
             for (let k in mapaIds) {
                 const el = document.getElementById(mapaIds[k]);
-                if (el) el.innerText = obtenerSimboloOrden(sortConfigAfectados, k);
+                // 2. Modifica esta línea para combinar el nombre base con el símbolo
+                if (el) el.innerText = `${nombresBase[k]} ${obtenerSimboloOrden(sortConfigAfectados, k)}`;
             }
             filtrarYActualizarTablero();
         };
