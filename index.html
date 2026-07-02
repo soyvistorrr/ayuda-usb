@@ -1035,13 +1035,9 @@
         function ordenarColeccion(array, config) {
             if (!config.key || config.direction === 'none') return [...array];
             return [...array].sort((a, b) => {
-                let valA = a[config.key] || '';
-                let valB = b[config.key] || '';
-                if (typeof valA === 'string') valA = valA.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (typeof valB === 'string') valB = valB.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (valA < valB) return config.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return config.direction === 'asc' ? 1 : -1;
-                return 0;
+                let valA = String(a[config.key] || '');
+                let valB = String(b[config.key] || '');
+                return config.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             });
         }
 
@@ -1059,10 +1055,9 @@
                 'ubicacion': 'UBICACIÓN', 'telefono': 'TELÉFONO', 'observaciones': 'OBSERVACIÓN'
             };
             for (let k in mapaIds) {
-                const el = document.getElementById(mapaIds[k]);
-                // 2. Modifica esta línea para combinar el nombre base con el símbolo
-                if (el) el.innerText = `${nombresBase[k]} ${obtenerSimboloOrden(sortConfigAfectados, k)}`;
-            }
+            const el = document.getElementById(mapaIds[k]);
+            if (el) el.innerText = obtenerSimboloOrden(sortConfigAfectados, k);
+        }
             filtrarYActualizarTablero();
         };
 
@@ -1398,8 +1393,7 @@
             document.getElementById('colab_area').value = reg.area_apoyo;
             document.getElementById('colab_lugar').value = reg.lugar_voluntariado;
             document.getElementById('colab_vehiculo').value = reg.vehiculo;
-            document.getElementById('colab_notes').value = reg.disponibilidad;
-
+            document.getElementById('colab_notas').value = reg.disponibilidad;
             document.getElementById('btn-submit-colab').innerText = "Actualizar Voluntario";
             document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar</button>`;
             navegarA('view-colaborar');
