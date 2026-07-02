@@ -152,11 +152,6 @@
         .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(251, 192, 45, 0.2); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-        /* Estilos de Checkboxes para Servicios */
-        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
-        .checkbox-grid label.checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--gray-700); cursor: pointer; }
-        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent); }
-
         /* Carga Masiva y Filtros */
         .import-zone {
             border: 2px dashed var(--gray-300); background-color: #ffffff; border-radius: 0.5rem; padding: 2rem; text-align: center; margin-bottom: 1.75rem; cursor: pointer;
@@ -225,7 +220,7 @@
         .badge-gray { background: var(--gray-200); color: var(--gray-700); }
 
         /* Botonera Avanzada */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; border: none; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.02em; }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--accent); color: var(--primary); }
         .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(251, 192, 45, 0.25); transform: translateY(-1px); }
@@ -285,9 +280,9 @@
         .donation-table-info td { padding: 0.65rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; color: var(--primary); text-align: left; display: table-cell !important; }
         .donation-table-info td strong { color: var(--gray-700); font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
         
-        /* Pie de Página Institucional */
+        /* Pie de Página Centrado */
         .site-footer { background-color: #ffffff; border-top: 1px solid var(--gray-200); padding: 2.5rem 0; margin-top: 4rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); box-shadow: 0 -2px 10px rgba(0,0,0,0.01); }
-        .site-footer p { max-width: 850px; margin: 0 auto 0.5rem auto; line-height: 1.6; }
+        .site-footer p { max-width: 850px; margin: 0 auto 0.5rem auto; line-height: 1.6; text-align: center; }
         .site-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
         .site-footer a:hover { text-decoration: underline; }
 
@@ -520,7 +515,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Estado Residencial *</label>
-                                            <select id="ayuda_estado_res" class="form-select" required>
+                                            <select id="ayuda_state_res" class="form-select" required>
                                                 <option value="La Guaira">La Guaira</option>
                                                 <option value="Miranda">Miranda</option>
                                                 <option value="Distrito Capital">Distrito Capital</option>
@@ -830,7 +825,18 @@
                         <div class="table-container">
                             <table>
                                 <thead>
-                                    <tr><th>SITUACIÓN</th><th>CÉDULA</th><th>NOMBRE</th><th>COMUNIDAD</th><th>GRUPO</th><th>DAMNIFICADO</th><th>UBICACIÓN</th><th>TELÉFONO</th><th>OBSERVACIÓN</th><th class="admin-action-header" style="display: none;">ACCIONES</th></tr>
+                                    <tr>
+                                        <th id="sort-af-estado" onclick="ordenarTablaAfectados('estado')" style="cursor:pointer">SITUACIÓN ↕</th>
+                                        <th id="sort-af-cedula_identidad" onclick="ordenarTablaAfectados('cedula_identidad')" style="cursor:pointer">CÉDULA ↕</th>
+                                        <th id="sort-af-nombre" onclick="ordenarTablaAfectados('nombre')" style="cursor:pointer">NOMBRE ↕</th>
+                                        <th id="sort-af-cedula" onclick="ordenarTablaAfectados('cedula')" style="cursor:pointer">COMUNIDAD ↕</th>
+                                        <th id="sort-af-edad" onclick="ordenarTablaAfectados('edad')" style="cursor:pointer">GRUPO ↕</th>
+                                        <th id="sort-af-damnificado" onclick="ordenarTablaAfectados('damnificado')" style="cursor:pointer">DAMNIFICADO ↕</th>
+                                        <th id="sort-af-ubicacion" onclick="ordenarTablaAfectados('ubicacion')" style="cursor:pointer">UBICACIÓN ↕</th>
+                                        <th id="sort-af-telefono" onclick="ordenarTablaAfectados('telefono')" style="cursor:pointer">TELÉFONO ↕</th>
+                                        <th id="sort-af-observaciones" onclick="ordenarTablaAfectados('observaciones')" style="cursor:pointer">OBSERVACIÓN ↕</th>
+                                        <th class="admin-action-header" style="display: none;">ACCIONES</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="tablaCuerpo"></tbody>
                             </table>
@@ -973,10 +979,13 @@
         let idEdicionAyuda = null;
         let idEdicionColab = null;
 
+        let sortConfigAfectados = { key: null, direction: 'none' };
+        let sortConfigAyuda = { key: null, direction: 'none' };
+        let sortConfigColab = { key: null, direction: 'none' };
+
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
 
-        // --- FUNCIONES AUXILIARES PARA LIMPIEZA INTELIGENTE Y FILTRADO DE TEXTO ---
         function normalizarTexto(txt) {
             return String(txt || '')
                 .toLowerCase()
@@ -1002,6 +1011,64 @@
             return coincidencias >= 2 || (coincidencias > 0 && coincidencias === Math.min(tokens1.length, tokens2.length));
         }
 
+        function procesarCicloOrden(config, key) {
+            if (config.key !== key) {
+                config.key = key;
+                config.direction = 'asc';
+            } else {
+                if (config.direction === 'asc') {
+                    config.direction = 'desc';
+                } else if (config.direction === 'desc') {
+                    config.direction = 'none';
+                    config.key = null;
+                } else {
+                    config.direction = 'asc';
+                }
+            }
+        }
+
+        function obtenerSimboloOrden(config, key) {
+            if (config.key !== key || config.direction === 'none') return '↕';
+            return config.direction === 'asc' ? '▲' : '▼';
+        }
+
+        function ordenarColeccion(array, config) {
+            if (!config.key || config.direction === 'none') return [...array];
+            return [...array].sort((a, b) => {
+                let valA = a[config.key] || '';
+                let valB = b[config.key] || '';
+                if (typeof valA === 'string') valA = valA.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (typeof valB === 'string') valB = valB.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (valA < valB) return config.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return config.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        window.ordenarTablaAfectados = function(key) {
+            procesarCicloOrden(sortConfigAfectados, key);
+            const mapaIds = {
+                'estado': 'sort-af-estado', 'cedula_identidad': 'sort-af-cedula_identidad', 'nombre': 'sort-af-nombre',
+                'cedula': 'sort-af-cedula', 'edad': 'sort-af-edad', 'damnificado': 'sort-af-damnificado',
+                'ubicacion': 'sort-af-ubicacion', 'telefono': 'sort-af-telefono', 'observaciones': 'sort-af-observaciones'
+            };
+            for (let k in mapaIds) {
+                const el = document.getElementById(mapaIds[k]);
+                if (el) el.innerText = obtenerSimboloOrden(sortConfigAfectados, k);
+            }
+            filtrarYActualizarTablero();
+        };
+
+        window.ordenarTablaAyuda = function(key) {
+            procesarCicloOrden(sortConfigAyuda, key);
+            actualizarInterfazAyuda(ayudaNube);
+        };
+
+        window.ordenarTablaColab = function(key) {
+            procesarCicloOrden(sortConfigColab, key);
+            actualizarInterfazColaboradores(colaboradoresNube);
+        };
+
         function navegarA(idSeccion, desdeHistorial = false) {
             document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
             const seccionDestino = document.getElementById(idSeccion);
@@ -1012,16 +1079,6 @@
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        window.addEventListener('popstate', function(event) {
-            if (event.state && event.state.vistaActiva) {
-                navegarA(event.state.vistaActiva, true);
-            } else {
-                navegarA('view-home', true);
-            }
-        });
-
-        window.history.replaceState({ vistaActiva: 'view-home' }, "", "#view-home");
 
         function conmutarAccesoSeguro() {
             const malla = document.getElementById('mallaPrincipal');
@@ -1066,8 +1123,6 @@
 
                 document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "none");
                 cancelarEdicion();
-                cancelarEdicionAyuda();
-                cancelarEdicionColab();
             }
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
@@ -1122,7 +1177,6 @@
                 return cumpleTexto && cumpleEst && cumpleGrp;
             });
 
-            // LOGICA DEL FILTRO DE BUSQUEDA AUXILIAR DE DUPLICADOS EN TABLERO
             if (filterDup === 'Duplicados') {
                 registrosFiltrados = registrosFiltrados.filter(r1 => {
                     return registrosNube.some(r2 => r1.id !== r2.id && sonNombresSimilares(r1.nombre, r2.nombre));
@@ -1137,7 +1191,9 @@
             if (!cuerpo) return;
             cuerpo.innerHTML = '';
             
-            datosFiltrados.forEach(reg => {
+            let datosOrdenados = ordenarColeccion(datosFiltrados, sortConfigAfectados);
+            
+            datosOrdenados.forEach(reg => {
                 let badgeClass = 'badge-info';
                 let est = String(reg.estado || 'Desaparecido').trim();
                 if (est.toLowerCase().includes('desaparecido') || est.toLowerCase().includes('informacion') || est.toLowerCase().includes('información') || est.includes('❓')) badgeClass = 'badge-warning';
@@ -1160,14 +1216,14 @@
                     <td data-label="Ubicación"><div class="text-truncate-clamp">${reg.ubicacion || '-'}</div></td>
                     <td data-label="Teléfono">${enmascararTelefono(reg.telefono)}</td>
                     <td data-label="Observación"><div class="text-truncate-clamp">${reg.observaciones || '-'}</div></td>
-                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina(${reg.id})">Editar</button><button class="btn-delete" onclick="eliminarFila(${reg.id})">Eliminar</button></td>` : ''}
+                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina(${reg.id})">Editar</button><button class="btn-delete" onclick="eliminarFila(${reg.id}, this)">Eliminar</button></td>` : ''}
                 `;
                 cuerpo.appendChild(fila);
             });
 
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('atrapado') || String(r.estado).includes('⚠️'))).length;
-            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).includes('✅'))).length;
+            let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).toLowerCase().includes('✅'))).length;
             let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información') || String(r.estado).includes('❓'))).length;
             let fall = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('fallecido') || String(r.estado).includes('🕊️'))).length;
 
@@ -1184,47 +1240,55 @@
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO</th><th>TELÉFONO</th><th>NOTAS</th><th class="admin-action-header">ACCIONES</th></tr>`;
+                thead.innerHTML = `<tr>
+                    <th onclick="ordenarTablaColab('nombre')" style="cursor:pointer">VOLUNTARIO ${obtenerSimboloOrden(sortConfigColab, 'nombre')}</th>
+                    <th onclick="ordenarTablaColab('cargo_usb')" style="cursor:pointer">VÍNCULO USB ${obtenerSimboloOrden(sortConfigColab, 'cargo_usb')}</th>
+                    <th onclick="ordenarTablaColab('area_apoyo')" style="cursor:pointer">ÁREA DE APOYO ${obtenerSimboloOrden(sortConfigColab, 'area_apoyo')}</th>
+                    <th onclick="ordenarTablaColab('lugar_voluntariado')" style="cursor:pointer">LUGAR ${obtenerSimboloOrden(sortConfigColab, 'lugar_voluntariado')}</th>
+                    <th onclick="ordenarTablaColab('vehiculo')" style="cursor:pointer">VEHÍCULO ${obtenerSimboloOrden(sortConfigColab, 'vehiculo')}</th>
+                    <th onclick="ordenarTablaColab('telefono')" style="cursor:pointer">TELÉFONO ${obtenerSimboloOrden(sortConfigColab, 'telefono')}</th>
+                    <th onclick="ordenarTablaColab('disponibilidad')" style="cursor:pointer">NOTAS ${obtenerSimboloOrden(sortConfigColab, 'disponibilidad')}</th>
+                    <th class="admin-action-header">ACCIONES</th>
+                </tr>`;
             } else {
-                thead.innerHTML = `<tr><th>VOLUNTARIO</th><th>VÍNCULO</th><th>UBICACIÓN BASE</th><th>ÁREA DE APOYO</th><th>LOGÍSTICA TRASLADO</th><th>LUGAR DESTINO</th><th>VEHÍCULO</th><th>OFRECIMIENTO</th><th>NOTAS</th></tr>`;
+                thead.innerHTML = `<tr>
+                    <th onclick="ordenarTablaColab('nombre')" style="cursor:pointer">VOLUNTARIO ${obtenerSimboloOrden(sortConfigColab, 'nombre')}</th>
+                    <th onclick="ordenarTablaColab('cargo_usb')" style="cursor:pointer">VÍNCULO USB ${obtenerSimboloOrden(sortConfigColab, 'cargo_usb')}</th>
+                    <th onclick="ordenarTablaColab('area_apoyo')" style="cursor:pointer">ÁREA DE APOYO ${obtenerSimboloOrden(sortConfigColab, 'area_apoyo')}</th>
+                    <th onclick="ordenarTablaColab('lugar_voluntariado')" style="cursor:pointer">LUGAR ${obtenerSimboloOrden(sortConfigColab, 'lugar_voluntariado')}</th>
+                    <th onclick="ordenarTablaColab('vehiculo')" style="cursor:pointer">VEHÍCULO ${obtenerSimboloOrden(sortConfigColab, 'vehiculo')}</th>
+                    <th onclick="ordenarTablaColab('disponibilidad')" style="cursor:pointer">NOTAS ${obtenerSimboloOrden(sortConfigColab, 'disponibilidad')}</th>
+                </tr>`;
             }
 
             cuerpo.innerHTML = '';
-            datos.forEach(c => {
+            let datosOrdenados = ordenarColeccion(datos, sortConfigColab);
+
+            datosOrdenados.forEach(c => {
                 const fila = document.createElement('tr');
                 let grpVoluntario = mapaGrupo[String(c.cargo_usb).trim().toLowerCase()] || c.cargo_usb || 'Estudiante';
                 let lugar = c.lugar_voluntariado || 'Punto de Acopio USB';
                 let vehiculo = c.vehiculo || 'No';
-                let geo = c.ubicacion_geografica || '-';
-                let traslado = c.traslado_logistico || 'No especifica';
-                let ofr = c.ofrecimiento_detallado || '-';
-                let notas = c.disponibilidad || '-';
                 
                 if (esAdministrador) {
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
-                        <td data-label="Ubicación Base">${geo}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                        <td data-label="Logística Traslado">${traslado}</td>
-                        <td data-label="Lugar Destino">${lugar}</td>
+                        <td data-label="Lugar">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
-                        <td data-label="Ofrecimiento Detallado"><div class="text-truncate-clamp">${ofr}</div></td>
                         <td data-label="Teléfono">${c.telefono || '-'}</td>
-                        <td data-label="Notas"><div class="text-truncate-clamp">${notas}</div></td>
-                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionColab(${c.id})">Editar</button><button class="btn-delete" onclick="eliminarColab(${c.id})">Eliminar</button></td>
+                        <td data-label="Notas"><div class="text-truncate-clamp">${c.disponibilidad || '-'}</div></td>
+                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionColab(${c.id})">Editar</button><button class="btn-delete" onclick="eliminarColab(${c.id}, this)">Eliminar</button></td>
                     `;
                 } else {
                     fila.innerHTML = `
                         <td data-label="Voluntario"><strong>${c.nombre}</strong></td>
                         <td data-label="Vínculo USB">${grpVoluntario}</td>
-                        <td data-label="Ubicación Base">${geo}</td>
                         <td data-label="ÁREA APOYO"><span class="badge badge-success" style="background-color:#e0f2fe; color:#0369a1;">${c.area_apoyo}</span></td>
-                        <td data-label="Logística Traslado">${traslado}</td>
-                        <td data-label="Lugar Destino">${lugar}</td>
+                        <td data-label="Lugar">${lugar}</td>
                         <td data-label="Vehículo">${vehiculo}</td>
-                        <td data-label="Ofrecimiento Detallado"><div class="text-truncate-clamp">${ofr}</div></td>
-                        <td data-label="Notas"><div class="text-truncate-clamp">${notas}</div></td>
+                        <td data-label="Notas"><div class="text-truncate-clamp">${c.disponibilidad || '-'}</div></td>
                     `;
                 }
                 cuerpo.appendChild(fila);
@@ -1237,180 +1301,114 @@
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>CÉDULA</th><th>TELÉFONO</th><th>CORREO</th><th>SEDE</th><th>CARNET</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>DIRECCIÓN</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th><th class="admin-action-header">ACCIONES</th></tr>`;
+                thead.innerHTML = `<tr>
+                    <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ${obtenerSimboloOrden(sortConfigAyuda, 'tipo_reporte')}</th>
+                    <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ${obtenerSimboloOrden(sortConfigAyuda, 'nombre')}</th>
+                    <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ${obtenerSimboloOrden(sortConfigAyuda, 'cedula')}</th>
+                    <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ${obtenerSimboloOrden(sortConfigAyuda, 'telefono')}</th>
+                    <th onclick="ordenarTablaAyuda('comunidad')" style="cursor:pointer">COMUNIDAD ${obtenerSimboloOrden(sortConfigAyuda, 'comunidad')}</th>
+                    <th onclick="ordenarTablaAyuda('grupo')" style="cursor:pointer">GRUPO ${obtenerSimboloOrden(sortConfigAyuda, 'grupo')}</th>
+                    <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'estado')}</th>
+                    <th onclick="ordenarTablaAyuda('damnificado')" style="cursor:pointer">DAMNIFICADO ${obtenerSimboloOrden(sortConfigAyuda, 'damnificado')}</th>
+                    <th onclick="ordenarTablaAyuda('ubicacion')" style="cursor:pointer">UBICACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'ubicacion')}</th>
+                    <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ${obtenerSimboloOrden(sortConfigAyuda, 'descripcion_ayuda')}</th>
+                    <th class="admin-action-header">ACCIONES</th>
+                </tr>`;
             } else {
-                thead.innerHTML = `<tr><th>TIPO</th><th>AFECTADO</th><th>SEDE</th><th>COMUNIDAD</th><th>GRUPO</th><th>ESTADO RES.</th><th>EJE</th><th>AFECTACIÓN VIV.</th><th>REFUGIO</th><th>SERVICIOS</th><th>SITUACIÓN</th><th>LESIONES</th><th>DAMNIFICADO</th><th>UBICACIÓN ACTUAL</th><th>REQUERIMIENTO</th></tr>`;
+                thead.innerHTML = `<tr>
+                    <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ${obtenerSimboloOrden(sortConfigAyuda, 'tipo_reporte')}</th>
+                    <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ${obtenerSimboloOrden(sortConfigAyuda, 'nombre')}</th>
+                    <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ${obtenerSimboloOrden(sortConfigAyuda, 'cedula')}</th>
+                    <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ${obtenerSimboloOrden(sortConfigAyuda, 'telefono')}</th>
+                    <th onclick="ordenarTablaAyuda('comunidad')" style="cursor:pointer">COMUNIDAD ${obtenerSimboloOrden(sortConfigAyuda, 'comunidad')}</th>
+                    <th onclick="ordenarTablaAyuda('grupo')" style="cursor:pointer">GRUPO ${obtenerSimboloOrden(sortConfigAyuda, 'grupo')}</th>
+                    <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'estado')}</th>
+                    <th onclick="ordenarTablaAyuda('damnificado')" style="cursor:pointer">DAMNIFICADO ${obtenerSimboloOrden(sortConfigAyuda, 'damnificado')}</th>
+                    <th onclick="ordenarTablaAyuda('ubicacion')" style="cursor:pointer">UBICACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'ubicacion')}</th>
+                    <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ${obtenerSimboloOrden(sortConfigAyuda, 'descripcion_ayuda')}</th>
+                </tr>`;
             }
 
             cuerpo.innerHTML = '';
-            datos.forEach(a => {
-                const fila = document.createElement('tr');
-                
-                let tipo = a.tipo_reporte || '-';
-                let nom = a.nombre || '-';
-                let ci = a.cedula || '-';
-                let tlf = a.telefono || '-';
-                let email = a.correo || '-';
-                let Sede = a.sede_usb || '-';
-                let Carnet = a.carnet_estudiante || '-';
-                let com = a.comunidad || '-';
-                let grp = a.grupo || '-';
-                let estRes = a.estado_residencial || '-';
-                let eje = a.eje_logistico || '-';
-                let dir = a.direccion_residencial || '-';
-                let afViv = a.afectacion_vivienda || '-';
-                let ref = a.requiere_refugio || '-';
-                let serv = a.servicios_afectados || '-';
-                let estSalud = a.estado || '-';
-                let les = a.lesiones_fisicas || '-';
-                let damn = a.damnificado || '-';
-                let ubiAct = a.ubicacion || '-';
-                let req = a.descripcion_ayuda || '-';
+            let datosOrdenados = ordenarColeccion(datos, sortConfigAyuda);
 
-                if (esAdministrador) {
-                    fila.innerHTML = `
-                        <td data-label="Tipo">${tipo}</td>
-                        <td data-label="Afectado"><strong>${nom}</strong></td>
-                        <td data-label="Cédula">${ci}</td>
-                        <td data-label="Teléfono">${tlf}</td>
-                        <td data-label="Correo">${email}</td>
-                        <td data-label="Sede">${Sede}</td>
-                        <td data-label="Carnet">${Carnet}</td>
-                        <td data-label="Comunidad">${com}</td>
-                        <td data-label="Grupo">${grp}</td>
-                        <td data-label="Estado Res.">${estRes}</td>
-                        <td data-label="Eje">${eje}</td>
-                        <td data-label="Dirección"><div class="text-truncate-clamp">${dir}</div></td>
-                        <td data-label="Afectación Viv.">${afViv}</td>
-                        <td data-label="Refugio">${ref}</td>
-                        <td data-label="Servicios">${serv}</td>
-                        <td data-label="Situación">${estSalud}</td>
-                        <td data-label="Lesiones">${les}</td>
-                        <td data-label="Damnificado">${damn}</td>
-                        <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${ubiAct}</div></td>
-                        <td data-label="Requerimiento"><div class="text-truncate-clamp">${req}</div></td>
-                        <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda(${a.id})">Editar</button><button class="btn-delete" onclick="eliminarAyuda(${a.id})">Eliminar</button></td>
-                    `;
-                } else {
-                    fila.innerHTML = `
-                        <td data-label="Tipo">${tipo}</td>
-                        <td data-label="Afectado"><strong>${nom}</strong></td>
-                        <td data-label="Sede">${Sede}</td>
-                        <td data-label="Comunidad">${com}</td>
-                        <td data-label="Grupo">${grp}</td>
-                        <td data-label="Estado Res.">${estRes}</td>
-                        <td data-label="Eje">${eje}</td>
-                        <td data-label="Afectación Viv.">${afViv}</td>
-                        <td data-label="Refugio">${ref}</td>
-                        <td data-label="Servicios">${serv}</td>
-                        <td data-label="Situación">${estSalud}</td>
-                        <td data-label="Lesiones">${les}</td>
-                        <td data-label="Damnificado">${damn}</td>
-                        <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${ubiAct}</div></td>
-                        <td data-label="Requerimiento"><div class="text-truncate-clamp">${req}</div></td>
-                    `;
-                }
+            datosOrdenados.forEach(a => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
+                    <td data-label="Afectado"><strong>${a.nombre}</strong></td>
+                    <td data-label="Cédula">${a.cedula || '-'}</td>
+                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                    <td data-label="Comunidad">${a.comunidad || '-'}</td>
+                    <td data-label="Grupo">${a.grupo || '-'}</td>
+                    <td data-label="Situación">${a.estado || '-'}</td>
+                    <td data-label="Damnificado">${a.damnificado || '-'}</td>
+                    <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                    <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
+                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda(${a.id})">Editar</button><button class="btn-delete" onclick="eliminarAyuda(${a.id}, this)">Eliminar</button></td>` : ''}
+                `;
                 cuerpo.appendChild(fila);
             });
         }
 
-        // --- MÓDULO CRUD AVANZADO COOPERATIVO ---
         window.activarEdicionAyuda = function(id) {
             const reg = ayudaNube.find(r => r.id === id);
             if (!reg) return;
             idEdicionAyuda = id;
-            
-            document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio (Admin)";
-            document.getElementById('ayuda_tipo').value = reg.tipo_reporte || 'Para mí';
-            document.getElementById('ayuda_nombre').value = reg.nombre || '';
-            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : (reg.cedula || '');
-            document.getElementById('ayuda_telefono').value = reg.telefono || '';
-            document.getElementById('ayuda_sede_usb').value = reg.sede_usb || 'Sartenejas';
-            document.getElementById('ayuda_carnet').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
-            document.getElementById('comunidad_ayuda').value = reg.comunidad || 'Universidad Simón Bolívar';
-            document.getElementById('grupo_ayuda').value = reg.grupo || 'Estudiante';
-            document.getElementById('ayuda_state_res').value = reg.estado_residencial || 'La Guaira';
-            document.getElementById('ayuda_eje').value = reg.eje_logistico || 'Eje 1. Naiguatá-Camurí Grande';
-            document.getElementById('ayuda_direccion_res').value = reg.direccion_residencial || '';
-            document.getElementById('ayuda_afectacion_viv').value = reg.afectacion_vivienda || 'Afectación parcial';
-            document.getElementById('ayuda_refugio').value = reg.requiere_refugio || 'No';
-            document.getElementById('ayuda_estado').value = reg.estado || 'Desaparecido';
-            document.getElementById('ayuda_lesiones').value = reg.lesiones_fisicas || 'No';
-            document.getElementById('ayuda_damnificado').value = reg.damnificado || 'No';
-            document.getElementById('ayuda_correo').value = reg.correo || '';
-            document.getElementById('ayuda_ubicacion').value = reg.ubicacion || '';
-            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda || '';
+            document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio";
+            document.getElementById('ayuda_tipo').value = reg.tipo_reporte;
+            document.getElementById('ayuda_nombre').value = reg.nombre;
+            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : reg.cedula;
+            document.getElementById('ayuda_telefono').value = reg.telefono;
+            document.getElementById('comunidad_ayuda').value = reg.comunidad;
+            document.getElementById('grupo_ayuda').value = reg.grupo;
+            document.getElementById('ayuda_estado').value = reg.estado;
+            document.getElementById('ayuda_damnificado').value = reg.damnificado;
+            document.getElementById('ayuda_ubicacion').value = reg.ubicacion;
+            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda;
 
-            let servs = reg.servicios_afectados ? reg.servicios_afectados.split(', ') : [];
-            document.querySelectorAll('input[name="servicio_afectado"]').forEach(cb => {
-                cb.checked = servs.includes(cb.value);
-            });
-
-            document.getElementById('btn-submit-ayuda').innerText = "Actualizar Registro en Nube";
-            document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar Edición</button>`;
-            window.scrollTo({ top: document.getElementById('ayudaForm').offsetTop - 20, behavior: 'smooth' });
+            document.getElementById('btn-submit-ayuda').innerText = "Actualizar Solicitud";
+            document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar</button>`;
+            navegarA('view-necesito-ayuda');
         };
 
-        window.cancelarEdicionAyuda = function() {
+        function cancelarEdicionAyuda() {
             idEdicionAyuda = null;
             document.getElementById('ayudaForm').reset();
             document.getElementById('form-mode-title-ayuda').innerText = "Formulario de Solicitud de Auxilio";
             document.getElementById('btn-submit-ayuda').innerText = "Enviar Requerimiento";
             document.getElementById('cancel-edit-container-ayuda').innerHTML = '';
-        };
-
-        window.eliminarAyuda = async function(id) {
-            if(confirm('¿Deseas borrar permanentemente este caso de auxilio?')) {
-                await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
-                await cargarDatosDesdeNube();
-            }
-        };
+        }
 
         window.activarEdicionColab = function(id) {
             const reg = colaboradoresNube.find(r => r.id === id);
             if (!reg) return;
             idEdicionColab = id;
+            document.getElementById('form-mode-title-colab').innerText = "Modificar Ficha Voluntario";
+            document.getElementById('colab_nombre').value = reg.nombre;
+            document.getElementById('colab_telefono').value = reg.telefono;
+            document.getElementById('colab_cargo').value = reg.cargo_usb;
+            document.getElementById('colab_area').value = reg.area_apoyo;
+            document.getElementById('colab_lugar').value = reg.lugar_voluntariado;
+            document.getElementById('colab_vehiculo').value = reg.vehiculo;
+            document.getElementById('colab_notes').value = reg.disponibilidad;
 
-            document.getElementById('form-mode-title-colab').innerText = "Modificar Ficha de Voluntario (Admin)";
-            document.getElementById('colab_nombre').value = reg.nombre || '';
-            document.getElementById('colab_telefono').value = reg.telefono || '';
-            document.getElementById('colab_cargo').value = reg.cargo_usb || 'Estudiante USB';
-            document.getElementById('colab_area').value = reg.area_apoyo || 'Remoción de Escombros';
-            document.getElementById('colab_ubicacion_geo').value = reg.ubicacion_geografica || '';
-            document.getElementById('colab_traslado').value = reg.traslado_logistico || 'Dispone de transporte propio';
-            document.getElementById('colab_lugar').value = reg.lugar_voluntariado || 'Punto de Acopio USB';
-            document.getElementById('colab_vehiculo').value = reg.vehiculo || 'No';
-            document.getElementById('colab_ofrecimiento_det').value = reg.ofrecimiento_detallado || 'Alimentos, Ropa, Art. Higiene, Colchonetas';
-            document.getElementById('colab_notas').value = reg.disponibilidad || '';
-
-            document.getElementById('btn-submit-colab').innerText = "Actualizar Ficha en Nube";
-            document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar Edición</button>`;
-            window.scrollTo({ top: document.getElementById('colaboradorForm').offsetTop - 20, behavior: 'smooth' });
+            document.getElementById('btn-submit-colab').innerText = "Actualizar Voluntario";
+            document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar</button>`;
+            navegarA('view-colaborar');
         };
 
-        window.cancelarEdicionColab = function() {
+        function cancelarEdicionColab() {
             idEdicionColab = null;
             document.getElementById('colaboradorForm').reset();
             document.getElementById('form-mode-title-colab').innerText = "Inscripción de Voluntarios";
             document.getElementById('btn-submit-colab').innerText = "Registrarse como Voluntario";
             document.getElementById('cancel-edit-container-colab').innerHTML = '';
-        };
-
-        window.eliminarColab = async function(id) {
-            if(confirm('¿Deseas dar de baja a este brigadista de la base de datos?')) {
-                await supabaseClient.from('colaboradores').delete().eq('id', id);
-                await cargarDatosDesdeNube();
-            }
-        };
+        }
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            let serviciosMarcados = [];
-            document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
-                serviciosMarcados.push(cb.value);
-            });
-
-            const nuevaSolicitud = {
+            const payload = {
                 nombre: document.getElementById('ayuda_nombre').value.trim(),
                 cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
                 telefono: document.getElementById('ayuda_telefono').value.trim(),
@@ -1420,24 +1418,13 @@
                 comunidad: document.getElementById('comunidad_ayuda').value,
                 grupo: document.getElementById('grupo_ayuda').value,
                 estado: document.getElementById('ayuda_estado').value,
-                damnificado: document.getElementById('ayuda_damnificado').value,
-                sede_usb: document.getElementById('ayuda_sede_usb').value,
-                carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
-                estado_residencial: document.getElementById('ayuda_state_res').value,
-                eje_logistico: document.getElementById('ayuda_eje').value,
-                direccion_residencial: document.getElementById('ayuda_direccion_res').value.trim(),
-                afectacion_vivienda: document.getElementById('ayuda_afectacion_viv').value,
-                requiere_refugio: document.getElementById('ayuda_refugio').value,
-                lesiones_fisicas: document.getElementById('ayuda_lesiones').value,
-                servicios_afectados: serviciosMarcados.join(', ') || 'Ninguno',
-                correo: document.getElementById('ayuda_correo').value.trim()
+                damnificado: document.getElementById('ayuda_damnificado').value
             };
-
             if (idEdicionAyuda !== null) {
-                await supabaseClient.from('solicitudes_ayuda').update(nuevaSolicitud).eq('id', idEdicionAyuda);
+                await supabaseClient.from('solicitudes_ayuda').update(payload).eq('id', idEdicionAyuda);
                 cancelarEdicionAyuda();
             } else {
-                await supabaseClient.from('solicitudes_ayuda').insert([nuevaSolicitud]);
+                await supabaseClient.from('solicitudes_ayuda').insert([payload]);
                 document.getElementById('ayudaForm').reset();
             }
             await cargarDatosDesdeNube();
@@ -1445,64 +1432,24 @@
 
         document.getElementById('colaboradorForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const nuevoVoluntario = {
+            const payload = {
                 nombre: document.getElementById('colab_nombre').value.trim(),
                 telefono: document.getElementById('colab_telefono').value.trim(),
                 cargo_usb: document.getElementById('colab_cargo').value,
                 area_apoyo: document.getElementById('colab_area').value,
                 lugar_voluntariado: document.getElementById('colab_lugar').value,
                 vehiculo: document.getElementById('colab_vehiculo').value,
-                disponibilidad: document.getElementById('colab_notas').value.trim(),
-                ubicacion_geografica: document.getElementById('colab_ubicacion_geo').value.trim(),
-                traslado_logistico: document.getElementById('colab_traslado').value,
-                ofrecimiento_detallado: document.getElementById('colab_ofrecimiento_det').value
+                disponibilidad: document.getElementById('colab_notes').value.trim()
             };
-
             if (idEdicionColab !== null) {
-                await supabaseClient.from('colaboradores').update(nuevoVoluntario).eq('id', idEdicionColab);
+                await supabaseClient.from('colaboradores').update(payload).eq('id', idEdicionColab);
                 cancelarEdicionColab();
             } else {
-                await supabaseClient.from('colaboradores').insert([nuevoVoluntario]);
+                await supabaseClient.from('colaboradores').insert([payload]);
                 document.getElementById('colaboradorForm').reset();
             }
             await cargarDatosDesdeNube();
         });
-
-        window.activarEdiciónEnPagina = function(id) {
-            const reg = registrosNube.find(r => r.id === id);
-            if (!reg) return;
-            idEnEdicion = id;
-            document.getElementById('form-mode-title-afectado').innerText = "Modificar Registro Afectado";
-            document.getElementById('nombre').value = reg.nombre;
-            document.getElementById('cedula_id').value = reg.cedula_identidad === '-' ? '' : reg.cedula_identidad;
-            document.getElementById('telefono_id').value = reg.telefono === '-' ? '' : reg.telefono;
-            document.getElementById('ubicacion').value = reg.ubicacion === '-' ? '' : reg.ubicacion;
-            document.getElementById('observaciones').value = reg.observaciones === '-' ? '' : reg.observaciones;
-            document.getElementById('estado').value = reg.estado;
-            document.getElementById('es_damnificado').value = reg.damnificado || 'No';
-            
-            let cKey = String(reg.cedula).trim().toLowerCase();
-            document.getElementById('comunidad').value = (cKey === 'usb' || cKey.includes('simon')) ? "Universidad Simón Bolívar" : "Externo";
-            
-            let gKey = String(reg.edad).trim().toLowerCase();
-            let grupoMapeado = "Estudiante";
-            if(gKey.includes('prof')) grupoMapeado = "Profesor";
-            if(gKey.includes('egr')) grupoMapeado = "Egresado";
-            if(gKey.includes('adm')) grupoMapeado = "Administrativo";
-            if(gKey.includes('obr')) grupoMapeado = "Obrero";
-            if(gKey.includes('ext')) grupoMapeado = "Externo";
-            document.getElementById('grupo').value = grupoMapeado;
-
-            document.getElementById('btn-submit-form').innerText = "Actualizar Estatus en la Nube";
-            document.getElementById('cancel-edit-container').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicion()">Cancelar</button>`;
-        };
-
-        window.cancelarEdicion = function() {
-            idEnEdicion = null; document.getElementById('registroForm').reset();
-            document.getElementById('form-mode-title-afectado').innerText = "Registro Afectado";
-            document.getElementById('btn-submit-form').innerText = "Guardar en la Nube";
-            document.getElementById('cancel-edit-container').innerHTML = '';
-        };
 
         document.getElementById('registroForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1551,7 +1498,6 @@
                     let iObs = cabecera.indexOf('observacion');
                     let iDam = cabecera.indexOf('damnificado');
 
-                    // Sincronizar datos nube locales para asegurar coherencia de limpieza
                     const { data: syncData } = await supabaseClient.from('registros_ciudadanos').select('*');
                     if (syncData) registrosNube = syncData;
 
@@ -1573,7 +1519,6 @@
                         let comExcelLimpia = mapaComunidad[comExcelRaw.toLowerCase()] || comExcelRaw;
                         let gruExcelLimpio = mapaGrupo[gruExcelRaw.toLowerCase()] || gruExcelRaw;
 
-                        // ALGORITMO INTEGRADO DE EVITACIÓN DE REGISTROS DUPLICADOS EN LA SUBIDA MASIVA
                         let esDuplicado = registrosNube.some(r => {
                             let comNubeLimpia = mapaComunidad[String(r.cedula).trim().toLowerCase()] || r.cedula || '';
                             let gruNubeLimpio = mapaGrupo[String(r.edad).trim().toLowerCase()] || r.edad || '';
@@ -1610,6 +1555,73 @@
         });
 
         document.getElementById('filtroDuplicados').addEventListener('change', filtrarYActualizarTablero);
+
+        /* SISTEMA INMUNE A BLOQUEOS DE NAVEGACIÓN EN DOS PASOS */
+        window.eliminarFila = async function(id, boton) {
+            if (!boton) return;
+            if (boton.innerText === "Eliminar") {
+                boton.innerText = "¿Seguro?";
+                boton.style.backgroundColor = "#dc2626";
+                boton.style.color = "#ffffff";
+                boton.style.borderColor = "#dc2626";
+                boton.timeoutId = setTimeout(() => {
+                    boton.innerText = "Eliminar";
+                    boton.style.backgroundColor = "#fef2f2";
+                    boton.style.color = "var(--danger)";
+                    boton.style.borderColor = "#fecaca";
+                }, 3000);
+            } else if (boton.innerText === "¿Seguro?") {
+                if (boton.timeoutId) clearTimeout(boton.timeoutId);
+                boton.innerText = "Borrando...";
+                boton.disabled = true;
+                await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
+
+        window.eliminarAyuda = async function(id, boton) {
+            if (!boton) return;
+            if (boton.innerText === "Eliminar") {
+                boton.innerText = "¿Seguro?";
+                boton.style.backgroundColor = "#dc2626";
+                boton.style.color = "#ffffff";
+                boton.style.borderColor = "#dc2626";
+                boton.timeoutId = setTimeout(() => {
+                    boton.innerText = "Eliminar";
+                    boton.style.backgroundColor = "#fef2f2";
+                    boton.style.color = "var(--danger)";
+                    boton.style.borderColor = "#fecaca";
+                }, 3000);
+            } else if (boton.innerText === "¿Seguro?") {
+                if (boton.timeoutId) clearTimeout(boton.timeoutId);
+                boton.innerText = "Borrando...";
+                boton.disabled = true;
+                await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
+
+        window.eliminarColab = async function(id, boton) {
+            if (!boton) return;
+            if (boton.innerText === "Eliminar") {
+                boton.innerText = "¿Seguro?";
+                boton.style.backgroundColor = "#dc2626";
+                boton.style.color = "#ffffff";
+                boton.style.borderColor = "#dc2626";
+                boton.timeoutId = setTimeout(() => {
+                    boton.innerText = "Eliminar";
+                    boton.style.backgroundColor = "#fef2f2";
+                    boton.style.color = "var(--danger)";
+                    boton.style.borderColor = "#fecaca";
+                }, 3000);
+            } else if (boton.innerText === "¿Seguro?") {
+                if (boton.timeoutId) clearTimeout(boton.timeoutId);
+                boton.innerText = "Borrando...";
+                boton.disabled = true;
+                await supabaseClient.from('colaboradores').delete().eq('id', id);
+                await cargarDatosDesdeNube();
+            }
+        };
 
         setInterval(cargarDatosDesdeNube, 15000);
         cargarDatosDesdeNube();
