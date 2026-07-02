@@ -555,7 +555,8 @@
                                         <div class="form-group">
                                             <label class="form-label">Situación General Actual *</label>
                                             <select id="ayuda_estado" class="form-select" required>
-                                                <option value="Desaparecido">Sin Información / Desaparecido</option>
+                                                <option value="Sin Información">Sin Información</option>
+                                                <option value="Desaparecido">Desaparecido</option>
                                                 <option value="Con Vida">Reportados Bien / Con Vida</option>
                                                 <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
                                                 <option value="Fallecido">Fallecido</option>
@@ -708,6 +709,7 @@
                             <div class="stat-card"><span class="stat-value" id="stat-atrapados">0</span><span class="stat-label">EMERGENCIA / ATRAPADOS</span></div>
                             <div class="stat-card"><span class="stat-value" id="stat-vivos">0</span><span class="stat-label">REPORTADOS BIEN</span></div>
                             <div class="stat-card"><span class="stat-value" id="stat-desaparecidos">0</span><span class="stat-label">SIN INFORMACIÓN</span></div>
+                            <div class="stat-card"><span class="stat-value" id="stat-desaparecidos-real">0</span><span class="stat-label">DESAPARECIDOS</span></div>
                             <div class="stat-card"><span class="stat-value" id="stat-fallecidos">0</span><span class="stat-label">FALLECIDOS</span></div>
                         </div>
                     </div>
@@ -748,7 +750,8 @@
                                         <div class="form-group">
                                             <label class="form-label">Situación Actual *</label>
                                             <select id="estado" class="form-select" required>
-                                                <option value="Desaparecido">Sin Información / Desaparecido</option>
+                                                <option value="Sin Información">Sin Información</option>
+                                                <option value="Desaparecido">Desaparecido</option>
                                                 <option value="Con Vida">Reportados Bien / Con Vida</option>
                                                 <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
                                                 <option value="Fallecido">Fallecido</option>
@@ -783,7 +786,8 @@
                             
                             <select id="filtroEstado" class="form-select" style="width: auto; min-width: 160px;">
                                 <option value="Todos">Todas las Situaciones</option>
-                                <option value="Desaparecido">Desaparecido / Sin Info</option>
+                                <option value="Sin Información">Sin Información</option>
+                                <option value="Desaparecido">Desaparecido</option>
                                 <option value="Con Vida">Con Vida / Bien</option>
                                 <option value="Atrapado">Atrapado / Emergencia</option>
                                 <option value="Fallecido">Fallecido</option>
@@ -1150,7 +1154,8 @@
                 let estStr = String(r.estado || 'Desaparecido').toLowerCase();
                 let cumpleEst = true;
                 if (filterEst !== 'Todos') {
-                    if (filterEst === 'Desaparecido') cumpleEst = estStr.includes('desaparecido') || estStr.includes('informacion') || estStr.includes('información') || estStr.includes('❓');
+                    if (filterEst === 'Sin Información') cumpleEst = estStr.includes('informacion') || estStr.includes('información') || estStr.includes('❓');
+                    if (filterEst === 'Desaparecido') cumpleEst = estStr.includes('desaparecido');
                     if (filterEst === 'Con Vida') cumpleEst = estStr.includes('vida') || estStr.includes('bien') || estStr.includes('✅');
                     if (filterEst === 'Atrapado') cumpleEst = estStr.includes('atrapado') || estStr.includes('emergencia') || estStr.includes('⚠️');
                     if (filterEst === 'Fallecido') cumpleEst = estStr.includes('fallecido') || estStr.includes('🕊️');
@@ -1193,7 +1198,7 @@
                 htmlFinal += `
                     <tr>
                         <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
-                        <td data-label="Cédula">${reg.cedula_identidad || '-'}</td>
+                        <td data-label="Cédula">${enmascararTelefono(reg.cedula_identidad)}</td>
                         <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
                         <td data-label="Comunidad">${comLimpia}</td>
                         <td data-label="Grupo">${grpLimpio}</td>
@@ -1211,13 +1216,15 @@
             let total = registrosNube.length;
             let trap = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('atrapado') || String(r.estado).includes('⚠️'))).length;
             let vivos = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('vida') || String(r.estado).toLowerCase().includes('bien') || String(r.estado).includes('✅'))).length;
-            let des = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('desaparecido') || String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información') || String(r.estado).includes('❓'))).length;
+            let sinInfo = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('informacion') || String(r.estado).toLowerCase().includes('información') || String(r.estado).includes('❓'))).length;
+            let desaparecidosReal = registrosNube.filter(r => r.estado && String(r.estado).toLowerCase().includes('desaparecido')).length;
             let fall = registrosNube.filter(r => r.estado && (String(r.estado).toLowerCase().includes('fallecido') || String(r.estado).includes('🕊️'))).length;
 
             const elTotal = document.getElementById('stat-total'); if (elTotal) elTotal.innerText = total;
             const elTrap = document.getElementById('stat-atrapados'); if (elTrap) elTrap.innerText = trap;
             const elVivos = document.getElementById('stat-vivos'); if (elVivos) elVivos.innerText = vivos;
-            const elDes = document.getElementById('stat-desaparecidos'); if (elDes) elDes.innerText = des;
+            const elDes = document.getElementById('stat-desaparecidos'); if (elDes) elDes.innerText = sinInfo;
+            const elDesReal = document.getElementById('stat-desaparecidos-real'); if (elDesReal) elDesReal.innerText = desaparecidosReal;
             const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
         }
 
@@ -1324,12 +1331,22 @@
                         <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                         <td data-label="Afectado"><strong>${a.nombre}</strong></td>
                         <td data-label="Cédula">${a.cedula || '-'}</td>
-                        <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                        <td data-label="Teléfono">${a.telefono || '-'}</td>
+                        <td data-label="Correo">${a.correo || '-'}</td>
+                        <td data-label="Sede">${a.sede_usb || '-'}</td>
+                        <td data-label="Carnet">${a.carnet_estudiante || '-'}</td>
                         <td data-label="Comunidad">${a.comunidad || '-'}</td>
                         <td data-label="Grupo">${a.grupo || '-'}</td>
+                        <td data-label="Estado Res.">${a.estado_residencial || '-'}</td>
+                        <td data-label="Eje">${a.eje_logistico || '-'}</td>
+                        <td data-label="Dirección"><div class="text-truncate-clamp">${a.direccion_residencial || '-'}</div></td>
+                        <td data-label="Afectación Viv.">${a.afectacion_vivienda || '-'}</td>
+                        <td data-label="Refugio">${a.requiere_refugio || '-'}</td>
+                        <td data-label="Servicios">${a.servicios_afectados || '-'}</td>
                         <td data-label="Situación">${a.estado || '-'}</td>
+                        <td data-label="Lesiones">${a.lesiones_fisicas || '-'}</td>
                         <td data-label="Damnificado">${a.damnificado || '-'}</td>
-                        <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                        <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
                         <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
                         <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button><button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button></td>
                     </tr>`;
@@ -1337,13 +1354,13 @@
                     htmlFinal += `<tr>
                         <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                         <td data-label="Afectado"><strong>${a.nombre}</strong></td>
-                        <td data-label="Cédula">${a.cedula || '-'}</td>
+                        <td data-label="Cédula">${enmascararTelefono(a.cedula)}</td>
                         <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
                         <td data-label="Comunidad">${a.comunidad || '-'}</td>
                         <td data-label="Grupo">${a.grupo || '-'}</td>
                         <td data-label="Situación">${a.estado || '-'}</td>
                         <td data-label="Damnificado">${a.damnificado || '-'}</td>
-                        <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                        <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
                         <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
                     </tr>`;
                 }
@@ -1626,7 +1643,9 @@
 
         document.getElementById('btnExportarAyuda').addEventListener('click', function() {
             let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Teléfono Móvil", "Correo Electrónico", "Sede USB", "Carnet", "Comunidad", "Grupo", "Estado Residencial", "Eje Logístico", "Dirección Completa", "Afectación Vivienda", "Requieres Refugio", "Servicios Afectados", "Situación Actual", "Lesiones Físicas", "Damnificado", "Ubicacion Actual Exacta", "Descripción Requerimiento"]];
-            ayudaNube.forEach(a => matriz.push([a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.telefono || '-', a.correo || '-', a.sede_usb || '-', a.carnet_estudiante || '-', a.comunidad || '-', a.grupo || '-', a.estado_residencial || '-', a.eje_logistico || '-', a.direccion_residencial || '-', a.afectacion_vivienda || '-', a.requiere_refugio || '-', a.servicios_afectados || '-', a.estado || '-', a.lesiones_fisicas || '-', a.damnificado || '-', a.ubicacion, a.descripcion_ayuda]));
+            ayudaNube.forEach(a => matriz.push([
+                a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.telefono || '-', a.correo || '-', a.sede_usb || '-', a.carnet_estudiante || '-', a.comunidad || '-', a.grupo || '-', a.estado_residencial || '-', a.eje_logistico || '-', a.direccion_residencial || '-', a.afectacion_vivienda || '-', a.requiere_refugio || '-', a.servicios_afectados || '-', a.estado || '-', a.lesiones_fisicas || '-', a.damnificado || '-', a.ubicacion, a.descripcion_ayuda
+            ]));
             descargarMatrizComoExcel(matriz, "Data_Ayudas_Afectados_Vivienda_USB");
         });
 
