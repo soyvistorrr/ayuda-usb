@@ -1677,10 +1677,10 @@
             XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
+        /* SISTEMA INMUNE A BLOQUEOS CON DETECCIÓN DE POLÍTICAS RLS DE SUPABASE */
         window.eliminarFila = async function(id, boton) {
             if (!boton) return;
             let texto = boton.innerText.trim();
-            
             if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
@@ -1697,9 +1697,16 @@
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
                 
-                const { error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
+                // Añadimos .select() para obligar a Supabase a reportar si borró la fila
+                const { data, error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id).select();
+                
                 if (error) {
-                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    alert("Error interno: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else if (!data || data.length === 0) {
+                    // Si la data vuelve vacía, Supabase te bloqueó por seguridad
+                    alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de esta tabla.");
                     boton.innerText = "Eliminar";
                     boton.disabled = false;
                 } else {
@@ -1711,7 +1718,6 @@
         window.eliminarAyuda = async function(id, boton) {
             if (!boton) return;
             let texto = boton.innerText.trim();
-
             if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
@@ -1728,9 +1734,14 @@
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
                 
-                const { error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
+                const { data, error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id).select();
+                
                 if (error) {
-                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    alert("Error interno: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else if (!data || data.length === 0) {
+                    alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de la tabla 'solicitudes_ayuda'.");
                     boton.innerText = "Eliminar";
                     boton.disabled = false;
                 } else {
@@ -1742,7 +1753,6 @@
         window.eliminarColab = async function(id, boton) {
             if (!boton) return;
             let texto = boton.innerText.trim();
-
             if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
@@ -1759,9 +1769,14 @@
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
                 
-                const { error } = await supabaseClient.from('colaboradores').delete().eq('id', id);
+                const { data, error } = await supabaseClient.from('colaboradores').delete().eq('id', id).select();
+                
                 if (error) {
-                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    alert("Error interno: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else if (!data || data.length === 0) {
+                    alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de la tabla 'colaboradores'.");
                     boton.innerText = "Eliminar";
                     boton.disabled = false;
                 } else {
