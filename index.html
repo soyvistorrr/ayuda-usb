@@ -1847,6 +1847,19 @@
         };
 
         setInterval(cargarDatosDesdeNube, 15000);
+
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.vistaActiva) {
+                navegarA(event.state.vistaActiva, true);
+            } else {
+                navegarA('view-home', true);
+            }
+        });
+
+        if (!window.history.state) {
+            window.history.replaceState({ vistaActiva: 'view-home' }, "", "#view-home");
+        }
+
         cargarDatosDesdeNube();
     </script>
 </body>
