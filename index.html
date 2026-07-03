@@ -1123,6 +1123,14 @@
             return t.length > 4 ? t.substring(0, 4) + "-***" + t.substring(t.length - 4) : "****";
         }
 
+        function enmascararCedula(ced) {
+            let c = String(ced || '').trim();
+            if (!c || c === '-') return '-';
+            if (esAdministrador) return c; 
+            // Muestra la primera mitad de la cédula y oculta los últimos 4 dígitos limpiamente
+            return c.length > 4 ? c.substring(0, c.length - 4) + "****" : "****";
+        }
+
         async function cargarDatosDesdeNube() {
             let todosLosAfectados = [];
             let rangoInicio = 0;
@@ -1217,7 +1225,7 @@
                 htmlFinal += `
                     <tr>
                         <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
-                        <td data-label="Cédula">${enmascararTelefono(reg.cedula_identidad)}</td>
+                        <td data-label="Cédula">${enmascararCedula(reg.cedula_identidad)}</td>
                         <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
                         <td data-label="Comunidad">${comLimpia}</td>
                         <td data-label="Grupo">${grpLimpio}</td>
@@ -1353,7 +1361,7 @@
                 htmlFinal += `<tr>
                     <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                     <td data-label="Afectado"><strong>${a.nombre}</strong></td>
-                    <td data-label="Cédula">${a.cedula || '-'}</td>
+                    <td data-label="Cédula">${enmascararCedula(a.cedula)}</td>
                     <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
                     <td data-label="Correo">${a.correo || '-'}</td>
                     <td data-label="Sede">${a.sede_usb || '-'}</td>
