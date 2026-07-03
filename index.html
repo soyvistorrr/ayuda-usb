@@ -1294,18 +1294,28 @@
             if (!thead || !cuerpo) return;
 
             if (esAdministrador) {
-                thead.innerHTML = `<tr>
-                    <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ${obtenerSimboloOrden(sortConfigAyuda, 'tipo_reporte')}</th>
-                    <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ${obtenerSimboloOrden(sortConfigAyuda, 'nombre')}</th>
-                    <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ${obtenerSimboloOrden(sortConfigAyuda, 'cedula')}</th>
-                    <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ${obtenerSimboloOrden(sortConfigAyuda, 'telefono')}</th>
-                    <th onclick="ordenarTablaAyuda('comunidad')" style="cursor:pointer">COMUNIDAD ${obtenerSimboloOrden(sortConfigAyuda, 'comunidad')}</th>
-                    <th onclick="ordenarTablaAyuda('grupo')" style="cursor:pointer">GRUPO ${obtenerSimboloOrden(sortConfigAyuda, 'grupo')}</th>
-                    <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'estado')}</th>
-                    <th onclick="ordenarTablaAyuda('damnificado')" style="cursor:pointer">DAMNIFICADO ${obtenerSimboloOrden(sortConfigAyuda, 'damnificado')}</th>
-                    <th onclick="ordenarTablaAyuda('ubicacion')" style="cursor:pointer">UBICACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'ubicacion')}</th>
-                    <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ${obtenerSimboloOrden(sortConfigAyuda, 'descripcion_ayuda')}</th>
-                    <th class="admin-action-header">ACCIONES</th>
+                htmlFinal += `<tr>
+                    <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
+                    <td data-label="Afectado"><strong>${a.nombre}</strong></td>
+                    <td data-label="Cédula">${a.cedula || '-'}</td>
+                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
+                    <td data-label="Correo">${a.correo || '-'}</td>
+                    <td data-label="Sede">${a.sede_usb || '-'}</td>
+                    <td data-label="Carnet">${a.carnet_estudiante || '-'}</td>
+                    <td data-label="Comunidad">${a.comunidad || '-'}</td>
+                    <td data-label="Grupo">${a.grupo || '-'}</td>
+                    <td data-label="Estado Res.">${a.estado_residencial || '-'}</td>
+                    <td data-label="Eje">${a.eje_logistico || '-'}</td>
+                    <td data-label="Dirección"><div class="text-truncate-clamp">${a.direccion_residencial || '-'}</div></td>
+                    <td data-label="Afectación Viv.">${a.afectacion_vivienda || '-'}</td>
+                    <td data-label="Refugio">${a.requiere_refugio || '-'}</td>
+                    <td data-label="Servicios">${a.servicios_afectados || '-'}</td>
+                    <td data-label="Situación">${a.estado || '-'}</td>
+                    <td data-label="Lesiones">${a.lesiones_fisicas || '-'}</td>
+                    <td data-label="Damnificado">${a.damnificado || '-'}</td>
+                    <td data-label="Ubicación"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
+                    <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
+                    <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button><button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button></td>
                 </tr>`;
             } else {
                 thead.innerHTML = `<tr>
@@ -1373,16 +1383,31 @@
             if (!reg) return;
             idEdicionAyuda = id;
             document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio";
-            document.getElementById('ayuda_tipo').value = reg.tipo_reporte;
-            document.getElementById('ayuda_nombre').value = reg.nombre;
-            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : reg.cedula;
-            document.getElementById('ayuda_telefono').value = reg.telefono;
-            document.getElementById('comunidad_ayuda').value = reg.comunidad;
-            document.getElementById('grupo_ayuda').value = reg.grupo;
-            document.getElementById('ayuda_estado').value = reg.estado;
-            document.getElementById('ayuda_damnificado').value = reg.damnificado;
-            document.getElementById('ayuda_ubicacion').value = reg.ubicacion;
-            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda;
+
+            document.getElementById('ayuda_tipo').value = reg.tipo_reporte || 'Para mí';
+            document.getElementById('ayuda_nombre').value = reg.nombre || '';
+            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : (reg.cedula || '');
+            document.getElementById('ayuda_telefono').value = reg.telefono || '';
+            document.getElementById('ayuda_sede_usb').value = reg.sede_usb || 'Sartenejas';
+            document.getElementById('ayuda_carnet').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
+            document.getElementById('comunidad_ayuda').value = reg.comunidad || 'Universidad Simón Bolívar';
+            document.getElementById('grupo_ayuda').value = reg.grupo || 'Estudiante';
+            document.getElementById('ayuda_state_res').value = reg.estado_residencial || 'La Guaira';
+            document.getElementById('ayuda_eje').value = reg.eje_logistico || 'Eje 1. Naiguatá-Camurí Grande';
+            document.getElementById('ayuda_direccion_res').value = reg.direccion_residencial || '';
+            document.getElementById('ayuda_afectacion_viv').value = reg.afectacion_vivienda || 'Afectación parcial';
+            document.getElementById('ayuda_refugio').value = reg.requiere_refugio || 'No';
+            document.getElementById('ayuda_estado').value = reg.estado || 'Sin Información';
+            document.getElementById('ayuda_lesiones').value = reg.lesiones_fisicas || 'No';
+            document.getElementById('ayuda_damnificado').value = reg.damnificado || 'No';
+            document.getElementById('ayuda_correo').value = reg.correo || '';
+            document.getElementById('ayuda_ubicacion').value = reg.ubicacion || '';
+            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda || '';
+
+            let servs = reg.servicios_afectados ? reg.servicios_afectados.split(', ') : [];
+            document.querySelectorAll('input[name="servicio_afectado"]').forEach(cb => {
+                cb.checked = servs.includes(cb.value);
+            });
 
             document.getElementById('btn-submit-ayuda').innerText = "Actualizar Solicitud";
             document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar</button>`;
@@ -1427,6 +1452,11 @@
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            let serviciosMarcados = [];
+            document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
+                serviciosMarcados.push(cb.value);
+            });
+
             const payload = {
                 nombre: document.getElementById('ayuda_nombre').value.trim(),
                 cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
@@ -1437,8 +1467,19 @@
                 comunidad: document.getElementById('comunidad_ayuda').value,
                 grupo: document.getElementById('grupo_ayuda').value,
                 estado: document.getElementById('ayuda_estado').value,
-                damnificado: document.getElementById('ayuda_damnificado').value
+                damnificado: document.getElementById('ayuda_damnificado').value,
+                sede_usb: document.getElementById('ayuda_sede_usb').value,
+                carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
+                estado_residencial: document.getElementById('ayuda_state_res').value,
+                eje_logistico: document.getElementById('ayuda_eje').value,
+                direccion_residencial: document.getElementById('ayuda_direccion_res').value.trim(),
+                afectacion_vivienda: document.getElementById('ayuda_afectacion_viv').value,
+                requiere_refugio: document.getElementById('ayuda_refugio').value,
+                lesiones_fisicas: document.getElementById('ayuda_lesiones').value,
+                servicios_afectados: serviciosMarcados.join(', ') || 'Ninguno',
+                correo: document.getElementById('ayuda_correo').value.trim()
             };
+
             if (idEdicionAyuda !== null) {
                 await supabaseClient.from('solicitudes_ayuda').update(payload).eq('id', idEdicionAyuda);
                 cancelarEdicionAyuda();
