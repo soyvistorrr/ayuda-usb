@@ -1598,21 +1598,22 @@
                     let cabecera = rawData.shift().map(c => String(c).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                     
                     let iEst = cabecera.indexOf('situacion');
-                    let iNumId = cabecera.indexOf('cedula'); // Extrae la cédula real del archivo
+                    let iNumId = cabecera.indexOf('cedula'); 
                     let iNom = cabecera.indexOf('nombre');
                     let iCom = cabecera.indexOf('comunidad');
                     let iGru = cabecera.indexOf('grupo');
                     let iUbi = cabecera.indexOf('ubicacion');
                     let iObs = cabecera.indexOf('observacion');
                     let iDam = cabecera.indexOf('damnificado');
-                    let iTel = cabecera.indexOf('telefono'); // Extrae el teléfono real del archivo
+                    let iTel = cabecera.indexOf('telefono'); 
 
                     const { data: syncData } = await supabaseClient.from('registros_ciudadanos').select('*');
                     if (syncData) registrosNube = syncData;
 
                     let duplicadosOmitidos = 0;
+                    let registrosActualizados = 0;
                     let nuevosRegistros = [];
-                    // Evita que se dupliquen datos que vienen repetidos en el mismo archivo
+                    let listaParaActualizar = [];
                     let validacionCombinada = [...registrosNube]; 
 
                     for (let row of rawData) {
@@ -1624,7 +1625,7 @@
                         
                         if (rawEst.includes('atrapado') || rawEst.includes('emergencia') || rawEst.includes('⚠️')) {
                             estadoFinal = 'Atrapado';
-                        } else if (rawEst.includes('bien') || rawEst.includes('vida') || rawEst.includes('✅')) {
+                        } else if (rawEst.includes('bien') || rawEst.includes('vida') || rawEst.includes('✅') || rawEst.includes('salvo') || rawEst.includes('rescatado') || rawEst.includes('ileso')) {
                             estadoFinal = 'Con Vida';
                         } else if (rawEst.includes('fallecido') || rawEst.includes('💀') || rawEst.includes('🕊️')) {
                             estadoFinal = 'Fallecido';
@@ -1636,23 +1637,17 @@
 
                         let comExcelRaw = iCom !== -1 ? String(row[iCom] || 'USB').trim() : 'USB';
                         let gruExcelRaw = iGru !== -1 ? String(row[iGru] || 'EST').trim() : 'EST';
-                        
                         let idExcelReal = iNumId !== -1 ? String(row[iNumId] || '-').trim() : '-';
                         let telExcelReal = iTel !== -1 ? String(row[iTel] || '-').trim() : '-';
+                        let ubiExcelReal = iUbi !== -1 ? String(row[iUbi] || '-').trim() : '-';
 
                         let comExcelLimpia = mapaComunidad[comExcelRaw.toLowerCase()] || comExcelRaw;
                         let gruExcelLimpio = mapaGrupo[gruExcelRaw.toLowerCase()] || gruExcelRaw;
 
-                        // LÓGICA DE DUPLICADOS MEGA VÁLIDA
-                        let esDuplicado = validacionCombinada.some(r => {
-                            // Criterio 1: Cédula de identidad exacta
-                            if (idExcelReal !== '-' && r.cedula_identidad !== '-' && idExcelReal === r.cedula_identidad) {
-                                return true;
-                            }
-
-                            // Criterio 2: Nombres similares Y misma Comunidad Y mismo Grupo
-                            let nombresSimilares = sonNombresSimilares(r.nombre, nomVal);
+                        let registroExistente = validacionCombinada.find(r => {
+                            if (idExcelReal !== '-' && r.cedula_identidad !== '-' && idExcelReal === r.cedula_identidad) return true;
                             
+                            let nombresSimilares = sonNombresSimilares(r.nombre, nomVal);
                             let comNubeLimpia = mapaComunidad[String(r.cedula).trim().toLowerCase()] || r.cedula || '';
                             let gruNubeLimpio = mapaGrupo[String(r.edad).trim().toLowerCase()] || r.edad || '';
                             let comCoincide = normalizarTexto(comNubeLimpia) === normalizarTexto(comExcelLimpia);
@@ -1661,8 +1656,20 @@
                             return nombresSimilares && comCoincide && gruCoincide;
                         });
 
-                        if (esDuplicado) {
-                            duplicadosOmitidos++;
+                        if (registroExistente) {
+                            if (estadoFinal !== 'Sin Información' && registroExistente.estado !== estadoFinal) {
+                                if (registroExistente.id) { 
+                                    listaParaActualizar.push({
+                                        id: registroExistente.id,
+                                        estado: estadoFinal,
+                                        ubicacion: ubiExcelReal !== '-' ? ubiExcelReal : registroExistente.ubicacion
+                                    });
+                                }
+                                registroExistente.estado = estadoFinal; 
+                                registrosActualizados++;
+                            } else {
+                                duplicadosOmitidos++; 
+                            }
                             continue; 
                         }
 
@@ -1672,7 +1679,7 @@
                             edad: gruExcelRaw,
                             estado: estadoFinal,
                             damnificado: iDam !== -1 ? String(row[iDam] || 'No sé').trim() : 'No sé',
-                            ubicacion: iUbi !== -1 ? String(row[iUbi] || '-').trim() : '-',
+                            ubicacion: ubiExcelReal,
                             observaciones: iObs !== -1 ? String(row[iObs] || '-').trim() : '-',
                             cedula_identidad: idExcelReal,
                             telefono: telExcelReal
@@ -1683,10 +1690,18 @@
                     }
                     
                     if (nuevosRegistros.length > 0) {
-                        // Inserción masiva ultra rápida
                         await supabaseClient.from('registros_ciudadanos').insert(nuevosRegistros);
                     }
-                    alert(`Plantilla procesada.\n✅ Se guardaron ${nuevosRegistros.length} registros nuevos.\n⚠️ Se filtraron ${duplicadosOmitidos} filas duplicadas.`);
+
+                    if (listaParaActualizar.length > 0) {
+                        for (let act of listaParaActualizar) {
+                            await supabaseClient.from('registros_ciudadanos')
+                                .update({ estado: act.estado, ubicacion: act.ubicacion })
+                                .eq('id', act.id);
+                        }
+                    }
+                    
+                    alert(`Plantilla procesada.\n✅ ${nuevosRegistros.length} registros nuevos.\n🔄 ${registrosActualizados} registros actualizados a un estado más reciente.\n⚠️ ${duplicadosOmitidos} filas omitidas (sin cambios).`);
                     document.getElementById('excelFile').value = ''; 
                     await cargarDatosDesdeNube();
                 } catch (err) { alert('Error de lectura de archivo. Asegúrate de usar la plantilla correcta.'); console.error(err); }
