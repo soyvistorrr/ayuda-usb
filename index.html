@@ -1581,6 +1581,20 @@
             await cargarDatosDesdeNube();
         });
 
+        // Función auxiliar para unificar abreviaciones ("EST" vs "Estudiante", "PROF" vs "Profesor")
+        function obtenerRaizAtributo(txt) {
+            let t = String(txt || '').toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (!t || t === '-' || t === 'no se' || t === 'n/a') return 'indefinido';
+            if (t.includes('est')) return 'estudiante';
+            if (t.includes('prof')) return 'profesor';
+            if (t.includes('obr')) return 'obrero';
+            if (t.includes('adm')) return 'administrativo';
+            if (t.includes('egr')) return 'egresado';
+            if (t.includes('ext')) return 'externo';
+            if (t.includes('usb') || t.includes('simon') || t.includes('sartenejas')) return 'usb';
+            return t;
+        }
+
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
             const lector = new FileReader();
@@ -1607,13 +1621,33 @@
                     let iDam = cabecera.indexOf('damnificado');
                     let iTel = cabecera.indexOf('telefono'); 
 
-                    const { data: syncData } = await supabaseClient.from('registros_ciudadanos').select('*');
-                    if (syncData) registrosNube = syncData;
+                    // SOLUCIÓN AL PUNTO CIEGO: Descargamos TODA la base de datos de la nube por bloques sin límite de 1000
+                    let todosLosRegistros = [];
+                    let inicioRango = 0;
+                    let finRango = 999;
+                    let descargarMas = true;
+
+                    while (descargarMas) {
+                        const { data: chunk, error: errChunk } = await supabaseClient
+                            .from('registros_ciudadanos')
+                            .select('*')
+                            .range(inicioRango, finRango);
+                        
+                        if (chunk && chunk.length > 0) {
+                            todosLosRegistros = todosLosRegistros.concat(chunk);
+                            inicioRango += 1000;
+                            finRango += 1000;
+                        }
+                        if (!chunk || chunk.length < 1000 || errChunk) {
+                            descargarMas = false;
+                        }
+                    }
+                    registrosNube = todosLosRegistros;
 
                     let duplicadosOmitidos = 0;
                     let registrosActualizados = 0;
                     let nuevosRegistros = [];
-                    let listaParaActualizar = [];
+                    let listaParaActualizar = []; 
                     let validacionCombinada = [...registrosNube]; 
 
                     for (let row of rawData) {
@@ -1641,24 +1675,32 @@
                         let telExcelReal = iTel !== -1 ? String(row[iTel] || '-').trim() : '-';
                         let ubiExcelReal = iUbi !== -1 ? String(row[iUbi] || '-').trim() : '-';
 
-                        let comExcelLimpia = mapaComunidad[comExcelRaw.toLowerCase()] || comExcelRaw;
-                        let gruExcelLimpio = mapaGrupo[gruExcelRaw.toLowerCase()] || gruExcelRaw;
-
+                        // BUSCADOR INTELIGENTE EN LA NUBE
                         let registroExistente = validacionCombinada.find(r => {
-                            if (idExcelReal !== '-' && r.cedula_identidad !== '-' && idExcelReal === r.cedula_identidad) return true;
+                            // Validación por cédula de identidad exacta
+                            if (idExcelReal !== '-' && r.cedula_identidad && r.cedula_identidad !== '-' && idExcelReal === String(r.cedula_identidad).trim()) {
+                                return true;
+                            }
                             
+                            // Validación por Nombre + Comunidad + Grupo (Unificando abreviaturas)
                             let nombresSimilares = sonNombresSimilares(r.nombre, nomVal);
-                            let comNubeLimpia = mapaComunidad[String(r.cedula).trim().toLowerCase()] || r.cedula || '';
-                            let gruNubeLimpio = mapaGrupo[String(r.edad).trim().toLowerCase()] || r.edad || '';
-                            let comCoincide = normalizarTexto(comNubeLimpia) === normalizarTexto(comExcelLimpia);
-                            let gruCoincide = normalizarTexto(gruNubeLimpio) === normalizarTexto(gruExcelLimpio);
+                            if (!nombresSimilares) return false;
 
-                            return nombresSimilares && comCoincide && gruCoincide;
+                            let cNube = obtenerRaizAtributo(r.cedula);
+                            let cExcel = obtenerRaizAtributo(comExcelRaw);
+                            let gNube = obtenerRaizAtributo(r.edad);
+                            let gExcel = obtenerRaizAtributo(gruExcelRaw);
+
+                            // Si la comunidad o grupo están indefinidos en algún lado, permitimos el cruce para evitar duplicar
+                            let comCoincide = (cNube === 'indefinido' || cExcel === 'indefinido' || cNube === cExcel);
+                            let gruCoincide = (gNube === 'indefinido' || gExcel === 'indefinido' || gNube === gExcel);
+
+                            return comCoincide && gruCoincide;
                         });
 
                         if (registroExistente) {
                             if (estadoFinal !== 'Sin Información' && registroExistente.estado !== estadoFinal) {
-                                if (registroExistente.id) { 
+                                if (registroExistente.id) {
                                     listaParaActualizar.push({
                                         id: registroExistente.id,
                                         estado: estadoFinal,
@@ -1701,7 +1743,7 @@
                         }
                     }
                     
-                    alert(`Plantilla procesada.\n✅ ${nuevosRegistros.length} registros nuevos.\n🔄 ${registrosActualizados} registros actualizados a un estado más reciente.\n⚠️ ${duplicadosOmitidos} filas omitidas (sin cambios).`);
+                    alert(`Plantilla procesada.\n✅ ${nuevosRegistros.length} registros nuevos.\n🔄 ${registrosActualizados} registros actualizados.\n⚠️ ${duplicadosOmitidos} filas omitidas.`);
                     document.getElementById('excelFile').value = ''; 
                     await cargarDatosDesdeNube();
                 } catch (err) { alert('Error de lectura de archivo. Asegúrate de usar la plantilla correcta.'); console.error(err); }
