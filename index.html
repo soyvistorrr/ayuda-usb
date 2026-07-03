@@ -1679,7 +1679,9 @@
 
         window.eliminarFila = async function(id, boton) {
             if (!boton) return;
-            if (boton.innerText === "Eliminar") {
+            let texto = boton.innerText.trim();
+            
+            if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
                 boton.style.color = "#ffffff";
@@ -1690,18 +1692,27 @@
                     boton.style.color = "var(--danger)";
                     boton.style.borderColor = "#fecaca";
                 }, 3000);
-            } else if (boton.innerText === "¿Seguro?") {
+            } else if (texto.includes("Seguro")) {
                 if (boton.timeoutId) clearTimeout(boton.timeoutId);
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
-                await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
-                await cargarDatosDesdeNube();
+                
+                const { error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
+                if (error) {
+                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else {
+                    await cargarDatosDesdeNube();
+                }
             }
         };
 
         window.eliminarAyuda = async function(id, boton) {
             if (!boton) return;
-            if (boton.innerText === "Eliminar") {
+            let texto = boton.innerText.trim();
+
+            if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
                 boton.style.color = "#ffffff";
@@ -1712,18 +1723,27 @@
                     boton.style.color = "var(--danger)";
                     boton.style.borderColor = "#fecaca";
                 }, 3000);
-            } else if (boton.innerText === "¿Seguro?") {
+            } else if (texto.includes("Seguro")) {
                 if (boton.timeoutId) clearTimeout(boton.timeoutId);
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
-                await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
-                await cargarDatosDesdeNube();
+                
+                const { error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
+                if (error) {
+                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else {
+                    await cargarDatosDesdeNube();
+                }
             }
         };
 
         window.eliminarColab = async function(id, boton) {
             if (!boton) return;
-            if (boton.innerText === "Eliminar") {
+            let texto = boton.innerText.trim();
+
+            if (texto === "Eliminar") {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
                 boton.style.color = "#ffffff";
@@ -1734,12 +1754,19 @@
                     boton.style.color = "var(--danger)";
                     boton.style.borderColor = "#fecaca";
                 }, 3000);
-            } else if (boton.innerText === "¿Seguro?") {
+            } else if (texto.includes("Seguro")) {
                 if (boton.timeoutId) clearTimeout(boton.timeoutId);
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
-                await supabaseClient.from('colaboradores').delete().eq('id', id);
-                await cargarDatosDesdeNube();
+                
+                const { error } = await supabaseClient.from('colaboradores').delete().eq('id', id);
+                if (error) {
+                    alert("Supabase denegó el borrado. Error: " + error.message);
+                    boton.innerText = "Eliminar";
+                    boton.disabled = false;
+                } else {
+                    await cargarDatosDesdeNube();
+                }
             }
         };
 
