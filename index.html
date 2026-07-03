@@ -1432,6 +1432,7 @@
 
         document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             let serviciosMarcados = [];
             document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
                 serviciosMarcados.push(cb.value);
