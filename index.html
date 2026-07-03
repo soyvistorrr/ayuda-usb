@@ -1130,8 +1130,29 @@
         }
 
         async function cargarDatosDesdeNube() {
-            const { data: afect } = await supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false });
-            if (afect) registrosNube = afect;
+            let todosLosAfectados = [];
+            let rangoInicio = 0;
+            let rangoFin = 999;
+            let hayMasDatos = true;
+
+            while (hayMasDatos) {
+                const { data, error } = await supabaseClient
+                    .from('registros_ciudadanos')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .range(rangoInicio, rangoFin);
+                
+                if (data && data.length > 0) {
+                    todosLosAfectados = todosLosAfectados.concat(data);
+                    rangoInicio += 1000;
+                    rangoFin += 1000;
+                }
+                
+                if (!data || data.length < 1000 || error) {
+                    hayMasDatos = false; 
+                }
+            }
+            registrosNube = todosLosAfectados;
             
             try {
                 const { data: colabs } = await supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false });
