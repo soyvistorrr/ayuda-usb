@@ -1953,10 +1953,16 @@
         document.getElementById('novedadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const btnSubmit = this.querySelector('button[type="submit"]');
-            const textoOriginal = btnSubmit.innerText;
-            btnSubmit.innerText = "Enviando...";
-            btnSubmit.disabled = true;
+            // Buscamos el botón de forma segura para que no dé error "null"
+            const botones = this.getElementsByTagName('button');
+            const btnSubmit = botones.length > 0 ? botones[0] : null;
+            let textoOriginal = "Enviar Reporte";
+            
+            if (btnSubmit) {
+                textoOriginal = btnSubmit.innerText;
+                btnSubmit.innerText = "Enviando...";
+                btnSubmit.disabled = true;
+            }
 
             try {
                 const payload = {
@@ -1971,17 +1977,19 @@
                 const { error } = await supabaseClient.from('novedades_pendientes').insert([payload]);
                 
                 if (error) {
-                    alert("Error enviando reporte: " + error.message);
+                    alert("Error enviando reporte a Supabase: " + error.message);
                 } else {
                     mostrarNotificacion("¡Reporte enviado! Un administrador lo revisará pronto.");
                     document.getElementById('novedadForm').reset();
                     document.getElementById('modal-novedad').style.display = 'none';
                 }
             } catch (err) {
-                alert("Error de sistema: " + err.message);
+                alert("Error interno: " + err.message);
             } finally {
-                btnSubmit.innerText = textoOriginal;
-                btnSubmit.disabled = false;
+                if (btnSubmit) {
+                    btnSubmit.innerText = textoOriginal;
+                    btnSubmit.disabled = false;
+                }
             }
         });
 
