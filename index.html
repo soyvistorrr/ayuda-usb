@@ -1347,24 +1347,34 @@
                         nov.forEach(n => {
                             let original = registrosNube.find(r => r.id == n.registro_id);
                             
-                            let nomOrig = original ? original.nombre : 'Usuario no encontrado en la base actual';
-                            let cedOrig = original ? (original.cedula_identidad !== '-' ? original.cedula_identidad : original.cedula) : '-';
+                            let nomOrig = original ? original.nombre : 'Usuario no encontrado';
                             let estOrig = original ? original.estado : 'Desconocido';
-                            let comOrig = original ? original.cedula : '-';
-                            let grpOrig = original ? original.edad : '-';
+                            
+                            let cedOrig = 'No tiene';
+                            if (original && original.cedula_identidad && original.cedula_identidad.trim() !== '' && original.cedula_identidad.trim() !== '-') {
+                                cedOrig = original.cedula_identidad;
+                            }
+                            
+                            let comBruto = original ? (original.cedula || '-') : '-';
+                            let grpBruto = original ? (original.edad || '-') : '-';
+                            
+                            let comLimpia = mapaComunidad[comBruto.trim().toLowerCase()] || comBruto;
+                            let grpLimpio = mapaGrupo[grpBruto.trim().toLowerCase()] || grpBruto;
                             
                             htmlNovedades += `
                             <div style="border:1px solid #e5e7eb; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                 
+                                <!-- DATOS ORIGINALES DE LA BASE DE DATOS -->
                                 <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
                                     <h4 style="margin: 0 0 8px 0; color: var(--primary); font-size: 1.05rem;">👤 Afectado: ${nomOrig}</h4>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; color: #475569;">
                                         <div><strong>Cédula:</strong> ${cedOrig}</div>
-                                        <div><strong>Comunidad:</strong> ${comOrig} / ${grpOrig}</div>
-                                        <div><strong>ESTADO ACTUAL:</strong> <span class="badge" style="background:#64748b; color:white; padding:3px 6px;">${estOrig}</span></div>
+                                        <div><strong>Vínculo:</strong> ${comLimpia} / ${grpLimpio}</div>
+                                        <div style="grid-column: span 2;"><strong>ESTADO ACTUAL:</strong> <span class="badge" style="background:#64748b; color:white; padding:3px 6px;">${estOrig}</span></div>
                                     </div>
                                 </div>
                                 
+                                <!-- DATOS DEL REPORTE / SUGERENCIA -->
                                 <div style="margin-bottom: 15px;">
                                     <h5 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">📢 Cambio Sugerido:</h5>
                                     <div style="background: #fff; padding: 10px; border: 1px dashed #cbd5e1; border-radius: 6px;">
@@ -1375,6 +1385,7 @@
                                     </div>
                                 </div>
                                 
+                                <!-- BOTONES DE ACCIÓN -->
                                 <div style="display:flex; gap:10px;">
                                     <button class="btn" style="background:#10b981; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="aprobarNovedad('${n.id}', '${n.registro_id}', '${n.estado_sugerido}', '${n.observaciones.replace(/'/g, "\\'")}')">✅ Aprobar y Actualizar</button>
                                     <button class="btn" style="background:#dc2626; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="rechazarNovedad('${n.id}')">❌ Rechazar (Falso)</button>
