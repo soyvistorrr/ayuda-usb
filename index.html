@@ -482,6 +482,19 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
+        .btn-share {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+            color: #fff; border: none; cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+            text-decoration: none; text-transform: uppercase; letter-spacing: 0.02em;
+        }
+        .btn-share:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-twitter { background-color: #0f1419; }
+        .btn-facebook { background-color: #1877F2; }
+        .btn-copy { background-color: var(--gray-700); }
+
     </style>
 </head>
 <body>
@@ -1179,7 +1192,13 @@
                     <span id="noticia-modal-fecha" class="news-date"></span>
                 </div>
                 <h3 id="noticia-modal-titulo" style="font-family: 'Montserrat', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem; line-height: 1.4;"></h3>
-                <div id="noticia-modal-contenido" style="font-size: 0.95rem; color: var(--gray-700); line-height: 1.7; white-space: pre-wrap;"></div>
+                <div id="noticia-modal-contenido" style="font-size: 0.95rem; color: var(--gray-700); line-height: 1.7; white-space: pre-wrap; word-break: break-word;"></div>
+                
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.05em;">Difundir este Boletín:</div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;" id="noticia-botones-compartir">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1231,6 +1250,15 @@
             carrusel.addEventListener('touchend', iniciarCarruselAutomatico, {passive: true});
         }
 
+        function hacerLinksClicables(texto) {
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+            return texto.replace(urlRegex, function(url) {
+                let enlace = url;
+                if (!enlace.match('^https?:\/\/')) { enlace = 'https://' + enlace; }
+                return `<a href="${enlace}" target="_blank" style="color: #0284c7; text-decoration: underline; font-weight: 700;">${url}</a>`;
+            });
+        }
+
         window.abrirNoticiaCompleta = function(id) {
             const n = noticiasNube.find(x => x.id == id);
             if (!n) return;
@@ -1256,8 +1284,20 @@
             
             document.getElementById('noticia-modal-fecha').innerText = fechaString;
             document.getElementById('noticia-modal-titulo').innerText = n.titulo;
-            document.getElementById('noticia-modal-contenido').innerText = n.contenido;
             
+            document.getElementById('noticia-modal-contenido').innerHTML = hacerLinksClicables(n.contenido);
+            
+            const urlSitio = "https://www.ayudausb.org";
+            const textoACompartir = `📢 Boletín Oficial USB: ${n.titulo}\n\nLee los detalles ingresando a la plataforma central aquí: ${urlSitio}`;
+            const textoCodificado = encodeURIComponent(textoACompartir);
+            
+            const btnWP = `<a href="https://api.whatsapp.com/send?text=${textoCodificado}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
+            const btnX = `<a href="https://twitter.com/intent/tweet?text=${textoCodificado}" target="_blank" class="btn-share btn-twitter">𝕏 Twitter</a>`;
+            const btnFB = `<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlSitio)}&quote=${encodeURIComponent("Boletín Oficial USB: " + n.titulo)}" target="_blank" class="btn-share btn-facebook">👥 Facebook</a>`;
+            const btnCopy = `<button onclick="navigator.clipboard.writeText('${textoACompartir}'); mostrarNotificacion('¡Mensaje oficial copiado al portapapeles!');" class="btn-share btn-copy">📋 Copiar Mensaje</button>`;
+            
+            document.getElementById('noticia-botones-compartir').innerHTML = btnWP + btnX + btnFB + btnCopy;
+
             document.getElementById('modal-noticia').style.display = 'flex';
         };
 
