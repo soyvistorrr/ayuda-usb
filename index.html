@@ -1282,38 +1282,43 @@
             let c = String(ced || '').trim();
             if (!c || c === '-') return '-';
             if (esAdministrador) return c; 
-            // Muestra la primera mitad de la cédula y oculta los últimos 4 dígitos limpiamente
             return c.length > 4 ? c.substring(0, c.length - 4) + "****" : "****";
         }
 
         async function cargarDatosDesdeNube() {
-            // 1. Mostrar estado de carga inmediatamente
             if (registrosNube.length === 0) {
                 const cuerpo = document.getElementById('tablaCuerpo');
                 if (cuerpo) cuerpo.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--text-muted);"><strong>⏳ Conectando con la base de datos...</strong></td></tr>';
-                ['stat-total', 'stat-atrapados', 'stat-vivos', 'stat-desaparecidos', 'stat-desaparecidos-real', 'stat-fallecidos'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.innerText = "⏳";
-                });
             }
 
             try {
-                // 2. DESCARGA PARALELA: Pedimos las 3 tablas al mismo tiempo para ganar velocidad
                 const [resAfectados, resColabs, resAyudas] = await Promise.all([
                     supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(0, 999),
                     supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false }),
                     supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false })
                 ]);
 
+                let tempAfectados = resAfectados.data || [];
+                
+                if (tempAfectados.length === 1000) {
+                    let rangoInicio = 1000;
+                    let rangoFin = 1999;
+                    let hayMasDatos = true;
+                    while (hayMasDatos) {
+                        const { data } = await supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(rangoInicio, rangoFin);
+                        if (data && data.length > 0) {
+                            tempAfectados = tempAfectados.concat(data);
+                            rangoInicio += 1000;
+                            rangoFin += 1000;
+                        }
+                        if (!data || data.length < 1000) hayMasDatos = false; 
+                    }
+                }
+
+                registrosNube = tempAfectados;
                 if (resColabs.data) colaboradoresNube = resColabs.data;
                 if (resAyudas.data) ayudaNube = resAyudas.data;
 
-                let todosLosAfectados = resAfectados.data || [];
-                
-                // Actualizamos de inmediato con los primeros 1000 registros para que el usuario no espere nada
-                registrosNube = todosLosAfectados;
-                
-                // Cargamos novedades de admin si aplica
                 if (esAdministrador) {
                     const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
                     if (nov && nov.length > 0) {
@@ -1338,38 +1343,10 @@
                     }
                 }
 
-                // Renderizamos la tabla casi al instante
                 filtrarYActualizarTablero();
                 actualizarInterfazColaboradores(colaboradoresNube);
                 actualizarInterfazAyuda(ayudaNube);
 
-                // 3. DESCARGA EN SEGUNDO PLANO: Si hay más de 1000, seguimos descargando sin bloquear la pantalla
-                if (resAfectados.data && resAfectados.data.length === 1000) {
-                    let rangoInicio = 1000;
-                    let rangoFin = 1999;
-                    let hayMasDatos = true;
-
-                    while (hayMasDatos) {
-                        const { data, error } = await supabaseClient
-                            .from('registros_ciudadanos')
-                            .select('*')
-                            .order('created_at', { ascending: false })
-                            .range(rangoInicio, rangoFin);
-                        
-                        if (error) break;
-                        
-                        if (data && data.length > 0) {
-                            todosLosAfectados = todosLosAfectados.concat(data);
-                            rangoInicio += 1000;
-                            rangoFin += 1000;
-                            // Actualizamos los contadores y tabla "en silencio" mientras la persona lee
-                            registrosNube = todosLosAfectados;
-                            filtrarYActualizarTablero();
-                        }
-                        
-                        if (!data || data.length < 1000) hayMasDatos = false; 
-                    }
-                }
             } catch (error) {
                 console.error("Error en sincronización:", error);
             }
@@ -1975,21 +1952,36 @@
 
         document.getElementById('novedadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const payload = {
-                registro_id: document.getElementById('novedad_registro_id').value,
-                nombre_reportante: document.getElementById('novedad_reportante').value.trim(),
-                telefono_reportante: document.getElementById('novedad_telefono').value.trim(),
-                relacion: document.getElementById('novedad_relacion').value,
-                estado_sugerido: document.getElementById('novedad_estado').value,
-                observaciones: document.getElementById('novedad_obs').value.trim()
-            };
-            const { error } = await supabaseClient.from('novedades_pendientes').insert([payload]);
-            if (error) {
-                alert("Error enviando reporte: " + error.message);
-            } else {
-                mostrarNotificacion("¡Reporte enviado! Un administrador lo revisará pronto.");
-                document.getElementById('novedadForm').reset();
-                document.getElementById('modal-novedad').style.display = 'none';
+            
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            const textoOriginal = btnSubmit.innerText;
+            btnSubmit.innerText = "Enviando...";
+            btnSubmit.disabled = true;
+
+            try {
+                const payload = {
+                    registro_id: parseInt(document.getElementById('novedad_registro_id').value),
+                    nombre_reportante: document.getElementById('novedad_reportante').value.trim(),
+                    telefono_reportante: document.getElementById('novedad_telefono').value.trim(),
+                    relacion: document.getElementById('novedad_relacion').value,
+                    estado_sugerido: document.getElementById('novedad_estado').value,
+                    observaciones: document.getElementById('novedad_obs').value.trim()
+                };
+                
+                const { error } = await supabaseClient.from('novedades_pendientes').insert([payload]);
+                
+                if (error) {
+                    alert("Error enviando reporte: " + error.message);
+                } else {
+                    mostrarNotificacion("¡Reporte enviado! Un administrador lo revisará pronto.");
+                    document.getElementById('novedadForm').reset();
+                    document.getElementById('modal-novedad').style.display = 'none';
+                }
+            } catch (err) {
+                alert("Error de sistema: " + err.message);
+            } finally {
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
             }
         });
 
