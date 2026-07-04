@@ -1211,6 +1211,34 @@
                 if (ayudas) ayudaNube = ayudas;
             } catch(e) { console.log("Tablas preparadas."); }
 
+            if (esAdministrador) {
+                const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
+                if (nov && nov.length > 0) {
+                    document.getElementById('btn-novedades-admin').style.display = 'block';
+                    document.getElementById('contador-novedades').innerText = nov.length;
+                    
+                    let htmlNovedades = '';
+                    nov.forEach(n => {
+                        htmlNovedades += `<div style="border:1px solid #ccc; padding:10px; border-radius:5px; margin-bottom:10px; background:#f9fafb;">
+                            <p><strong>Reporta:</strong> ${n.nombre_reportante} (${n.relacion}) - 📞 ${n.telefono_reportante}</p>
+                            <p><strong>Sugiere:</strong> <span class="badge" style="background:#0284c7; color:white; padding: 2px 6px; border-radius:4px;">${n.estado_sugerido}</span></p>
+                            <p><strong>Observaciones:</strong> ${n.observaciones}</p>
+                            <div style="margin-top:10px; display:flex; gap:10px;">
+                                <button class="btn" style="background:#10b981; color:white; padding:5px 10px;" onclick="aprobarNovedad('${n.id}', '${n.registro_id}', '${n.estado_sugerido}', '${n.observaciones}')">✅ Aprobar</button>
+                                <button class="btn" style="background:#dc2626; color:white; padding:5px 10px;" onclick="rechazarNovedad('${n.id}')">❌ Rechazar</button>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('contenedor-lista-novedades').innerHTML = htmlNovedades;
+                } else {
+                    document.getElementById('btn-novedades-admin').style.display = 'none';
+                    document.getElementById('contenedor-lista-novedades').innerHTML = '<p>No hay reportes pendientes.</p>';
+                    document.getElementById('modal-admin-novedades').style.display = 'none';
+                }
+            } else {
+                if (document.getElementById('btn-novedades-admin')) document.getElementById('btn-novedades-admin').style.display = 'none';
+            }
+
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
             actualizarInterfazAyuda(ayudaNube);
@@ -1273,7 +1301,10 @@
                     <tr>
                         <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
                         <td data-label="Cédula">${enmascararCedula(reg.cedula_identidad)}</td>
-                        <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
+                        <td data-label="Nombre" style="position: relative;">
+                            <strong>${reg.nombre}</strong>
+                            <button onclick="abrirFormularioNovedad('${reg.id}', '${reg.nombre}')" style="display: block; margin-top: 5px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; cursor: pointer; text-transform: uppercase; font-weight: bold;">📝 Actualizar info</button>
+                        </td>
                         <td data-label="Comunidad">${comLimpia}</td>
                         <td data-label="Grupo">${grpLimpio}</td>
                         <td data-label="Damnificado">${damLimpio}</td>
@@ -1631,7 +1662,6 @@
             await cargarDatosDesdeNube();
         });
 
-        // Función auxiliar para unificar abreviaciones ("EST" vs "Estudiante", "PROF" vs "Profesor")
         function obtenerRaizAtributo(txt) {
             let t = String(txt || '').toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (!t || t === '-' || t === 'no se' || t === 'n/a') return 'indefinido';
@@ -1670,8 +1700,6 @@
                     let iObs = cabecera.indexOf('observacion');
                     let iDam = cabecera.indexOf('damnificado');
                     let iTel = cabecera.indexOf('telefono'); 
-
-                    // SOLUCIÓN AL PUNTO CIEGO: Descargamos TODA la base de datos de la nube por bloques sin límite de 1000
                     let todosLosRegistros = [];
                     let inicioRango = 0;
                     let finRango = 999;
@@ -1725,14 +1753,11 @@
                         let telExcelReal = iTel !== -1 ? String(row[iTel] || '-').trim() : '-';
                         let ubiExcelReal = iUbi !== -1 ? String(row[iUbi] || '-').trim() : '-';
 
-                        // BUSCADOR INTELIGENTE EN LA NUBE
                         let registroExistente = validacionCombinada.find(r => {
-                            // Validación por cédula de identidad exacta
                             if (idExcelReal !== '-' && r.cedula_identidad && r.cedula_identidad !== '-' && idExcelReal === String(r.cedula_identidad).trim()) {
                                 return true;
                             }
                             
-                            // Validación por Nombre + Comunidad + Grupo (Unificando abreviaturas)
                             let nombresSimilares = sonNombresSimilares(r.nombre, nomVal);
                             if (!nombresSimilares) return false;
 
@@ -1741,7 +1766,6 @@
                             let gNube = obtenerRaizAtributo(r.edad);
                             let gExcel = obtenerRaizAtributo(gruExcelRaw);
 
-                            // Si la comunidad o grupo están indefinidos en algún lado, permitimos el cruce para evitar duplicar
                             let comCoincide = (cNube === 'indefinido' || cExcel === 'indefinido' || cNube === cExcel);
                             let gruCoincide = (gNube === 'indefinido' || gExcel === 'indefinido' || gNube === gExcel);
 
@@ -1809,6 +1833,54 @@
                 filtrarYActualizarTablero();
             }, 300);
         });
+
+        window.abrirFormularioNovedad = function(id, nombre) {
+            document.getElementById('novedad_registro_id').value = id;
+            document.getElementById('novedad-persona-nombre').innerText = "Afectado: " + nombre;
+            document.getElementById('modal-novedad').style.display = 'flex';
+        };
+
+        document.getElementById('novedadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const payload = {
+                registro_id: document.getElementById('novedad_registro_id').value,
+                nombre_reportante: document.getElementById('novedad_reportante').value.trim(),
+                telefono_reportante: document.getElementById('novedad_telefono').value.trim(),
+                relacion: document.getElementById('novedad_relacion').value,
+                estado_sugerido: document.getElementById('novedad_estado').value,
+                observaciones: document.getElementById('novedad_obs').value.trim()
+            };
+            const { error } = await supabaseClient.from('novedades_pendientes').insert([payload]);
+            if (error) {
+                alert("Error enviando reporte: " + error.message);
+            } else {
+                mostrarNotificacion("¡Reporte enviado! Un administrador lo revisará pronto.");
+                document.getElementById('novedadForm').reset();
+                document.getElementById('modal-novedad').style.display = 'none';
+            }
+        });
+
+        window.aprobarNovedad = async function(idNovedad, idRegistro, nuevoEstado, observacionesNuevas) {
+            if(!confirm("¿Aprobar y cambiar el estado en la base de datos oficial?")) return;
+            
+            const { error: errUpdate } = await supabaseClient.from('registros_ciudadanos')
+                .update({ estado: nuevoEstado })
+                .eq('id', idRegistro);
+            
+            if (errUpdate) { alert("Error al actualizar: " + errUpdate.message); return; }
+
+            await supabaseClient.from('novedades_pendientes').delete().eq('id', idNovedad);
+            
+            mostrarNotificacion("¡Estado actualizado y aprobado!");
+            await cargarDatosDesdeNube(); 
+        };
+
+        window.rechazarNovedad = async function(idNovedad) {
+            if(!confirm("¿Rechazar y eliminar este reporte falso/inválido?")) return;
+            await supabaseClient.from('novedades_pendientes').delete().eq('id', idNovedad);
+            mostrarNotificacion("Reporte eliminado exitosamente");
+            await cargarDatosDesdeNube();
+        };
 
         function mostrarCargaYFiltrar() {
             document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--primary);"><strong>⏳ Aplicando filtros...</strong></td></tr>';
@@ -1976,6 +2048,62 @@
         <span id="toast-mensaje">¡Registro enviado con éxito!</span>
     </div>
 </div>
+
+<div id="modal-novedad" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div class="modal-content" style="max-width: 500px; width: 90%; padding: 20px; background: white; border-radius: 8px;">
+            <h3 style="color:var(--primary); margin-bottom:10px;">Actualizar estado de afectado</h3>
+            <p id="novedad-persona-nombre" style="font-weight:bold; margin-bottom:15px; color:#333;"></p>
+            <form id="novedadForm">
+                <input type="hidden" id="novedad_registro_id">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem;">Tu Nombre y Apellido (Obligatorio)</label>
+                    <input type="text" id="novedad_reportante" required style="width:100%; padding:8px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem;">Tu Teléfono (Obligatorio)</label>
+                    <input type="tel" id="novedad_telefono" required style="width:100%; padding:8px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem;">¿Qué eres de esta persona?</label>
+                    <select id="novedad_relacion" required style="width:100%; padding:8px;">
+                        <option value="Soy yo mismo">Soy yo mismo</option>
+                        <option value="Familiar directo">Familiar directo</option>
+                        <option value="Amigo / Conocido">Amigo / Conocido</option>
+                        <option value="Rescatista / Autoridad">Rescatista / Autoridad</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem;">Nuevo Estado Sugerido</label>
+                    <select id="novedad_estado" required style="width:100%; padding:8px;">
+                        <option value="Con Vida">Con Vida / A Salvo</option>
+                        <option value="Atrapado">Atrapado / En Emergencia</option>
+                        <option value="Desaparecido">Desaparecido</option>
+                        <option value="Fallecido">Fallecido</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 0.9rem;">Observaciones (Dónde está, etc.)</label>
+                    <textarea id="novedad_obs" rows="3" required style="width:100%; padding:8px;"></textarea>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" class="btn" style="flex:1; background-color: #10b981; color: white;">Enviar Reporte</button>
+                    <button type="button" class="btn" style="flex:1; background-color: #dc2626; color: white;" onclick="document.getElementById('modal-novedad').style.display='none'">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-admin-novedades" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div class="modal-content" style="max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 20px; background: white; border-radius: 8px;">
+            <h3 style="color:var(--primary); margin-bottom:15px;">Buzón de Novedades Pendientes</h3>
+            <div id="contenedor-lista-novedades"></div>
+            <button type="button" class="btn btn-block" style="margin-top:15px;" onclick="document.getElementById('modal-admin-novedades').style.display='none'">Cerrar Panel</button>
+        </div>
+    </div>
+
+    <button id="btn-novedades-admin" class="btn" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #f59e0b; color: white; border: none; font-weight: bold; padding: 10px 15px; border-radius: 30px;" onclick="document.getElementById('modal-admin-novedades').style.display='flex'">
+        🔔 Novedades (<span id="contador-novedades">0</span>)
+    </button>
 
 </body>
 </html>
