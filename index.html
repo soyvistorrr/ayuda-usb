@@ -344,6 +344,37 @@
             td.actions-cell::before { display: none !important; }
             td.actions-cell button { padding: 0.5rem 1rem; font-size: 0.8rem; }
         }
+
+        /* Estilos para el Popup de Confirmación (Toast) */
+        #toast-notificacion {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981; /* Verde éxito */
+            color: #ffffff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s ease-in-out;
+        }
+
+        #toast-notificacion.mostrar {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px; /* Sube un poquito al aparecer */
+        }
     </style>
 </head>
 <body>
@@ -968,6 +999,22 @@
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
 
+        function mostrarNotificacion(mensaje, exito = true) {
+            const toast = document.getElementById("toast-notificacion");
+            const toastMsj = document.getElementById("toast-mensaje");
+            const toastIcono = document.getElementById("toast-icono");
+            
+            toastMsj.innerText = mensaje;
+            toastIcono.innerText = exito ? "✅" : "⚠️";
+            toast.style.backgroundColor = exito ? "#10b981" : "#dc2626";
+
+            toast.classList.add("mostrar");
+            
+            setTimeout(function(){ 
+                toast.classList.remove("mostrar"); 
+            }, 4000);
+        }
+
         function normalizarTexto(txt) {
             return String(txt || '')
                 .toLowerCase()
@@ -1494,6 +1541,7 @@
             } else {
                 await supabaseClient.from('solicitudes_ayuda').insert([payload]);
                 document.getElementById('ayudaForm').reset();
+                mostrarNotificacion("¡Solicitud registrada exitosamente!");
             }
             await cargarDatosDesdeNube();
         });
@@ -1515,6 +1563,7 @@
             } else {
                 await supabaseClient.from('colaboradores').insert([payload]);
                 document.getElementById('colaboradorForm').reset();
+                mostrarNotificacion("¡Solicitud registrada exitosamente!");
             }
             await cargarDatosDesdeNube();
         });
@@ -1577,6 +1626,7 @@
             } else {
                 await supabaseClient.from('registros_ciudadanos').insert([manual]);
                 document.getElementById('registroForm').reset();
+                mostrarNotificacion("¡Solicitud registrada exitosamente!");
             }
             await cargarDatosDesdeNube();
         });
@@ -1919,5 +1969,13 @@
 
         cargarDatosDesdeNube();
     </script>
+
+    <div id="toast-notificacion" class="toast-oculto">
+    <div class="toast-contenido">
+        <span id="toast-icono">✅</span>
+        <span id="toast-mensaje">¡Registro enviado con éxito!</span>
+    </div>
+</div>
+
 </body>
 </html>
