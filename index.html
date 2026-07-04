@@ -1211,34 +1211,6 @@
                 if (ayudas) ayudaNube = ayudas;
             } catch(e) { console.log("Tablas preparadas."); }
 
-            if (esAdministrador) {
-                const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
-                if (nov && nov.length > 0) {
-                    document.getElementById('btn-novedades-admin').style.display = 'block';
-                    document.getElementById('contador-novedades').innerText = nov.length;
-                    
-                    let htmlNovedades = '';
-                    nov.forEach(n => {
-                        htmlNovedades += `<div style="border:1px solid #ccc; padding:10px; border-radius:5px; margin-bottom:10px; background:#f9fafb;">
-                            <p><strong>Reporta:</strong> ${n.nombre_reportante} (${n.relacion}) - 📞 ${n.telefono_reportante}</p>
-                            <p><strong>Sugiere:</strong> <span class="badge" style="background:#0284c7; color:white; padding: 2px 6px; border-radius:4px;">${n.estado_sugerido}</span></p>
-                            <p><strong>Observaciones:</strong> ${n.observaciones}</p>
-                            <div style="margin-top:10px; display:flex; gap:10px;">
-                                <button class="btn" style="background:#10b981; color:white; padding:5px 10px;" onclick="aprobarNovedad('${n.id}', '${n.registro_id}', '${n.estado_sugerido}', '${n.observaciones}')">✅ Aprobar</button>
-                                <button class="btn" style="background:#dc2626; color:white; padding:5px 10px;" onclick="rechazarNovedad('${n.id}')">❌ Rechazar</button>
-                            </div>
-                        </div>`;
-                    });
-                    document.getElementById('contenedor-lista-novedades').innerHTML = htmlNovedades;
-                } else {
-                    document.getElementById('btn-novedades-admin').style.display = 'none';
-                    document.getElementById('contenedor-lista-novedades').innerHTML = '<p>No hay reportes pendientes.</p>';
-                    document.getElementById('modal-admin-novedades').style.display = 'none';
-                }
-            } else {
-                if (document.getElementById('btn-novedades-admin')) document.getElementById('btn-novedades-admin').style.display = 'none';
-            }
-
             filtrarYActualizarTablero();
             actualizarInterfazColaboradores(colaboradoresNube);
             actualizarInterfazAyuda(ayudaNube);
@@ -1301,10 +1273,7 @@
                     <tr>
                         <td data-label="Situación"><span class="badge ${badgeClass}">${est}</span></td>
                         <td data-label="Cédula">${enmascararCedula(reg.cedula_identidad)}</td>
-                        <td data-label="Nombre" style="position: relative;">
-                            <strong>${reg.nombre}</strong>
-                            <button onclick="abrirFormularioNovedad('${reg.id}', '${reg.nombre}')" style="display: block; margin-top: 5px; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; cursor: pointer; text-transform: uppercase; font-weight: bold;">📝 Actualizar info</button>
-                        </td>
+                        <td data-label="Nombre"><strong>${reg.nombre || '-'}</strong></td>
                         <td data-label="Comunidad">${comLimpia}</td>
                         <td data-label="Grupo">${grpLimpio}</td>
                         <td data-label="Damnificado">${damLimpio}</td>
