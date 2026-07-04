@@ -1022,6 +1022,13 @@
         </div>
     </footer>
 
+    <div id="toast-notificacion" class="toast-oculto">
+        <div class="toast-contenido">
+            <span id="toast-icono">✅</span>
+            <span id="toast-mensaje">¡Registro enviado con éxito!</span>
+        </div>
+    </div>
+
     <div id="modal-novedad" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
         <div class="panel-card" style="width: 90%; max-width: 550px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--accent);">
             <div class="panel-header">
@@ -1085,6 +1092,10 @@
             </div>
         </div>
     </div>
+
+    <button id="btn-novedades-admin" class="btn" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #f59e0b; color: white; border: none; font-weight: bold; padding: 10px 15px; border-radius: 30px;" onclick="document.getElementById('modal-admin-novedades').style.display='flex'">
+        🔔 Novedades (<span id="contador-novedades">0</span>)
+    </button>
 
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
