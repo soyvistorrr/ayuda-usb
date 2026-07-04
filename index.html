@@ -432,7 +432,7 @@
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
-        .news-carousel-container::-webkit-scrollbar { display: none;}
+        .news-carousel-container::-webkit-scrollbar { display: none; }
         
         .news-card {
             flex: 0 0 320px;
@@ -445,7 +445,9 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            height: 280px !important;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
         }
         .news-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08); }
         
@@ -455,8 +457,31 @@
 
         .news-date { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
         .news-title { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 800; color: var(--primary); margin: 0.75rem 0; line-height: 1.3; }
-        .news-body { font-size: 0.85rem; color: var(--gray-700); line-height: 1.5; flex: 1; }
+        
+        .news-body { 
+            font-size: 0.85rem; 
+            color: var(--gray-700); 
+            line-height: 1.5; 
+            
+            display: -webkit-box !important;
+            -webkit-line-clamp: 3 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-height: 3.8em !important; 
+            margin-bottom: auto;
+        }
+        
         .news-badge { display: inline-block; padding: 0.2rem 0.6rem; color: #fff; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin: 0; }
+        
+        .leer-mas-link {
+            font-size: 0.75rem;
+            color: #0284c7;
+            font-weight: 700;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 <body>
@@ -1142,12 +1167,31 @@
         🔔 Novedades (<span id="contador-novedades">0</span>)
     </button>
 
+    <div id="modal-noticia" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:99999;">
+        <div class="panel-card" style="width: 90%; max-width: 650px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; border-top: 4px solid var(--primary);" id="modal-noticia-borde">
+                <div class="panel-title">Boletín Oficial</div>
+                <button onclick="cerrarNoticiaCompleta()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; line-height:1; color: var(--gray-700);">&times;</button>
+            </div>
+            <div class="panel-body" style="overflow-y: auto; flex: 1; padding: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <span id="noticia-modal-etiqueta" class="news-badge"></span>
+                    <span id="noticia-modal-fecha" class="news-date"></span>
+                </div>
+                <h3 id="noticia-modal-titulo" style="font-family: 'Montserrat', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem; line-height: 1.4;"></h3>
+                <div id="noticia-modal-contenido" style="font-size: 0.95rem; color: var(--gray-700); line-height: 1.7; white-space: pre-wrap;"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const SUPABASE_KEY = "sb_publishable_ECurpyGW8jSgTMe30r89xA_o-WRwADV";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let registrosNube = [];
+        let noticiasNube = [];
+        let intervaloCarrusel;
         let colaboradoresNube = [];
         let ayudaNube = [];
         let esAdministrador = false; 
@@ -1162,6 +1206,65 @@
 
         const mapaComunidad = { 'usb': 'Universidad Simón Bolívar', 'ext': 'Externo', 'externo': 'Externo', 'universidad simon bolivar': 'Universidad Simón Bolívar' };
         const mapaGrupo = { 'est': 'Estudiante', 'estudiante': 'Estudiante', 'prof': 'Profesor', 'profesor': 'Profesor', 'egr': 'Egresado', 'egresado': 'Egresado', 'adm': 'Administrativo', 'administrativo': 'Administrativo', 'obr': 'Obrero', 'obrero': 'Obrero', 'ext': 'Externo', 'externo': 'Externo' };
+
+        function iniciarCarruselAutomatico() {
+            const carrusel = document.getElementById('carrusel-noticias');
+            if (!carrusel) return;
+            if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+
+            intervaloCarrusel = setInterval(() => {
+                const scrollMaximo = carrusel.scrollWidth - carrusel.clientWidth;
+                if (carrusel.scrollLeft >= scrollMaximo - 10) {
+                    carrusel.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    const tarjeta = carrusel.querySelector('.news-card');
+                    if (tarjeta) {
+                        const distanciaAvance = tarjeta.offsetWidth + 24; 
+                        carrusel.scrollBy({ left: distanciaAvance, behavior: 'smooth' });
+                    }
+                }
+            }, 4000);
+
+            carrusel.addEventListener('mouseenter', () => clearInterval(intervaloCarrusel));
+            carrusel.addEventListener('mouseleave', iniciarCarruselAutomatico);
+            carrusel.addEventListener('touchstart', () => clearInterval(intervaloCarrusel), {passive: true});
+            carrusel.addEventListener('touchend', iniciarCarruselAutomatico, {passive: true});
+        }
+
+        window.abrirNoticiaCompleta = function(id) {
+            const n = noticiasNube.find(x => x.id == id);
+            if (!n) return;
+            
+            if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+            
+            const fechaObj = new Date(n.fecha_publicacion);
+            const fechaString = isNaN(fechaObj) ? '' : fechaObj.toLocaleDateString('es-VE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+            
+            let colorBorde = "var(--primary)"; 
+            let colorFondoEtiqueta = "var(--primary)";
+            let etiquetaVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
+            
+            if (etiquetaVal.includes('urgente')) { colorBorde = "var(--danger)"; colorFondoEtiqueta = "var(--danger)"; }
+            else if (etiquetaVal.includes('logro') || etiquetaVal.includes('buena')) { colorBorde = "var(--success)"; colorFondoEtiqueta = "var(--success)"; }
+            else if (etiquetaVal.includes('alerta')) { colorBorde = "var(--warning)"; colorFondoEtiqueta = "#ea580c"; }
+
+            document.getElementById('modal-noticia-borde').style.borderTopColor = colorBorde;
+            
+            const elEtiqueta = document.getElementById('noticia-modal-etiqueta');
+            elEtiqueta.innerText = n.etiqueta || 'Aviso';
+            elEtiqueta.style.backgroundColor = colorFondoEtiqueta;
+            
+            document.getElementById('noticia-modal-fecha').innerText = fechaString;
+            document.getElementById('noticia-modal-titulo').innerText = n.titulo;
+            document.getElementById('noticia-modal-contenido').innerText = n.contenido;
+            
+            document.getElementById('modal-noticia').style.display = 'flex';
+        };
+
+        window.cerrarNoticiaCompleta = function() {
+            document.getElementById('modal-noticia').style.display = 'none';
+            iniciarCarruselAutomatico(); 
+        };
 
         function mostrarNotificacion(mensaje, exito = true) {
             const toast = document.getElementById("toast-notificacion");
@@ -1348,15 +1451,17 @@
             }
 
             try {
+                // 1. Llamada paralela a la nube (AHORA PIDE LAS ÚLTIMAS 10 NOTICIAS)
                 const [resAfectados, resColabs, resAyudas, resNoticias] = await Promise.all([
                     supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(0, 999),
                     supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false }),
                     supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false }).limit(5)
-                ]);;
+                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false }).limit(10)
+                ]);
 
                 let tempAfectados = resAfectados.data || [];
                 
+                // 2. Descarga INVISIBLE del resto de los datos afectados
                 if (tempAfectados.length === 1000) {
                     let rangoInicio = 1000;
                     let rangoFin = 1999;
@@ -1372,85 +1477,16 @@
                     }
                 }
 
+                // 3. ACTUALIZAMOS LA PANTALLA
                 registrosNube = tempAfectados;
                 if (resColabs.data) colaboradoresNube = resColabs.data;
                 if (resAyudas.data) ayudaNube = resAyudas.data;
 
-                if (esAdministrador) {
-                    const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
-                    
-                    const btnAdmin = document.getElementById('btn-novedades-admin');
-                    
-                    if (nov && nov.length > 0) {
-                        if (btnAdmin) {
-                            btnAdmin.style.setProperty('display', 'flex', 'important');
-                            btnAdmin.style.zIndex = '999999';
-                        }
-                        
-                        document.getElementById('contador-novedades').innerText = nov.length;
-                        
-                        let htmlNovedades = '';
-                        nov.forEach(n => {
-                            let original = registrosNube.find(r => r.id == n.registro_id);
-                            
-                            let nomOrig = original ? original.nombre : 'Usuario no encontrado';
-                            let estOrig = original ? original.estado : 'Desconocido';
-                            
-                            let cedOrig = 'No tiene';
-                            if (original && original.cedula_identidad && original.cedula_identidad.trim() !== '' && original.cedula_identidad.trim() !== '-') {
-                                cedOrig = original.cedula_identidad;
-                            }
-                            
-                            let comBruto = original ? (original.cedula || '-') : '-';
-                            let grpBruto = original ? (original.edad || '-') : '-';
-                            
-                            let comLimpia = mapaComunidad[comBruto.trim().toLowerCase()] || comBruto;
-                            let grpLimpio = mapaGrupo[grpBruto.trim().toLowerCase()] || grpBruto;
-                            
-                            htmlNovedades += `
-                            <div style="border:1px solid #e5e7eb; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                                
-                                <!-- DATOS ORIGINALES DE LA BASE DE DATOS -->
-                                <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
-                                    <h4 style="margin: 0 0 8px 0; color: var(--primary); font-size: 1.05rem;">👤 Afectado: ${nomOrig}</h4>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; color: #475569;">
-                                        <div><strong>Cédula:</strong> ${cedOrig}</div>
-                                        <div><strong>Vínculo:</strong> ${comLimpia} / ${grpLimpio}</div>
-                                        <div style="grid-column: span 2;"><strong>ESTADO ACTUAL:</strong> <span class="badge" style="background:#64748b; color:white; padding:3px 6px;">${estOrig}</span></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- DATOS DEL REPORTE / SUGERENCIA -->
-                                <div style="margin-bottom: 15px;">
-                                    <h5 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">📢 Cambio Sugerido:</h5>
-                                    <div style="background: #fff; padding: 10px; border: 1px dashed #cbd5e1; border-radius: 6px;">
-                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>Reporta:</strong> ${n.nombre_reportante} (${n.relacion})</p>
-                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>Teléfono:</strong> 📞 ${n.telefono_reportante}</p>
-                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>NUEVO ESTADO:</strong> <span class="badge" style="background:#10b981; color:white; padding:3px 6px;">${n.estado_sugerido}</span></p>
-                                        <p style="font-size: 0.85rem; margin: 4px 0 0 0; color: #333;"><strong>Observaciones:</strong> ${n.observaciones}</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- BOTONES DE ACCIÓN -->
-                                <div style="display:flex; gap:10px;">
-                                    <button class="btn" style="background:#10b981; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="aprobarNovedad('${n.id}', '${n.registro_id}', '${n.estado_sugerido}', '${n.observaciones.replace(/'/g, "\\'")}')">✅ Aprobar y Actualizar</button>
-                                    <button class="btn" style="background:#dc2626; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="rechazarNovedad('${n.id}')">❌ Rechazar (Falso)</button>
-                                </div>
-                            </div>`;
-                        });
-                        document.getElementById('contenedor-lista-novedades').innerHTML = htmlNovedades;
-                    } else {
-                        if (btnAdmin) btnAdmin.style.setProperty('display', 'none', 'important');
-                        document.getElementById('contenedor-lista-novedades').innerHTML = '<p style="text-align:center; padding: 20px; color: #64748b;">✅ No hay reportes pendientes de revisión.</p>';
-                    }
-                }
-
-                filtrarYActualizarTablero();
-                actualizarInterfazColaboradores(colaboradoresNube);
-                actualizarInterfazAyuda(ayudaNube);
-
+                // 4. RENDERIZAR NOTICIAS DINÁMICAS
                 if (resNoticias && resNoticias.data) {
+                    noticiasNube = resNoticias.data; // Guardamos en memoria global
                     const contenedorNoticias = document.getElementById('carrusel-noticias');
+                    
                     if (resNoticias.data.length === 0) {
                         contenedorNoticias.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">No hay boletines oficiales en este momento.</div>';
                     } else {
@@ -1468,18 +1504,85 @@
                             else if (etiquetaVal.includes('alerta')) { colorBorde = "var(--warning)"; colorFondoEtiqueta = "#ea580c"; }
 
                             htmlNews += `
-                            <div class="news-card" style="border-left-color: ${colorBorde};">
+                            <div class="news-card" style="border-left-color: ${colorBorde};" onclick="abrirNoticiaCompleta('${n.id}')">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span class="news-badge" style="background-color: ${colorFondoEtiqueta};">${n.etiqueta || 'Aviso'}</span>
                                     <span class="news-date">${fechaString}</span>
                                 </div>
                                 <h4 class="news-title">${n.titulo}</h4>
                                 <div class="news-body">${n.contenido}</div>
+                                <div class="leer-mas-link">Leer completo ➔</div>
                             </div>`;
                         });
                         contenedorNoticias.innerHTML = htmlNews;
+                        iniciarCarruselAutomatico(); // Arrancamos el motor giratorio
                     }
                 }
+
+                // 5. ESCÁNER DE NOVEDADES DEL ADMIN
+                if (esAdministrador) {
+                    const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
+                    const btnAdmin = document.getElementById('btn-novedades-admin');
+                    
+                    if (nov && nov.length > 0) {
+                        if (btnAdmin) {
+                            btnAdmin.style.setProperty('display', 'flex', 'important');
+                            btnAdmin.style.zIndex = '999999';
+                        }
+                        
+                        document.getElementById('contador-novedades').innerText = nov.length;
+                        
+                        let htmlNovedades = '';
+                        nov.forEach(n => {
+                            let original = registrosNube.find(r => r.id == n.registro_id);
+                            let nomOrig = original ? original.nombre : 'Usuario no encontrado';
+                            let estOrig = original ? original.estado : 'Desconocido';
+                            
+                            let cedOrig = 'No tiene';
+                            if (original && original.cedula_identidad && original.cedula_identidad.trim() !== '' && original.cedula_identidad.trim() !== '-') {
+                                cedOrig = original.cedula_identidad;
+                            }
+                            
+                            let comBruto = original ? (original.cedula || '-') : '-';
+                            let grpBruto = original ? (original.edad || '-') : '-';
+                            let comLimpia = mapaComunidad[comBruto.trim().toLowerCase()] || comBruto;
+                            let grpLimpio = mapaGrupo[grpBruto.trim().toLowerCase()] || grpBruto;
+                            
+                            htmlNovedades += `
+                            <div style="border:1px solid #e5e7eb; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
+                                    <h4 style="margin: 0 0 8px 0; color: var(--primary); font-size: 1.05rem;">👤 Afectado: ${nomOrig}</h4>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; color: #475569;">
+                                        <div><strong>Cédula:</strong> ${cedOrig}</div>
+                                        <div><strong>Vínculo:</strong> ${comLimpia} / ${grpLimpio}</div>
+                                        <div style="grid-column: span 2;"><strong>ESTADO ACTUAL:</strong> <span class="badge" style="background:#64748b; color:white; padding:3px 6px;">${estOrig}</span></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <h5 style="margin: 0 0 8px 0; color: #0284c7; font-size: 0.95rem;">📢 Cambio Sugerido:</h5>
+                                    <div style="background: #fff; padding: 10px; border: 1px dashed #cbd5e1; border-radius: 6px;">
+                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>Reporta:</strong> ${n.nombre_reportante} (${n.relacion})</p>
+                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>Teléfono:</strong> 📞 ${n.telefono_reportante}</p>
+                                        <p style="font-size: 0.85rem; margin: 0 0 4px 0;"><strong>NUEVO ESTADO:</strong> <span class="badge" style="background:#10b981; color:white; padding:3px 6px;">${n.estado_sugerido}</span></p>
+                                        <p style="font-size: 0.85rem; margin: 4px 0 0 0; color: #333;"><strong>Observaciones:</strong> ${n.observaciones}</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn" style="background:#10b981; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="aprobarNovedad('${n.id}', '${n.registro_id}', '${n.estado_sugerido}', '${n.observaciones.replace(/'/g, "\\'")}')">✅ Aprobar</button>
+                                    <button class="btn" style="background:#dc2626; color:white; padding:8px 10px; flex:1; font-weight:bold; border-radius:6px;" onclick="rechazarNovedad('${n.id}')">❌ Rechazar</button>
+                                </div>
+                            </div>`;
+                        });
+                        document.getElementById('contenedor-lista-novedades').innerHTML = htmlNovedades;
+                    } else {
+                        if (btnAdmin) btnAdmin.style.setProperty('display', 'none', 'important');
+                        document.getElementById('contenedor-lista-novedades').innerHTML = '<p style="text-align:center; padding: 20px; color: #64748b;">✅ No hay reportes pendientes de revisión.</p>';
+                    }
+                }
+
+                filtrarYActualizarTablero();
+                actualizarInterfazColaboradores(colaboradoresNube);
+                actualizarInterfazAyuda(ayudaNube);
 
             } catch (error) {
                 console.error("Error en sincronización:", error);
