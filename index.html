@@ -364,15 +364,14 @@
         }
         .link-actualizar:hover { color: #0369a1; text-decoration: underline; }
 
-        /* Estilos obligatorios para que los formularios sean Popups Flotantes */
         .modal-overlay {
             position: fixed !important;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(15, 23, 42, 0.8) !important; /* Fondo oscuro transparente */
-            backdrop-filter: blur(4px); /* Efecto de desenfoque profesional */
+            background-color: rgba(15, 23, 42, 0.8) !important; 
+            backdrop-filter: blur(4px);
             z-index: 99999 !important;
         }
         
@@ -381,7 +380,7 @@
             border-radius: 12px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             max-height: 90vh;
-            overflow-y: auto; /* Agrega scroll interno si la pantalla del teléfono es pequeña */
+            overflow-y: auto; 
             animation: aparecerModal 0.3s ease-out forwards;
         }
 
@@ -393,7 +392,7 @@
         #toast-notificacion {
             visibility: hidden;
             min-width: 250px;
-            background-color: #10b981; /* Verde éxito */
+            background-color: #10b981;
             color: #ffffff;
             text-align: center;
             border-radius: 8px;
@@ -417,8 +416,47 @@
         #toast-notificacion.mostrar {
             visibility: visible;
             opacity: 1;
-            bottom: 50px; /* Sube un poquito al aparecer */
+            bottom: 50px;
         }
+
+        .news-section-header { margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .news-section-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.02em; }
+        
+        .news-carousel-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .news-carousel-container::-webkit-scrollbar { display: none;}
+        
+        .news-card {
+            flex: 0 0 320px;
+            scroll-snap-align: start;
+            background: #ffffff;
+            border: 1px solid var(--gray-200);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .news-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08); }
+        
+        @media (max-width: 768px) {
+            .news-card { flex: 0 0 85%; }
+        }
+
+        .news-date { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+        .news-title { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 800; color: var(--primary); margin: 0.75rem 0; line-height: 1.3; }
+        .news-body { font-size: 0.85rem; color: var(--gray-700); line-height: 1.5; flex: 1; }
+        .news-badge { display: inline-block; padding: 0.2rem 0.6rem; color: #fff; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin: 0; }
     </style>
 </head>
 <body>
@@ -468,6 +506,13 @@
                             <li><strong>🧸 Apoyo y Recreación:</strong> Juguetes para niños y juegos de mesa para adultos (dominó, cartas).</li>
                         </ul>
                     </div>
+                </div>
+
+                <div class="news-section-header">
+                    <h3>📢 Boletines Informativos</h3>
+                </div>
+                <div class="news-carousel-container" id="carrusel-noticias">
+                    <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; font-weight: 600;">⏳ Actualizando boletines...</div>
                 </div>
                 
                 <div class="home-grid-buttons">
@@ -1303,11 +1348,12 @@
             }
 
             try {
-                const [resAfectados, resColabs, resAyudas] = await Promise.all([
+                const [resAfectados, resColabs, resAyudas, resNoticias] = await Promise.all([
                     supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(0, 999),
                     supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false })
-                ]);
+                    supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false }),
+                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false }).limit(5)
+                ]);;
 
                 let tempAfectados = resAfectados.data || [];
                 
@@ -1402,6 +1448,38 @@
                 filtrarYActualizarTablero();
                 actualizarInterfazColaboradores(colaboradoresNube);
                 actualizarInterfazAyuda(ayudaNube);
+
+                if (resNoticias && resNoticias.data) {
+                    const contenedorNoticias = document.getElementById('carrusel-noticias');
+                    if (resNoticias.data.length === 0) {
+                        contenedorNoticias.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">No hay boletines oficiales en este momento.</div>';
+                    } else {
+                        let htmlNews = '';
+                        resNoticias.data.forEach(n => {
+                            const fechaObj = new Date(n.fecha_publicacion);
+                            const fechaString = isNaN(fechaObj) ? '' : fechaObj.toLocaleDateString('es-VE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                            
+                            let colorBorde = "var(--accent)"; 
+                            let colorFondoEtiqueta = "var(--primary)";
+                            let etiquetaVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
+                            
+                            if (etiquetaVal.includes('urgente')) { colorBorde = "var(--danger)"; colorFondoEtiqueta = "var(--danger)"; }
+                            else if (etiquetaVal.includes('logro') || etiquetaVal.includes('buena')) { colorBorde = "var(--success)"; colorFondoEtiqueta = "var(--success)"; }
+                            else if (etiquetaVal.includes('alerta')) { colorBorde = "var(--warning)"; colorFondoEtiqueta = "#ea580c"; }
+
+                            htmlNews += `
+                            <div class="news-card" style="border-left-color: ${colorBorde};">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="news-badge" style="background-color: ${colorFondoEtiqueta};">${n.etiqueta || 'Aviso'}</span>
+                                    <span class="news-date">${fechaString}</span>
+                                </div>
+                                <h4 class="news-title">${n.titulo}</h4>
+                                <div class="news-body">${n.contenido}</div>
+                            </div>`;
+                        });
+                        contenedorNoticias.innerHTML = htmlNews;
+                    }
+                }
 
             } catch (error) {
                 console.error("Error en sincronización:", error);
