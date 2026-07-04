@@ -1022,68 +1022,69 @@
         </div>
     </footer>
 
-    <div id="toast-notificacion" class="toast-oculto">
-        <div class="toast-contenido">
-            <span id="toast-icono">✅</span>
-            <span id="toast-mensaje">¡Registro enviado con éxito!</span>
-        </div>
-    </div>
-
     <div id="modal-novedad" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
-        <div class="modal-content" style="max-width: 500px; width: 90%; padding: 20px; background: white; border-radius: 8px;">
-            <h3 style="color:var(--primary); margin-bottom:10px;">Actualizar estado de afectado</h3>
-            <p id="novedad-persona-nombre" style="font-weight:bold; margin-bottom:15px; color:#333;"></p>
-            <form id="novedadForm">
-                <input type="hidden" id="novedad_registro_id">
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.9rem;">Tu Nombre y Apellido (Obligatorio)</label>
-                    <input type="text" id="novedad_reportante" required style="width:100%; padding:8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.9rem;">Tu Teléfono (Obligatorio)</label>
-                    <input type="tel" id="novedad_telefono" required style="width:100%; padding:8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.9rem;">¿Qué eres de esta persona?</label>
-                    <select id="novedad_relacion" required style="width:100%; padding:8px;">
-                        <option value="Soy yo mismo">Soy yo mismo</option>
-                        <option value="Familiar directo">Familiar directo</option>
-                        <option value="Amigo / Conocido">Amigo / Conocido</option>
-                        <option value="Rescatista / Autoridad">Rescatista / Autoridad</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 0.9rem;">Nuevo Estado Sugerido</label>
-                    <select id="novedad_estado" required style="width:100%; padding:8px;">
-                        <option value="Con Vida">Con Vida / A Salvo</option>
-                        <option value="Atrapado">Atrapado / En Emergencia</option>
-                        <option value="Desaparecido">Desaparecido</option>
-                        <option value="Fallecido">Fallecido</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="font-size: 0.9rem;">Observaciones (Dónde está, etc.)</label>
-                    <textarea id="novedad_obs" rows="3" required style="width:100%; padding:8px;"></textarea>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button type="submit" class="btn" style="flex:1; background-color: #10b981; color: white;">Enviar Reporte</button>
-                    <button type="button" class="btn" style="flex:1; background-color: #dc2626; color: white;" onclick="document.getElementById('modal-novedad').style.display='none'">Cancelar</button>
-                </div>
-            </form>
+        <div class="panel-card" style="width: 90%; max-width: 550px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--accent);">
+            <div class="panel-header">
+                <div class="panel-title">Sugerir Actualización de Estado</div>
+            </div>
+            <div class="panel-body">
+                <p id="novedad-persona-nombre" style="font-family: 'Montserrat', sans-serif; font-weight:800; margin-bottom:1.5rem; color: var(--primary); font-size: 1.15rem; text-align: center; text-transform: uppercase; letter-spacing: 0.02em;"></p>
+                <form id="novedadForm">
+                    <input type="hidden" id="novedad_registro_id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tu Nombre (Obligatorio)</label>
+                            <input type="text" id="novedad_reportante" class="form-input" required placeholder="Ej: Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tu Teléfono (Obligatorio)</label>
+                            <input type="tel" id="novedad_telefono" class="form-input" required placeholder="0412-1234567">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">¿Qué eres de esta persona?</label>
+                            <select id="novedad_relacion" class="form-select" required>
+                                <option value="Soy yo mismo">Soy yo mismo</option>
+                                <option value="Familiar directo">Familiar directo</option>
+                                <option value="Amigo / Conocido">Amigo / Conocido</option>
+                                <option value="Rescatista / Autoridad">Rescatista / Autoridad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado Sugerido</label>
+                            <select id="novedad_estado" class="form-select" required>
+                                <option value="Con Vida">Con Vida / A Salvo</option>
+                                <option value="Atrapado">Atrapado / En Emergencia</option>
+                                <option value="Desaparecido">Desaparecido</option>
+                                <option value="Fallecido">Fallecido</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observaciones Adicionales</label>
+                        <textarea id="novedad_obs" class="form-textarea" required placeholder="Indica dónde se encuentra o qué necesita..."></textarea>
+                    </div>
+                    <div style="display:flex; gap:15px; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-success" style="flex:1;">Enviar Reporte</button>
+                        <button type="button" class="btn btn-delete" style="flex:1; background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca;" onclick="document.getElementById('modal-novedad').style.display='none'">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <div id="modal-admin-novedades" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
-        <div class="modal-content" style="max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 20px; background: white; border-radius: 8px;">
-            <h3 style="color:var(--primary); margin-bottom:15px;">Buzón de Novedades Pendientes</h3>
-            <div id="contenedor-lista-novedades"></div>
-            <button type="button" class="btn btn-block" style="margin-top:15px;" onclick="document.getElementById('modal-admin-novedades').style.display='none'">Cerrar Panel</button>
+        <div class="panel-card" style="width: 95%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid #f59e0b;">
+            <div class="panel-header">
+                <div class="panel-title">Buzón de Novedades Pendientes</div>
+            </div>
+            <div class="panel-body" style="overflow-y: auto; flex: 1;">
+                <div id="contenedor-lista-novedades"></div>
+                <button type="button" class="btn btn-block" style="margin-top:1.5rem; background: var(--gray-200); color: var(--gray-700);" onclick="document.getElementById('modal-admin-novedades').style.display='none'">Cerrar Panel</button>
+            </div>
         </div>
     </div>
-
-    <button id="btn-novedades-admin" class="btn" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #f59e0b; color: white; border: none; font-weight: bold; padding: 10px 15px; border-radius: 30px;" onclick="document.getElementById('modal-admin-novedades').style.display='flex'">
-        🔔 Novedades (<span id="contador-novedades">0</span>)
-    </button>
 
     <script>
         const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
