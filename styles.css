@@ -510,3 +510,57 @@
 
     .news-thumbnail { height: 140px; background-color: var(--gray-100); background-size: cover; background-position: center; margin: -1.5rem -1.5rem 1rem -1.5rem; border-radius: 11px 11px 0 0; border-bottom: 3px solid var(--gray-200); }
     .news-grid-page { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+
+    .admin-secret-btn {
+        position: absolute;
+        bottom: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: #f1f5f9;
+        font-size: 0.65rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        transition: color 0.3s ease;
+    }
+    .admin-secret-btn:hover {
+        color: var(--gray-700);
+    }
+
+    .btn-flotante-wp {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background-color: #25D366;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 9000;
+        text-decoration: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-flotante-wp:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 14px rgba(37, 211, 102, 0.4);
+    }
+
+    @media (max-width: 768px) {
+        .btn-flotante-wp {
+            bottom: 15px;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+        }
+        .btn-flotante-wp svg {
+            width: 25px;
+            height: 25px;
+        }
+    }
