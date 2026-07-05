@@ -345,7 +345,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 thumbHtml = `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>`;
                             } else {
                                 thumbHtml = `
-                                <div class="news-thumbnail" style="background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 18px 18px; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colorBorde};">
+                                <div class="news-thumbnail" style="background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 18px 18px; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
                                     <img src="images.png" alt="Logo USB" style="height: 65px; opacity: 0.12; filter: grayscale(100%);">
                                 </div>`;
                             }
