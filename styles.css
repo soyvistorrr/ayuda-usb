@@ -459,11 +459,11 @@
             line-height: 1.5; 
             
             display: -webkit-box !important;
-            -webkit-line-clamp: 5 !important;
+            -webkit-line-clamp: 7 !important; 
             -webkit-box-orient: vertical !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-            max-height: 7.5em !important;
+            max-height: 10.5em !important;
             margin-bottom: auto !important; 
         }
     
@@ -517,8 +517,8 @@
         right: 20px;
         background: none;
         border: none;
-        color: #f1f5f9;
-        font-size: 0.65rem;
+        color: #cbd5e1;
+        font-size: 0.7rem;
         font-weight: 700;
         cursor: pointer;
         text-transform: uppercase;
@@ -526,7 +526,7 @@
         transition: color 0.3s ease;
     }
     .admin-secret-btn:hover {
-        color: var(--gray-700);
+        color: var(--primary); 
     }
 
     .btn-flotante-wp {

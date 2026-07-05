@@ -340,8 +340,16 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             else if (eVal.includes('logro')||eVal.includes('buena')) { colBorde = "var(--success)"; colFondo = "var(--success)"; }
                             else if (eVal.includes('alerta')) { colBorde = "var(--warning)"; colFondo = "#ea580c"; }
 
-                            let thumb = n.imagen_url ? `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>` : '';
-                            const tarjetaInterior = `${thumb}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
+                            let thumbHtml = '';
+                            if (n.imagen_url && n.imagen_url.trim() !== '') {
+                                thumbHtml = `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>`;
+                            } else {
+                                thumbHtml = `
+                                <div class="news-thumbnail" style="background: linear-gradient(135deg, var(--slate-800) 0%, var(--primary) 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid var(--accent);">
+                                    <span style="color: rgba(255,255,255,0.05); font-size: 3.5rem; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 0.1em;">USB</span>
+                                </div>`;
+                            }
+                            const tarjetaInterior = `${thumbHtml}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
 
                             if (index < 8) htmlCarrusel += `<div class="news-card" style="border-left-color:${colBorde};" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
                             htmlPagina += `<div class="news-card" style="border-left-color:${colBorde}; height:auto!important; min-height:280px;" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
