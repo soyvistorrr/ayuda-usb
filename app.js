@@ -44,6 +44,17 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             carrusel.addEventListener('touchend', iniciarCarruselAutomatico, {passive: true});
         }
 
+        window.moverCarrusel = function(direccion) {
+            const carrusel = document.getElementById('carrusel-noticias');
+            if(carrusel) {
+                if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+                const tarjeta = carrusel.querySelector('.news-card');
+                const avance = tarjeta ? tarjeta.offsetWidth + 24 : 320;
+                carrusel.scrollBy({ left: avance * direccion, behavior: 'smooth' });
+                setTimeout(iniciarCarruselAutomatico, 6000);
+            }
+        };
+
         function hacerLinksClicables(texto) {
             const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
             return texto.replace(urlRegex, function(url) {
@@ -56,48 +67,40 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         window.abrirNoticiaCompleta = function(id) {
             const n = noticiasNube.find(x => x.id == id);
             if (!n) return;
-            
             if (intervaloCarrusel) clearInterval(intervaloCarrusel);
             
             const fechaObj = new Date(n.fecha_publicacion);
             const fechaString = isNaN(fechaObj) ? '' : fechaObj.toLocaleDateString('es-VE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
             
-            let colorBorde = "var(--primary)"; 
-            let colorFondoEtiqueta = "var(--primary)";
+            let colorBorde = "var(--primary)"; let colorFondoEtiqueta = "var(--primary)";
             let etiquetaVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
-            
             if (etiquetaVal.includes('urgente')) { colorBorde = "var(--danger)"; colorFondoEtiqueta = "var(--danger)"; }
             else if (etiquetaVal.includes('logro') || etiquetaVal.includes('buena')) { colorBorde = "var(--success)"; colorFondoEtiqueta = "var(--success)"; }
             else if (etiquetaVal.includes('alerta')) { colorBorde = "var(--warning)"; colorFondoEtiqueta = "#ea580c"; }
 
-            document.getElementById('modal-noticia-borde').style.borderTopColor = colorBorde;
+            document.getElementById('pagina-noticia-borde').style.borderTopColor = colorBorde;
+            const elEtiqueta = document.getElementById('pagina-noticia-etiqueta');
+            elEtiqueta.innerText = n.etiqueta || 'Aviso'; elEtiqueta.style.backgroundColor = colorFondoEtiqueta;
+            document.getElementById('pagina-noticia-fecha').innerText = fechaString;
+            document.getElementById('pagina-noticia-titulo').innerText = n.titulo;
+            document.getElementById('pagina-noticia-contenido').innerHTML = hacerLinksClicables(n.contenido);
             
-            const elEtiqueta = document.getElementById('noticia-modal-etiqueta');
-            elEtiqueta.innerText = n.etiqueta || 'Aviso';
-            elEtiqueta.style.backgroundColor = colorFondoEtiqueta;
+            const imgEl = document.getElementById('pagina-noticia-imagen');
+            if (n.imagen_url) { imgEl.src = n.imagen_url; imgEl.style.display = 'block'; }
+            else { imgEl.style.display = 'none'; imgEl.src = ''; }
             
-            document.getElementById('noticia-modal-fecha').innerText = fechaString;
-            document.getElementById('noticia-modal-titulo').innerText = n.titulo;
+            const urlSitioDirecta = window.location.origin + window.location.pathname + `?noticia=${n.id}`;
+            const textoACompartir = `📢 Boletín Oficial USB: ${n.titulo}\n\nLee los detalles aquí: ${urlSitioDirecta}`;
             
-            document.getElementById('noticia-modal-contenido').innerHTML = hacerLinksClicables(n.contenido);
+            const btnWP = `<a href="https://api.whatsapp.com/send?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
+            const btnX = `<a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-twitter">𝕏 Twitter</a>`;
+            const btnFB = `<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlSitioDirecta)}" target="_blank" class="btn-share btn-facebook">👥 Facebook</a>`;
+            const btnCopy = `<button onclick="navigator.clipboard.writeText('${urlSitioDirecta}'); mostrarNotificacion('¡Enlace copiado!');" class="btn-share btn-copy">🔗 Copiar Enlace</button>`;
             
-            const urlSitio = "https://www.ayudausb.org";
-            const textoACompartir = `📢 Boletín Oficial USB: ${n.titulo}\n\nLee los detalles ingresando a la plataforma central aquí: ${urlSitio}`;
-            const textoCodificado = encodeURIComponent(textoACompartir);
-            
-            const btnWP = `<a href="https://api.whatsapp.com/send?text=${textoCodificado}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
-            const btnX = `<a href="https://twitter.com/intent/tweet?text=${textoCodificado}" target="_blank" class="btn-share btn-twitter">𝕏 Twitter</a>`;
-            const btnFB = `<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlSitio)}&quote=${encodeURIComponent("Boletín Oficial USB: " + n.titulo)}" target="_blank" class="btn-share btn-facebook">👥 Facebook</a>`;
-            const btnCopy = `<button onclick="navigator.clipboard.writeText('${textoACompartir}'); mostrarNotificacion('¡Mensaje oficial copiado al portapapeles!');" class="btn-share btn-copy">📋 Copiar Mensaje</button>`;
-            
-            document.getElementById('noticia-botones-compartir').innerHTML = btnWP + btnX + btnFB + btnCopy;
+            document.getElementById('pagina-botones-compartir').innerHTML = btnWP + btnX + btnFB + btnCopy;
 
-            document.getElementById('modal-noticia').style.display = 'flex';
-        };
-
-        window.cerrarNoticiaCompleta = function() {
-            document.getElementById('modal-noticia').style.display = 'none';
-            iniciarCarruselAutomatico(); 
+            navegarA('view-noticia-detalle');
+            window.history.pushState({ vistaActiva: 'view-noticia-detalle', idNoticia: n.id }, "", `?noticia=${n.id}`);
         };
 
         function mostrarNotificacion(mensaje, exito = true) {
@@ -209,8 +212,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const seccionDestino = document.getElementById(idSeccion);
             if (seccionDestino) seccionDestino.classList.add('active');
             
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active-nav'));
+            const navActivo = document.querySelector(`.nav-item[onclick*="${idSeccion}"]`);
+            if (navActivo) navActivo.classList.add('active-nav');
+            
             if (!desdeHistorial) {
-                window.history.pushState({ vistaActiva: idSeccion }, "", "#" + idSeccion);
+                let nuevaUrl = idSeccion === 'view-home' ? window.location.pathname : "#" + idSeccion;
+                window.history.pushState({ vistaActiva: idSeccion }, "", nuevaUrl);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -289,7 +297,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(0, 999),
                     supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false }),
                     supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false }).limit(60)
+                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false })
                 ]);
 
                 let tempAfectados = resAfectados.data || [];
@@ -314,38 +322,40 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 if (resAyudas.data) ayudaNube = resAyudas.data;
 
                 if (resNoticias && resNoticias.data) {
-                    noticiasNube = resNoticias.data;
-                    const contenedorNoticias = document.getElementById('carrusel-noticias');
+                    noticiasNube = resNoticias.data; 
+                    const contenedorCarrusel = document.getElementById('carrusel-noticias');
+                    const contenedorPagina = document.getElementById('contenedor-todas-noticias');
                     
                     if (resNoticias.data.length === 0) {
-                        contenedorNoticias.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">No hay boletines oficiales en este momento.</div>';
+                        const msjVacio = '<div style="color: var(--text-muted);">No hay boletines.</div>';
+                        if(contenedorCarrusel) contenedorCarrusel.innerHTML = msjVacio;
+                        if(contenedorPagina) contenedorPagina.innerHTML = msjVacio;
                     } else {
-                        let htmlNews = '';
-                        resNoticias.data.forEach(n => {
-                            const fechaObj = new Date(n.fecha_publicacion);
-                            const fechaString = isNaN(fechaObj) ? '' : fechaObj.toLocaleDateString('es-VE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                            
-                            let colorBorde = "var(--accent)"; 
-                            let colorFondoEtiqueta = "var(--primary)";
-                            let etiquetaVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
-                            
-                            if (etiquetaVal.includes('urgente')) { colorBorde = "var(--danger)"; colorFondoEtiqueta = "var(--danger)"; }
-                            else if (etiquetaVal.includes('logro') || etiquetaVal.includes('buena')) { colorBorde = "var(--success)"; colorFondoEtiqueta = "var(--success)"; }
-                            else if (etiquetaVal.includes('alerta')) { colorBorde = "var(--warning)"; colorFondoEtiqueta = "#ea580c"; }
+                        let htmlCarrusel = ''; let htmlPagina = '';
+                        resNoticias.data.forEach((n, index) => {
+                            const fString = new Date(n.fecha_publicacion).toLocaleDateString('es-VE', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                            let colBorde = "var(--accent)"; let colFondo = "var(--primary)";
+                            let eVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
+                            if (eVal.includes('urgente')) { colBorde = "var(--danger)"; colFondo = "var(--danger)"; }
+                            else if (eVal.includes('logro')||eVal.includes('buena')) { colBorde = "var(--success)"; colFondo = "var(--success)"; }
+                            else if (eVal.includes('alerta')) { colBorde = "var(--warning)"; colFondo = "#ea580c"; }
 
-                            htmlNews += `
-                            <div class="news-card" style="border-left-color: ${colorBorde};" onclick="abrirNoticiaCompleta('${n.id}')">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span class="news-badge" style="background-color: ${colorFondoEtiqueta};">${n.etiqueta || 'Aviso'}</span>
-                                    <span class="news-date">${fechaString}</span>
-                                </div>
-                                <h4 class="news-title">${n.titulo}</h4>
-                                <div class="news-body">${n.contenido}</div>
-                                <div class="leer-mas-link">Leer completo ➔</div>
-                            </div>`;
+                            let thumb = n.imagen_url ? `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>` : '';
+                            const tarjetaInterior = `${thumb}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
+
+                            if (index < 8) htmlCarrusel += `<div class="news-card" style="border-left-color:${colBorde};" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
+                            htmlPagina += `<div class="news-card" style="border-left-color:${colBorde}; height:auto!important; min-height:280px;" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
                         });
-                        contenedorNoticias.innerHTML = htmlNews;
-                        iniciarCarruselAutomatico();
+                        
+                        if(contenedorCarrusel) { contenedorCarrusel.innerHTML = htmlCarrusel; iniciarCarruselAutomatico(); }
+                        if(contenedorPagina) contenedorPagina.innerHTML = htmlPagina;
+                        
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const idNoticiaParam = urlParams.get('noticia');
+                        if (idNoticiaParam && !window.noticiaAutoAbierta) {
+                            window.noticiaAutoAbierta = true;
+                            setTimeout(() => abrirNoticiaCompleta(idNoticiaParam), 600);
+                        }
                     }
                 }
 
