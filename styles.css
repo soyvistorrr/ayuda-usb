@@ -217,9 +217,53 @@
     .app-view { display: none; padding: 1rem 0; }
     .app-view.active { display: block; }
 
-    .home-hero { text-align: center; padding: 4rem 1.5rem; background: var(--accent); color: var(--primary); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-    .home-hero h2 { font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.02em; }
-    .home-hero p { max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.05rem; }
+.home-hero { 
+    text-align: center; 
+    padding: 4.5rem 2rem; 
+    background-color: var(--accent);
+    background-image: 
+        radial-gradient(rgba(0, 0, 0, 0.05) 2px, transparent 2px),
+        linear-gradient(135deg, #fbc02d 0%, #f9a825 100%);
+    background-size: 20px 20px, 100% 100%;
+    background-position: center;
+    
+    border-radius: 16px; 
+    margin-bottom: 3rem; 
+    
+    box-shadow: 0 15px 35px -5px rgba(251, 192, 45, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+    
+    position: relative;
+    overflow: hidden;
+}
+
+.home-hero::before {
+    content: ""; position: absolute; top: -10%; left: -5%; width: 200px; height: 200px;
+    background: rgba(255, 255, 255, 0.35); border-radius: 50%; filter: blur(30px);
+}
+.home-hero::after {
+    content: ""; position: absolute; bottom: -15%; right: -5%; width: 250px; height: 250px;
+    background: rgba(0, 0, 0, 0.08); border-radius: 50%; filter: blur(35px);
+}
+
+.home-hero h2 { 
+    position: relative; z-index: 2;
+    font-family: 'Montserrat', sans-serif; font-size: 2.6rem; font-weight: 800; 
+    color: var(--primary-dark); text-transform: uppercase; margin-bottom: 1.25rem; 
+    letter-spacing: 0.03em;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.home-hero p { 
+    position: relative; z-index: 2;
+    max-width: 750px; margin: 0 auto; color: #111111; font-size: 1.1rem; 
+    font-weight: 500; line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .home-hero { padding: 3rem 1.5rem; }
+    .home-hero h2 { font-size: 1.85rem; }
+    .home-hero p { font-size: 0.95rem; }
+}
     
     .acopio-banner-card { background: #ffffff; border: 1px solid var(--gray-200); border-top: 4px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); display: grid; grid-template-columns: 1fr; gap: 2rem; }
     @media (min-width: 768px) { .acopio-banner-card { grid-template-columns: 350px 1fr; } }
