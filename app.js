@@ -345,8 +345,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 thumbHtml = `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>`;
                             } else {
                                 thumbHtml = `
-                                <div class="news-thumbnail" style="background: linear-gradient(135deg, var(--slate-800) 0%, var(--primary) 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid var(--accent);">
-                                    <span style="color: rgba(255,255,255,0.05); font-size: 3.5rem; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 0.1em;">USB</span>
+                                <div class="news-thumbnail" style="background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 18px 18px; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colorBorde};">
+                                    <img src="images.png" alt="Logo USB" style="height: 65px; opacity: 0.12; filter: grayscale(100%);">
                                 </div>`;
                             }
                             const tarjetaInterior = `${thumbHtml}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
