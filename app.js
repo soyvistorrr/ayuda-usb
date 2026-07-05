@@ -345,8 +345,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 thumbHtml = `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>`;
                             } else {
                                 thumbHtml = `
-                                <div class="news-thumbnail" style="background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 18px 18px; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
-                                    <img src="images.png" alt="Logo USB" style="height: 65px; opacity: 0.12; filter: grayscale(100%);">
+                                <div class="news-thumbnail" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
+                                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
+                                        <line x1="8" y1="7" x2="16" y2="7"></line>
+                                        <line x1="8" y1="11" x2="16" y2="11"></line>
+                                        <line x1="8" y1="15" x2="12" y2="15"></line>
+                                    </svg>
                                 </div>`;
                             }
                             const tarjetaInterior = `${thumbHtml}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;

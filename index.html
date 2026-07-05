@@ -69,18 +69,21 @@
                     </div>
                 </div>
 
-                <div class="news-header-wrapper">
-                    <div class="news-section-header" style="margin-bottom: 0;">
-                        <h3>📢 Boletines Informativos</h3>
+                <div class="seccion-destacada">
+                    <div class="news-header-wrapper">
+                        <div class="news-section-header" style="margin-bottom: 0;">
+                            <h3>📢 Boletines Informativos</h3>
+                        </div>
+                        <a class="btn-ver-todas" onclick="navegarA('view-todas-noticias')">Ver todas ➔</a>
                     </div>
-                    <a class="btn-ver-todas" onclick="navegarA('view-todas-noticias')">Ver todas ➔</a>
-                </div>
-                <div class="carousel-wrapper">
-                    <button class="carousel-arrow left" onclick="moverCarrusel(-1)">&#10094;</button>
-                    <div class="news-carousel-container" id="carrusel-noticias">
-                        <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">⏳ Actualizando boletines...</div>
+                    
+                    <div class="carousel-wrapper">
+                        <button class="carousel-arrow left" onclick="moverCarrusel(-1)">&#10094;</button>
+                        <div class="news-carousel-container" id="carrusel-noticias">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; font-weight: 600;">⏳ Actualizando boletines...</div>
+                        </div>
+                        <button class="carousel-arrow right" onclick="moverCarrusel(1)">&#10095;</button>
                     </div>
-                    <button class="carousel-arrow right" onclick="moverCarrusel(1)">&#10095;</button>
                 </div>
                 
                 <div class="home-grid-buttons">
