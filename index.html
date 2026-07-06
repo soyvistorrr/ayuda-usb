@@ -718,11 +718,16 @@
 
             <section class="app-view" id="view-todas-noticias">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
-                <div style="margin-bottom: 2rem;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">Archivo de Boletines</h2>
-                    <p style="color: var(--text-muted); font-size: 0.95rem;">Explora el historial completo de comunicados de la contingencia.</p>
+                
+                <div style="padding: 0 1rem; max-width: 1200px; margin: 0 auto;">
+                    <div style="margin-bottom: 2rem;">
+                        <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">📢 Todos los Boletines</h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Historial completo de comunicados oficiales y actualizaciones de la contingencia.</p>
+                    </div>
+                    
+                    <div class="news-grid" id="contenedor-todas-noticias">
+                    </div>
                 </div>
-                <div class="news-grid-page" id="contenedor-todas-noticias"></div>
             </section>
         </div>
 
