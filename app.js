@@ -89,9 +89,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if (n.imagen_url) { imgEl.src = n.imagen_url; imgEl.style.display = 'block'; }
             else { imgEl.style.display = 'none'; imgEl.src = ''; }
             
-            const urlSitioDirecta = window.location.origin + `/api/noticia?id=${n.id}&v=3`;
+            const urlSitioDirecta = window.location.origin + `/api/noticia?id=${n.id}&v=${Date.now()}`;
             
-            const textoACompartir = `Boletín Oficial USB: ${n.titulo}\n\nLee los detalles aquí:\n${urlSitioDirecta}`;
+            const textoACompartir = `*Boletín Oficial USB*\n*${n.titulo}*\n\nLee los detalles aquí:\n${urlSitioDirecta}`;
             
             const btnWP = `<a href="https://api.whatsapp.com/send?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
             const btnX = `<a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-twitter">𝕏 Twitter</a>`;

@@ -135,8 +135,21 @@
         
         td[data-label="Nombre"] strong, td[data-label="Voluntario"] strong, td[data-label="Afectado"] strong { font-size: 1.15rem; color: var(--primary); }
         
-        .text-truncate-clamp { max-height: none !important; overflow-y: visible !important; padding-right: 0 !important; width: 100% !important; }
+        .text-truncate-clamp { 
+            display: block !important; 
+            -webkit-line-clamp: unset !important; 
+            max-height: none !important; 
+            height: auto !important;
+            overflow: visible !important; 
+            padding-right: 0 !important; 
+            width: 100% !important;
+            white-space: normal !important;
+        }
 
+        tr, td {
+            height: auto !important;
+            min-height: min-content !important;
+        }
         td.actions-cell { flex-direction: row !important; justify-content: space-between !important; padding-top: 1rem !important; margin-top: 0.5rem; border-top: 1px dashed var(--gray-300) !important; gap: 1rem; }
         td.actions-cell::before { display: none !important; }
         td.actions-cell button { flex: 1; padding: 0.75rem; font-size: 0.85rem; }
