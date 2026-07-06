@@ -91,7 +91,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             
             const urlSitioDirecta = window.location.origin + `/api/noticia?id=${n.id}&v=${Date.now()}`;
             
-            const textoACompartir = `*Boletín Oficial USB*\n*${n.titulo}*\n\nLee los detalles aquí:\n${urlSitioDirecta}`;
+            const textoACompartir = `*Noticias AEUSB*\n*${n.titulo}*\n\nLee los detalles aquí:\n${urlSitioDirecta}`;
             
             const btnWP = `<a href="https://api.whatsapp.com/send?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
             const btnX = `<a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-twitter">𝕏 Twitter</a>`;
@@ -1264,8 +1264,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
         });
 
-        if (!window.history.state) {
+        const hashParams = window.location.hash.substring(1);
+
+        if (hashParams && document.getElementById(hashParams)) {
+            window.history.replaceState({ vistaActiva: hashParams }, "", "#" + hashParams);
+            navegarA(hashParams, true);
+        } else if (!window.history.state) {
             window.history.replaceState({ vistaActiva: 'view-home' }, "", "#view-home");
+            navegarA('view-home', true);
         }
 
         cargarDatosDesdeNube();
