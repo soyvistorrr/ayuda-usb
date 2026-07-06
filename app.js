@@ -89,7 +89,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if (n.imagen_url) { imgEl.src = n.imagen_url; imgEl.style.display = 'block'; }
             else { imgEl.style.display = 'none'; imgEl.src = ''; }
             
-            const urlSitioDirecta = window.location.origin + window.location.pathname + `?noticia=${n.id}`;
+            const urlSitioDirecta = window.location.origin + `/api/noticia?id=${n.id}`;
+            
             const textoACompartir = `📢 Boletín Oficial USB: ${n.titulo}\n\nLee los detalles aquí: ${urlSitioDirecta}`;
             
             const btnWP = `<a href="https://api.whatsapp.com/send?text=${encodeURIComponent(textoACompartir)}" target="_blank" class="btn-share btn-whatsapp">📱 WhatsApp</a>`;
