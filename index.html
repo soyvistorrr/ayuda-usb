@@ -31,6 +31,7 @@
         <div class="container nav-container" id="nav-superior">
             <a class="nav-item active-nav" onclick="navegarA('view-home')">Inicio</a>
             <a class="nav-item" onclick="navegarA('view-todas-noticias')">Boletines</a>
+            <a class="nav-item" onclick="navegarA('view-puntos-usb')">Puntos USB</a>
             <a class="nav-item" onclick="navegarA('view-necesito-ayuda')">Ayuda</a>
             <a class="nav-item" onclick="navegarA('view-colaborar')">Colaborar</a>
             <a class="nav-item" onclick="navegarA('view-buscar')">Buscar</a>
@@ -44,29 +45,8 @@
             
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
-                    <h2>Plataforma de Contingencia USB</h2>
-                    <p>Canal oficial de la Universidad Simón Bolívar para reportar afectados por los terremotos del 24/06/2026, solicitar asistencia inmediata o unirte a las cuadrilla voluntarias de apoyo, donar y más.</p>
-                </div>
-
-                <div class="acopio-banner-card">
-                    <div class="acopio-info-side">
-                        <h4>📍 Centro de Recepción Física</h4>
-                        <div class="acopio-chip">
-                            <strong>Dirección de entrega:</strong><br>Centro Venezolano Americano (CVA), Las Mercedes, Caracas.
-                        </div>
-                        <div class="acopio-chip" style="border-left-color: var(--accent);">
-                            <strong>Horario operativo:</strong><br>Lunes a Domingo — 9:00 a.m. a 6:00 p.m.
-                        </div>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; letter-spacing: 0.05em;">Insumos Críticos Solicitados en Campaña:</p>
-                        <ul class="acopio-list-grid">
-                            <li><strong>🍼 Cuidado Infantil y Adulto:</strong> Pañales para niños y adultos (todas las tallas).</li>
-                            <li><strong>⛺ Refugio y Emergencia:</strong> Carpas, colchonetas, cobijas, sábanas, linternas y pilas operativas.</li>
-                            <li><strong>🧼 Higiene e Higienización:</strong> Cepillos, pasta dental, desodorante, jabón, shampoo, toallas sanitarias y húmedas.</li>
-                            <li><strong>🧸 Apoyo y Recreación:</strong> Juguetes para niños y juegos de mesa para adultos (dominó, cartas).</li>
-                        </ul>
-                    </div>
+                    <h2>Uesebistas te necesitamos</h2>
+                    <p>Plataforma centralizada de contingencia comunitaria de la USB. Reporta afectados por el sismo, solicita asistencia inmediata o únete a las cuadrillas voluntarias de apoyo.</p>
                 </div>
 
                 <div class="seccion-destacada">
@@ -83,6 +63,37 @@
                             <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; font-weight: 600;">⏳ Actualizando boletines...</div>
                         </div>
                         <button class="carousel-arrow right" onclick="moverCarrusel(1)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="seccion-destacada" style="border-top: 4px solid var(--success);">
+                    <div class="news-header-wrapper">
+                        <div class="news-section-header" style="margin-bottom: 0;">
+                            <h3>Puntos USB y Centros de Acopio</h3>
+                        </div>
+                        <a class="btn-ver-todas" onclick="navegarA('view-puntos-usb')">Ver todos los puntos ➔</a>
+                    </div>
+                    
+                    <div class="acopio-banner-card" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
+                        <div class="acopio-info-side">
+                            <h4 style="color: #0284c7;">Punto USB - CVA Las Mercedes</h4>
+                            <p style="font-size: 0.85rem; color: var(--gray-700); margin-bottom: 1rem;">Centro de Acopio para la recepción de donaciones para la comunidad USB.</p>
+                            <div class="acopio-chip">
+                                <strong>Dirección:</strong> Centro Venezolano Americano (CVA), Las Mercedes, Caracas.
+                            </div>
+                            <div class="acopio-chip" style="border-left-color: var(--accent);">
+                                <strong>Horario:</strong> Lunes a Domingo — 9:00 a.m. a 6:00 p.m.
+                            </div>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; letter-spacing: 0.05em;">Insumos urgentes requeridos actualmente:</p>
+                            <ul class="acopio-list-grid">
+                                <li><strong>Cuidado Infantil y Adulto:</strong> Pañales para niños y adultos (todas las tallas).</li>
+                                <li><strong>Refugio y Emergencia:</strong> Carpas, colchonetas, cobijas, sábanas, linternas.</li>
+                                <li><strong>Higiene:</strong> Cepillos, pasta dental, desodorante, jabón, toallas sanitarias.</li>
+                                <li><strong>Apoyo y Recreación:</strong> Juguetes para niños y juegos de mesa.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
@@ -619,6 +630,78 @@
                 <div class="news-grid-page" id="contenedor-todas-noticias"></div>
             </section>
         </div>
+
+        <section class="app-view" id="view-puntos-usb">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">Red de Puntos USB</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Puntos oficiales donde estaremos distribuyendo la ayuda humanitaria recolectada.</p>
+                    <div style="background-color: #e0f2fe; color: #0369a1; padding: 1rem; border-radius: 8px; font-size: 0.85rem; margin-top: 1rem; border-left: 4px solid #0284c7; line-height: 1.5;">
+                        <strong>Importante:</strong> Estos puntos son exclusivos para entregar ayuda humanitaria a los miembros de la comunidad USB (Estudiantes, profesores, personal administrativo y obrero, egresados y sus grupos familiares). Ponte en contacto con la persona encargada para que te hagan el censo y manifiestes tus necesidades.
+                    </div>
+                </div>
+
+                <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid var(--gray-200); padding-bottom: 0.5rem;">Centros de Distribución (La Guaira)</h3>
+                
+                <div class="links-grid" style="margin-bottom: 3.5rem;">
+                    <div class="link-resource-card" style="border-left-color: var(--success);">
+                        <div>
+                            <h4 style="color: var(--success);">Punto USB Catia la Mar Centro</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Encargada:</strong> Estudiante Aitana Mora</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">0412-4176735</p>
+                        </div>
+                        <a href="https://wa.me/584124176735" target="_blank" class="btn btn-success btn-block" style="margin-top: 1rem;">Contactar por WhatsApp</a>
+                    </div>
+                    
+                    <div class="link-resource-card" style="border-left-color: var(--success);">
+                        <div>
+                            <h4 style="color: var(--success);">Punto USB Las Tunitas - Mamo</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Encargada:</strong> Prof. Alba Peraza</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">0424-1622863</p>
+                        </div>
+                        <a href="https://wa.me/584241622863" target="_blank" class="btn btn-success btn-block" style="margin-top: 1rem;">Contactar por WhatsApp</a>
+                    </div>
+
+                    <div class="link-resource-card" style="border-left-color: var(--success);">
+                        <div>
+                            <h4 style="color: var(--success);">Punto USB Caraballeda</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Encargada:</strong> Illeny Aponte</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">0414-3725800</p>
+                        </div>
+                        <a href="https://wa.me/584143725800" target="_blank" class="btn btn-success btn-block" style="margin-top: 1rem;">Contactar por WhatsApp</a>
+                    </div>
+
+                    <div class="link-resource-card" style="border-left-color: var(--success);">
+                        <div>
+                            <h4 style="color: var(--success);">Punto USB Naiguatá - Camurí</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Encargado:</strong> Prof. Elvin Barreto</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">0412-3701226</p>
+                        </div>
+                        <a href="https://wa.me/584123701226" target="_blank" class="btn btn-success btn-block" style="margin-top: 1rem;">Contactar por WhatsApp</a>
+                    </div>
+
+                    <div class="link-resource-card" style="border-left-color: var(--success);">
+                        <div>
+                            <h4 style="color: var(--success);">Punto USB Maiquetía</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;"><strong>Encargado:</strong> Estudiante Luis de Quintal</p>
+                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">0414-2518760</p>
+                        </div>
+                        <a href="https://wa.me/584142518760" target="_blank" class="btn btn-success btn-block" style="margin-top: 1rem;">Contactar por WhatsApp</a>
+                    </div>
+                </div>
+
+                <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid var(--gray-200); padding-bottom: 0.5rem;">Centro de Recepción Principal (Caracas)</h3>
+                <div class="links-grid">
+                    <div class="link-resource-card" style="border-left-color: #0284c7;">
+                        <div>
+                            <h4 style="color: #0284c7;">Punto USB - CVA Las Mercedes</h4>
+                            <p style="margin-bottom: 0.5rem; font-size: 0.9rem;">Centro de acopio central para la recepción de donaciones de la comunidad.</p>
+                            <p style="font-size: 0.9rem;"><strong>Dirección:</strong> Centro Venezolano Americano (CVA), Las Mercedes, Caracas.</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;"><strong>🕒 Horario:</strong> Lunes a Domingo, 9:00 a.m. - 6:00 p.m.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
     </main>
 
     <footer class="site-footer" style="position: relative;">
