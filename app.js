@@ -247,10 +247,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     document.getElementById('btnExportarAyuda').style.display = "inline-flex";
 
                     document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
+                    
+                    cargarDatosDesdeNube();
                 } else { alert("Clave incorrecta. Acceso denegado."); }
             } else {
                 esAdministrador = false;
-                document.getElementById('btn-toggle-role').innerText = "Acceso Admin";
+                document.getElementById('btn-toggle-role').innerText = "🔒 Acceso Administrador";
                 
                 if (malla) malla.classList.remove('admin-columns-layout');
                 if (mallaAyuda) mallaAyuda.classList.remove('admin-columns-layout');
@@ -265,6 +267,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 document.getElementById('btnExportarAyuda').style.display = "none";
 
                 document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "none");
+                
+                const btnAdmin = document.getElementById('btn-novedades-admin');
+                if (btnAdmin) btnAdmin.style.setProperty('display', 'none', 'important');
+                document.getElementById('modal-admin-novedades').style.display = 'none';
+
                 cancelarEdicion();
             }
             filtrarYActualizarTablero();
@@ -341,8 +348,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             else if (eVal.includes('alerta')) { colBorde = "var(--warning)"; colFondo = "#ea580c"; }
 
                             let thumbHtml = '';
-                            if (n.imagen_url && n.imagen_url.trim() !== '') {
-                                thumbHtml = `<div class="news-thumbnail" style="background-image: url('${n.imagen_url}'); display: block;"></div>`;
+                            
+                            let urlMini = (n.imagen_miniatura && n.imagen_miniatura.trim() !== '') ? n.imagen_miniatura : n.imagen_url;
+                            
+                            if (urlMini && urlMini.trim() !== '') {
+                                thumbHtml = `<div class="news-thumbnail" style="background-image: url('${urlMini}'); display: block; background-size: contain; background-color: var(--gray-100); background-repeat: no-repeat;"></div>`;
                             } else {
                                 thumbHtml = `
                                 <div class="news-thumbnail" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
