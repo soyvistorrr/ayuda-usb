@@ -352,3 +352,40 @@
             display: flex;
             flex-direction: column;
         }
+
+            /* =========================================
+    CORRECCIÓN GLOBAL DE MÁRGENES EN CELULARES
+    ========================================= */
+    @media (max-width: 768px) {
+        /* 1. Le da un "acolchado" obligatorio a toda la página a los lados */
+        .container, 
+        .app-view {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+
+        /* 2. Evita que la página haga scroll horizontal por error */
+        body, html {
+            overflow-x: hidden !important;
+        }
+
+        /* 3. Asegura que las tarjetas grandes no se desborden y respeten el margen */
+        .acopio-banner-card,
+        .action-card,
+        .link-resource-card,
+        .panel-card,
+        .dashboard-hero,
+        .news-card {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* 4. Separa un poco los elementos de la grilla principal para que respiren */
+        .home-grid-buttons {
+            gap: 1.5rem !important;
+        }
+    }
