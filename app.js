@@ -1319,9 +1319,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             div.className = 'fila-insumo';
             div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
             div.innerHTML = `
-                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem;" min="1" required>
-                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem;" required>
-                <button type="button" class="btn" style="padding: 0.6rem; background-color: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; color: #b91c1c; font-size: 0.8rem;" onclick="this.parentElement.remove()">❌</button>
+                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 80px;" min="1" required>
+                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
+                <button type="button" class="btn btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">❌</button>
             `;
             contenedor.appendChild(div);
         };
@@ -1367,7 +1367,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         });
 
         function renderizarTablaLogistica() {
-            if(!esAdministrador) return;
             const cuerpo = document.getElementById('tablaLogisticaCuerpo');
             if(!cuerpo || !pedidosLogistica) return;
             
@@ -1377,7 +1376,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
 
                 let btnAccion = p.estado === 'Pendiente' 
-                    ? `<button class="btn" style="background-color: var(--primary); color: white; padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
+                    ? `<button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
                     : `<button class="btn" style="background-color: #e2e8f0; color: #64748b; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: not-allowed;" disabled>✅ Ya enviado</button>`;
 
                 return `
