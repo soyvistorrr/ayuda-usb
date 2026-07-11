@@ -1361,7 +1361,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px;" min="1" required>
                         <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
                     </div>`;
-                cargarDatosDesdeNube();
+                cargarTablaLogisticaFuerza();
             }
             btn.innerText = "Guardar Petición en el Sistema"; btn.disabled = false;
         });
@@ -1446,4 +1446,51 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 </html>
             `);
             ventanita.document.close();
+        };
+
+        window.cargarTablaLogisticaFuerza = async function() {
+            const cuerpo = document.getElementById('tablaLogisticaCuerpo');
+            if(!cuerpo) return;
+
+            cuerpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem; font-weight: bold;">Cargando base de datos...</td></tr>';
+
+            const { data, error } = await supabaseClient
+                .from('etiquetas_logistica')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if(error) {
+                console.error(error);
+                cuerpo.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 1rem; color: red;">Error Supabase: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if(!data || data.length === 0) {
+                cuerpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem;">No hay pedidos registrados en la nube.</td></tr>';
+                return;
+            }
+
+            pedidosLogistica = data;
+
+            cuerpo.innerHTML = data.map(p => {
+                let badgeColor = p.estado === 'Despachado' ? 'badge-success' : 'badge-warning';
+                let resumenInsumos = Array.isArray(p.lista_insumos) 
+                    ? p.lista_insumos.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ')
+                    : 'Error de lectura de JSON';
+                
+                if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
+
+                let btnAccion = p.estado === 'Pendiente' 
+                    ? `<button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
+                    : `<button class="btn" style="background-color: #e2e8f0; color: #64748b; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: not-allowed;" disabled>✅ Ya enviado</button>`;
+
+                return `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 1rem;"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
+                        <td style="padding: 1rem;"><strong>${p.centro_acopio}</strong><br><span style="font-size:0.8rem; color:#64748b;">${p.encargado}</span></td>
+                        <td style="padding: 1rem; font-size: 0.9rem;">${resumenInsumos}</td>
+                        <td style="padding: 1rem;">${btnAccion}</td>
+                    </tr>
+                `;
+            }).join('');
         };
