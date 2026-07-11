@@ -240,6 +240,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if (mallaColab) mallaColab.classList.add('admin-columns-layout');
                     
                     document.getElementById('panel-formulario-afectado').style.display = "block";
+                    document.getElementById('btn-acceso-logistica').style.display = "flex";
                     document.getElementById('panel-tabla-solicitudes').style.display = "block";
                     document.getElementById('dropZone').style.display = "block";
                     
@@ -262,6 +263,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
+                document.getElementById('btn-acceso-logistica').style.display = "none"; // <-- ¡Aquí!
                 
                 document.getElementById('btnExportar').style.display = "none";
                 document.getElementById('btnExportarColab').style.display = "none";
@@ -302,11 +304,34 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             try {
                 const [resAfectados, resColabs, resAyudas, resNoticias] = await Promise.all([
-                    supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(0, 999),
-                    supabaseClient.from('colaboradores').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('solicitudes_ayuda').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('noticias_oficiales').select('*').order('fecha_publicacion', { ascending: false })
+                    supabaseClient
+                        .from('registros_ciudadanos')
+                        .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
+                        .order('created_at', { ascending: false })
+                        .limit(1000),
+
+                    supabaseClient
+                        .from('colaboradores')
+                        .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
+                        .order('created_at', { ascending: false })
+                        .limit(500),
+
+                    supabaseClient
+                        .from('solicitudes_ayuda')
+                        .select('id, tipo_reporte, nombre, cedula, telefono, correo, sede_usb, carnet_estudiante, comunidad, grupo, estado_residencial, eje_logistico, direccion_residencial, afectacion_vivienda, requiere_refugio, servicios_afectados, estado, lesiones_fisicas, damnificado, ubicacion, descripcion_ayuda')
+                        .order('created_at', { ascending: false })
+                        .limit(500),
+
+                    supabaseClient
+                        .from('noticias_oficiales')
+                        .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
+                        .order('fecha_publicacion', { ascending: false })
+                        .limit(15)
                 ]);
+
+                registrosNube = resAfectados.data || [];
+                if (resColabs.data) colaboradoresNube = resColabs.data;
+                if (resAyudas.data) ayudaNube = resAyudas.data;
 
                 let tempAfectados = resAfectados.data || [];
                 
@@ -1254,7 +1279,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
         };
 
-        setInterval(cargarDatosDesdeNube, 15000);
+        setInterval(cargarDatosDesdeNube, 300000);
 
         window.addEventListener('popstate', function(event) {
             if (event.state && event.state.vistaActiva) {
@@ -1275,3 +1300,138 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }
 
         cargarDatosDesdeNube();
+
+        window.agregarFilaInsumo = function() {
+            const contenedor = document.getElementById('contenedor-filas-insumos');
+            const div = document.createElement('div');
+            div.className = 'fila-insumo';
+            div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
+            div.innerHTML = `
+                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 80px;" min="1" required>
+                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
+                <button type="button" class="btn btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">❌</button>
+            `;
+            contenedor.appendChild(div);
+        };
+
+        document.getElementById('etiquetaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const encargado = document.getElementById('etiqueta_encargado').value.trim();
+            const centro = document.getElementById('etiqueta_centro').value;
+            
+            let insumos = [];
+            document.querySelectorAll('.fila-insumo').forEach(fila => {
+                const cant = fila.querySelector('.input-cantidad').value;
+                const desc = fila.querySelector('.input-nombre-insumo').value.trim();
+                if(cant && desc) {
+                    insumos.push({ cantidad: cant, descripcion: desc });
+                }
+            });
+            
+            if(insumos.length === 0) {
+                alert("Debes agregar al menos un insumo.");
+                return;
+            }
+            
+            const btn = this.querySelector('button[type="submit"]');
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+            
+            const payload = {
+                encargado: encargado,
+                centro_acopio: centro,
+                lista_insumos: insumos
+            };
+            
+            const { data, error } = await supabaseClient.from('etiquetas_logistica').insert([payload]).select();
+            
+            if(error) {
+                alert("Error al guardar en la nube: " + error.message);
+                btn.innerText = "Guardar y Generar Etiqueta de Impresión";
+                btn.disabled = false;
+                return;
+            }
+            
+            generarImpresionEtiqueta(encargado, centro, insumos, data[0].id);
+            
+            this.reset();
+            document.getElementById('contenedor-filas-insumos').innerHTML = `
+                <div class="fila-insumo" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 80px;" min="1" required>
+                    <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
+                </div>
+            `;
+            btn.innerText = "Guardar y Generar Etiqueta de Impresión";
+            btn.disabled = false;
+        });
+
+        function generarImpresionEtiqueta(encargado, centro, insumos, idRegistro) {
+            let filasHTML = insumos.map(i => `
+                <tr style="border-bottom: 1px solid #000;">
+                    <td style="padding: 8px; text-align: center; border-right: 1px solid #000; font-weight: bold; font-size: 18px;">${i.cantidad}</td>
+                    <td style="padding: 8px; font-size: 18px;">${i.descripcion}</td>
+                </tr>
+            `).join('');
+            
+            const fecha = new Date().toLocaleString('es-VE');
+            const idCorto = idRegistro.split('-')[0].toUpperCase();
+
+            const ventanita = window.open('', '_blank');
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Etiqueta Logística - ${centro}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
+                        .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
+                        .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
+                        th { background-color: #f0f0f0; padding: 12px; border-bottom: 2px solid #000; text-align: left; border-right: 2px solid #000; }
+                        td { border-right: 2px solid #000; border-bottom: 2px solid #000;}
+                        .footer { text-align: center; font-size: 14px; margin-top: 20px; font-weight: bold; }
+                        @media print {
+                            @page { margin: 0; }
+                            body { margin: 1cm; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="ticket">
+                        <h1>📦 GUÍA DE DESPACHO</h1>
+                        <hr style="border: 1px solid #000; margin-bottom: 15px;">
+                        <div class="info-header">
+                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${centro}</span><br>
+                            <strong>ENCARGADO:</strong> ${encargado}<br>
+                            <strong>FECHA:</strong> ${fecha}<br>
+                            <strong>CÓDIGO DE CONTROL:</strong> #${idCorto}
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px; text-align: center;">CANT.</th>
+                                    <th>DESCRIPCIÓN DEL INSUMO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filasHTML}
+                            </tbody>
+                        </table>
+                        <div class="footer">
+                            ORGANIZACIÓN LOGÍSTICA DE CONTINGENCIA<br>
+                            <em>Pegar esta etiqueta en un lugar visible de la caja/bolsa</em>
+                        </div>
+                    </div>
+                    <script>
+                        // Activa el menú de impresión automáticamente y cierra la ventana al terminar
+                        window.onload = function() { 
+                            window.print(); 
+                            window.onafterprint = function() { window.close(); }
+                        }
+                    </script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        }
