@@ -3,6 +3,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let registrosNube = [];
+        let pedidosLogistica = [];
         let noticiasNube = [];
         let intervaloCarrusel;
         let colaboradoresNube = [];
@@ -303,7 +304,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
 
             try {
-                const [resAfectados, resColabs, resAyudas, resNoticias] = await Promise.all([
+                const [resAfectados, resColabs, resAyudas, resNoticias, resLogistica] = await Promise.all([
                     supabaseClient
                         .from('registros_ciudadanos')
                         .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
@@ -326,7 +327,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         .from('noticias_oficiales')
                         .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
                         .order('fecha_publicacion', { ascending: false })
-                        .limit(15)
+                        .limit(15),
+
+                    supabaseClient
+                        .from('etiquetas_logistica')
+                        .select('id, encargado, centro_acopio, lista_insumos, estado, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(200)
                 ]);
 
                 registrosNube = resAfectados.data || [];
@@ -406,6 +413,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             setTimeout(() => abrirNoticiaCompleta(idNoticiaParam), 600);
                         }
                     }
+                }
+
+                if (resLogistica && resLogistica.data) {
+                pedidosLogistica = resLogistica.data;
+                renderizarTablaLogistica();
                 }
 
                 if (esAdministrador) {
@@ -1307,7 +1319,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             div.className = 'fila-insumo';
             div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
             div.innerHTML = `
-                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 80px;" min="1" required>
+                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px;" min="1" required>
                 <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
                 <button type="button" class="btn btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">❌</button>
             `;
@@ -1316,7 +1328,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         document.getElementById('etiquetaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const encargado = document.getElementById('etiqueta_encargado').value.trim();
             const centro = document.getElementById('etiqueta_centro').value;
             
@@ -1324,50 +1335,73 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             document.querySelectorAll('.fila-insumo').forEach(fila => {
                 const cant = fila.querySelector('.input-cantidad').value;
                 const desc = fila.querySelector('.input-nombre-insumo').value.trim();
-                if(cant && desc) {
-                    insumos.push({ cantidad: cant, descripcion: desc });
-                }
+                if(cant && desc) insumos.push({ cantidad: cant, descripcion: desc });
             });
             
-            if(insumos.length === 0) {
-                alert("Debes agregar al menos un insumo.");
-                return;
-            }
+            if(insumos.length === 0) return alert("Debes agregar al menos un insumo.");
             
             const btn = this.querySelector('button[type="submit"]');
-            btn.innerText = "Guardando...";
-            btn.disabled = true;
+            btn.innerText = "Guardando..."; btn.disabled = true;
             
             const payload = {
                 encargado: encargado,
                 centro_acopio: centro,
-                lista_insumos: insumos
+                lista_insumos: insumos,
+                estado: "Pendiente"
             };
             
-            const { data, error } = await supabaseClient.from('etiquetas_logistica').insert([payload]).select();
+            const { error } = await supabaseClient.from('etiquetas_logistica').insert([payload]);
             
-            if(error) {
-                alert("Error al guardar en la nube: " + error.message);
-                btn.innerText = "Guardar y Generar Etiqueta de Impresión";
-                btn.disabled = false;
-                return;
+            if(error) { alert("Error: " + error.message); } 
+            else {
+                mostrarNotificacion("¡Pedido guardado en la bandeja!");
+                this.reset();
+                document.getElementById('contenedor-filas-insumos').innerHTML = `
+                    <div class="fila-insumo" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px;" min="1" required>
+                        <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
+                    </div>`;
+                cargarDatosDesdeNube();
             }
-            
-            generarImpresionEtiqueta(encargado, centro, insumos, data[0].id);
-            
-            this.reset();
-            document.getElementById('contenedor-filas-insumos').innerHTML = `
-                <div class="fila-insumo" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 80px;" min="1" required>
-                    <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
-                </div>
-            `;
-            btn.innerText = "Guardar y Generar Etiqueta de Impresión";
-            btn.disabled = false;
+            btn.innerText = "Guardar Petición en el Sistema"; btn.disabled = false;
         });
 
-        function generarImpresionEtiqueta(encargado, centro, insumos, idRegistro) {
-            let filasHTML = insumos.map(i => `
+        function renderizarTablaLogistica() {
+            if(!esAdministrador) return;
+            const cuerpo = document.getElementById('tablaLogisticaCuerpo');
+            if(!cuerpo || !pedidosLogistica) return;
+            
+            cuerpo.innerHTML = pedidosLogistica.map(p => {
+                let badgeColor = p.estado === 'Despachado' ? 'badge-success' : 'badge-warning';
+                let resumenInsumos = p.lista_insumos.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ');
+                if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
+
+                let btnAccion = p.estado === 'Pendiente' 
+                    ? `<button class="btn" style="background-color: var(--primary); color: white; padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
+                    : `<button class="btn" style="background-color: #e2e8f0; color: #64748b; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: not-allowed;" disabled>✅ Ya enviado</button>`;
+
+                return `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 1rem;"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
+                        <td style="padding: 1rem;"><strong>${p.centro_acopio}</strong><br><span style="font-size:0.8rem; color:#64748b;">${p.encargado}</span></td>
+                        <td style="padding: 1rem; font-size: 0.9rem;">${resumenInsumos}</td>
+                        <td style="padding: 1rem;">${btnAccion}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.imprimirYDespachar = async function(idRegistro) {
+            const pedido = pedidosLogistica.find(p => p.id === idRegistro);
+            if(!pedido) return;
+
+            if(!confirm(`¿Generar factura de despacho para ${pedido.centro_acopio}? Esto marcará el pedido como enviado.`)) return;
+
+            await supabaseClient.from('etiquetas_logistica').update({ estado: 'Despachado' }).eq('id', idRegistro);
+            mostrarNotificacion("Pedido marcado como despachado.");
+            cargarDatosDesdeNube();
+
+            let filasHTML = pedido.lista_insumos.map(i => `
                 <tr style="border-bottom: 1px solid #000;">
                     <td style="padding: 8px; text-align: center; border-right: 1px solid #000; font-weight: bold; font-size: 18px;">${i.cantidad}</td>
                     <td style="padding: 8px; font-size: 18px;">${i.descripcion}</td>
@@ -1381,7 +1415,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             ventanita.document.write(`
                 <html>
                 <head>
-                    <title>Etiqueta Logística - ${centro}</title>
+                    <title>Guía de Despacho - ${pedido.centro_acopio}</title>
                     <style>
                         body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
                         .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
@@ -1390,11 +1424,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
                         th { background-color: #f0f0f0; padding: 12px; border-bottom: 2px solid #000; text-align: left; border-right: 2px solid #000; }
                         td { border-right: 2px solid #000; border-bottom: 2px solid #000;}
-                        .footer { text-align: center; font-size: 14px; margin-top: 20px; font-weight: bold; }
-                        @media print {
-                            @page { margin: 0; }
-                            body { margin: 1cm; }
-                        }
+                        @media print { @page { margin: 0; } body { margin: 1cm; } }
                     </style>
                 </head>
                 <body>
@@ -1402,36 +1432,19 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         <h1>📦 GUÍA DE DESPACHO</h1>
                         <hr style="border: 1px solid #000; margin-bottom: 15px;">
                         <div class="info-header">
-                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${centro}</span><br>
-                            <strong>ENCARGADO:</strong> ${encargado}<br>
+                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.centro_acopio}</span><br>
+                            <strong>ENCARGADO:</strong> ${pedido.encargado}<br>
                             <strong>FECHA:</strong> ${fecha}<br>
-                            <strong>CÓDIGO DE CONTROL:</strong> #${idCorto}
+                            <strong>CÓDIGO:</strong> #${idCorto}
                         </div>
                         <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 80px; text-align: center;">CANT.</th>
-                                    <th>DESCRIPCIÓN DEL INSUMO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${filasHTML}
-                            </tbody>
+                            <thead><tr><th style="width: 80px; text-align: center;">CANT.</th><th>DESCRIPCIÓN</th></tr></thead>
+                            <tbody>${filasHTML}</tbody>
                         </table>
-                        <div class="footer">
-                            ORGANIZACIÓN LOGÍSTICA DE CONTINGENCIA<br>
-                            <em>Pegar esta etiqueta en un lugar visible de la caja/bolsa</em>
-                        </div>
                     </div>
-                    <script>
-                        // Activa el menú de impresión automáticamente y cierra la ventana al terminar
-                        window.onload = function() { 
-                            window.print(); 
-                            window.onafterprint = function() { window.close(); }
-                        }
-                    </script>
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
                 </body>
                 </html>
             `);
             ventanita.document.close();
-        }
+        };
