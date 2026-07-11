@@ -1453,7 +1453,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     </head>
                     <body>
                         <div class="ticket">
-                            <h1>📦 GUÍA DE DESPACHO</h1>
+                            <h1>TICKET DE DESPACHO</h1>
                             <hr style="border: 1px solid #000; margin-bottom: 15px;">
                             <div class="info-header">
                                 <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.centro_acopio}</span><br>
