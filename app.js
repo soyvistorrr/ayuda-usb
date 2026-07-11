@@ -1319,9 +1319,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             div.className = 'fila-insumo';
             div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
             div.innerHTML = `
-                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px;" min="1" required>
-                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
-                <button type="button" class="btn btn-delete" style="padding: 0.5rem;" onclick="this.parentElement.remove()">❌</button>
+                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem;" min="1" required>
+                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem;" required>
+                <button type="button" class="btn" style="padding: 0.6rem; background-color: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; color: #b91c1c; font-size: 0.8rem;" onclick="this.parentElement.remove()">❌</button>
             `;
             contenedor.appendChild(div);
         };
