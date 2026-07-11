@@ -1474,9 +1474,16 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             cuerpo.innerHTML = data.map(p => {
                 let badgeColor = p.estado === 'Despachado' ? 'badge-success' : 'badge-warning';
-                let resumenInsumos = Array.isArray(p.lista_insumos) 
-                    ? p.lista_insumos.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ')
-                    : 'Error de lectura de JSON';
+                let insumosArray = p.lista_insumos;
+                
+                if (typeof insumosArray === 'string') {
+                    try { insumosArray = JSON.parse(insumosArray); } 
+                    catch(e) { insumosArray = []; }
+                }
+
+                let resumenInsumos = Array.isArray(insumosArray) 
+                    ? insumosArray.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ')
+                    : 'Error de lectura';
                 
                 if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
 
