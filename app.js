@@ -1537,3 +1537,46 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 `;
             }).join('');
         };
+
+        window.descargarExcelLogistica = function() {
+            if (!pedidosLogistica || pedidosLogistica.length === 0) {
+                alert("No hay pedidos registrados para descargar.");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; 
+            csvContent += "ID del Pedido,Fecha de Registro,Encargado,Centro de Acopio Destino,Estado,Resumen de Insumos\n";
+
+            pedidosLogistica.forEach(p => {
+                let fecha = p.created_at ? new Date(p.created_at).toLocaleString('es-VE') : 'Fecha no disponible';
+                
+                let insumosArray = p.lista_insumos;
+                if (typeof insumosArray === 'string') {
+                    try { insumosArray = JSON.parse(insumosArray); } catch(e) { insumosArray = []; }
+                }
+                
+                let insumosTexto = Array.isArray(insumosArray) 
+                    ? insumosArray.map(i => `${i.cantidad}x ${i.descripcion}`).join(' | ') 
+                    : 'Error de lectura';
+
+                let fila = [
+                    p.id,
+                    fecha,
+                    `"${(p.encargado || '').replace(/"/g, '""')}"`,
+                    `"${(p.centro_acopio || '').replace(/"/g, '""')}"`,
+                    p.estado || 'Pendiente',
+                    `"${insumosTexto.replace(/"/g, '""')}"`
+                ].join(",");
+
+                csvContent += fila + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Reporte_Logistica_Despachos_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
