@@ -1391,61 +1391,97 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }
 
         window.imprimirYDespachar = async function(idRegistro) {
-            const pedido = pedidosLogistica.find(p => p.id === idRegistro);
-            if(!pedido) return;
+            try {
+                const pedido = pedidosLogistica.find(p => p.id === idRegistro);
+                if(!pedido) {
+                    alert("Error: No se encontró el pedido.");
+                    return;
+                }
 
-            if(!confirm(`¿Generar factura de despacho para ${pedido.centro_acopio}? Esto marcará el pedido como enviado.`)) return;
+                if(!confirm(`¿Generar factura de despacho para ${pedido.centro_acopio}? Esto marcará el pedido como enviado.`)) return;
 
-            await supabaseClient.from('etiquetas_logistica').update({ estado: 'Despachado' }).eq('id', idRegistro);
-            mostrarNotificacion("Pedido marcado como despachado.");
-            cargarDatosDesdeNube();
+                const ventanita = window.open('', '_blank');
+                if(!ventanita) {
+                    alert("⚠️ Tu navegador bloqueó la ventana. Por favor, permite las ventanas emergentes en esta página.");
+                    return;
+                }
 
-            let filasHTML = pedido.lista_insumos.map(i => `
-                <tr style="border-bottom: 1px solid #000;">
-                    <td style="padding: 8px; text-align: center; border-right: 1px solid #000; font-weight: bold; font-size: 18px;">${i.cantidad}</td>
-                    <td style="padding: 8px; font-size: 18px;">${i.descripcion}</td>
-                </tr>
-            `).join('');
-            
-            const fecha = new Date().toLocaleString('es-VE');
-            const idCorto = idRegistro.split('-')[0].toUpperCase();
+                const { error } = await supabaseClient
+                    .from('etiquetas_logistica')
+                    .update({ estado: 'Despachado' })
+                    .eq('id', idRegistro);
 
-            const ventanita = window.open('', '_blank');
-            ventanita.document.write(`
-                <html>
-                <head>
-                    <title>Guía de Despacho - ${pedido.centro_acopio}</title>
-                    <style>
-                        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
-                        .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
-                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
-                        .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
-                        th { background-color: #f0f0f0; padding: 12px; border-bottom: 2px solid #000; text-align: left; border-right: 2px solid #000; }
-                        td { border-right: 2px solid #000; border-bottom: 2px solid #000;}
-                        @media print { @page { margin: 0; } body { margin: 1cm; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="ticket">
-                        <h1>📦 GUÍA DE DESPACHO</h1>
-                        <hr style="border: 1px solid #000; margin-bottom: 15px;">
-                        <div class="info-header">
-                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.centro_acopio}</span><br>
-                            <strong>ENCARGADO:</strong> ${pedido.encargado}<br>
-                            <strong>FECHA:</strong> ${fecha}<br>
-                            <strong>CÓDIGO:</strong> #${idCorto}
+                if(error) {
+                    ventanita.close();
+                    alert("Error al actualizar la base de datos: " + error.message);
+                    return;
+                }
+
+                if (typeof cargarTablaLogisticaFuerza === "function") {
+                    cargarTablaLogisticaFuerza();
+                }
+
+                let insumosArray = pedido.lista_insumos;
+                if (typeof insumosArray === 'string') {
+                    try { insumosArray = JSON.parse(insumosArray); } catch(e) { insumosArray = []; }
+                }
+
+                let filasHTML = insumosArray.map(i => `
+                    <tr style="border-bottom: 1px solid #000;">
+                        <td style="padding: 8px; text-align: center; border-right: 1px solid #000; font-weight: bold; font-size: 18px;">${i.cantidad}</td>
+                        <td style="padding: 8px; font-size: 18px;">${i.descripcion}</td>
+                    </tr>
+                `).join('');
+                
+                const fecha = new Date().toLocaleString('es-VE');
+                const idCorto = idRegistro.split('-')[0].toUpperCase();
+
+                ventanita.document.write(`
+                    <html>
+                    <head>
+                        <title>Guía de Despacho - ${pedido.centro_acopio}</title>
+                        <style>
+                            body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
+                            .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+                            h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
+                            .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
+                            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
+                            th { background-color: #f0f0f0; padding: 12px; border-bottom: 2px solid #000; text-align: left; border-right: 2px solid #000; }
+                            td { border-right: 2px solid #000; border-bottom: 2px solid #000;}
+                            @media print { @page { margin: 0; } body { margin: 1cm; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="ticket">
+                            <h1>📦 GUÍA DE DESPACHO</h1>
+                            <hr style="border: 1px solid #000; margin-bottom: 15px;">
+                            <div class="info-header">
+                                <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.centro_acopio}</span><br>
+                                <strong>ENCARGADO:</strong> ${pedido.encargado}<br>
+                                <strong>FECHA:</strong> ${fecha}<br>
+                                <strong>CÓDIGO:</strong> #${idCorto}
+                            </div>
+                            <table>
+                                <thead><tr><th style="width: 80px; text-align: center;">CANT.</th><th>DESCRIPCIÓN</th></tr></thead>
+                                <tbody>${filasHTML}</tbody>
+                            </table>
                         </div>
-                        <table>
-                            <thead><tr><th style="width: 80px; text-align: center;">CANT.</th><th>DESCRIPCIÓN</th></tr></thead>
-                            <tbody>${filasHTML}</tbody>
-                        </table>
-                    </div>
-                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
-                </body>
-                </html>
-            `);
-            ventanita.document.close();
+                        <script>
+                            // Activa la impresora de inmediato y cierra al terminar
+                            window.onload = function() { 
+                                window.print(); 
+                                window.onafterprint = function() { window.close(); } 
+                            }
+                        </script>
+                    </body>
+                    </html>
+                `);
+                ventanita.document.close();
+
+            } catch (error) {
+                console.error("Error crítico: ", error);
+                alert("Hubo un fallo en el sistema. Revisa la consola.");
+            }
         };
 
         window.cargarTablaLogisticaFuerza = async function() {
