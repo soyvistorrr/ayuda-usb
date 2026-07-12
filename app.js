@@ -839,7 +839,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             try {
                 mostrarNotificacion("Procesando solicitud...", true);
                 
-                if (idEdicionAyuda !== null) {\
+                if (idEdicionAyuda !== null) {
                     const { error: updateError } = await supabaseClient
                         .from('solicitudes_ayuda')
                         .update(payloadAyuda)
@@ -849,7 +849,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     
                     mostrarNotificacion("✅ Solicitud actualizada correctamente.");
                     cancelarEdicionAyuda();
-                } else {\
+                } else {
                     const { data: ayudaData, error: ayudaError } = await supabaseClient
                         .from('solicitudes_ayuda')
                         .insert([payloadAyuda])
