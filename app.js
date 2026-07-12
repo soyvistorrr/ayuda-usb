@@ -683,56 +683,41 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const cuerpo = document.getElementById('tablaAyudaCuerpo');
             if (!thead || !cuerpo) return;
 
+            const puedeEditar = perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin';
+
+            let encabezadoAcciones = puedeEditar ? `<th class="admin-action-header">ACCIONES</th>` : '';
+
             thead.innerHTML = `<tr>
-                <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ${obtenerSimboloOrden(sortConfigAyuda, 'tipo_reporte')}</th>
-                <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ${obtenerSimboloOrden(sortConfigAyuda, 'nombre')}</th>
-                <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ${obtenerSimboloOrden(sortConfigAyuda, 'cedula')}</th>
-                <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ${obtenerSimboloOrden(sortConfigAyuda, 'telefono')}</th>
-                <th onclick="ordenarTablaAyuda('correo')" style="cursor:pointer">CORREO ${obtenerSimboloOrden(sortConfigAyuda, 'correo')}</th>
-                <th onclick="ordenarTablaAyuda('sede_usb')" style="cursor:pointer">SEDE ${obtenerSimboloOrden(sortConfigAyuda, 'sede_usb')}</th>
-                <th onclick="ordenarTablaAyuda('carnet_estudiante')" style="cursor:pointer">CARNET ${obtenerSimboloOrden(sortConfigAyuda, 'carnet_estudiante')}</th>
-                <th onclick="ordenarTablaAyuda('comunidad')" style="cursor:pointer">COMUNIDAD ${obtenerSimboloOrden(sortConfigAyuda, 'comunidad')}</th>
-                <th onclick="ordenarTablaAyuda('grupo')" style="cursor:pointer">GRUPO ${obtenerSimboloOrden(sortConfigAyuda, 'grupo')}</th>
-                <th onclick="ordenarTablaAyuda('estado_residencial')" style="cursor:pointer">ESTADO RES. ${obtenerSimboloOrden(sortConfigAyuda, 'estado_residencial')}</th>
-                <th onclick="ordenarTablaAyuda('eje_logistico')" style="cursor:pointer">EJE ${obtenerSimboloOrden(sortConfigAyuda, 'eje_logistico')}</th>
-                <th onclick="ordenarTablaAyuda('direccion_residencial')" style="cursor:pointer">DIRECCIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'direccion_residencial')}</th>
-                <th onclick="ordenarTablaAyuda('afectacion_vivienda')" style="cursor:pointer">AFECTACIÓN VIV. ${obtenerSimboloOrden(sortConfigAyuda, 'afectacion_vivienda')}</th>
-                <th onclick="ordenarTablaAyuda('requiere_refugio')" style="cursor:pointer">REFUGIO ${obtenerSimboloOrden(sortConfigAyuda, 'requiere_refugio')}</th>
-                <th onclick="ordenarTablaAyuda('servicios_afectados')" style="cursor:pointer">SERVICIOS ${obtenerSimboloOrden(sortConfigAyuda, 'servicios_afectados')}</th>
-                <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ${obtenerSimboloOrden(sortConfigAyuda, 'estado')}</th>
-                <th onclick="ordenarTablaAyuda('lesiones_fisicas')" style="cursor:pointer">LESIONES ${obtenerSimboloOrden(sortConfigAyuda, 'lesiones_fisicas')}</th>
-                <th onclick="ordenarTablaAyuda('damnificado')" style="cursor:pointer">DAMNIFICADO ${obtenerSimboloOrden(sortConfigAyuda, 'damnificado')}</th>
-                <th onclick="ordenarTablaAyuda('ubicacion')" style="cursor:pointer">UBICACIÓN ACTUAL ${obtenerSimboloOrden(sortConfigAyuda, 'ubicacion')}</th>
-                <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ${obtenerSimboloOrden(sortConfigAyuda, 'descripcion_ayuda')}</th>
-                <th class="admin-action-header">ACCIONES</th>
+                <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ↕</th>
+                <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ↕</th>
+                <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ↕</th>
+                <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ↕</th>
+                <th onclick="ordenarTablaAyuda('estado_residencial')" style="cursor:pointer">ESTADO RES. ↕</th>
+                <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ↕</th>
+                <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ↕</th>
+                ${encabezadoAcciones}
             </tr>`;
 
             let htmlFinal = '';
             let datosOrdenados = ordenarColeccion(datos, sortConfigAyuda);
 
             datosOrdenados.forEach(a => {
+                let botonesAccion = puedeEditar 
+                    ? `<td class="actions-cell admin-action-header" data-label="Acciones">
+                        <button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button>
+                        <button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button>
+                       </td>` 
+                    : '';
+
                 htmlFinal += `<tr>
                     <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
                     <td data-label="Afectado"><strong>${a.nombre}</strong></td>
                     <td data-label="Cédula">${enmascararCedula(a.cedula)}</td>
                     <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
-                    <td data-label="Correo">${a.correo || '-'}</td>
-                    <td data-label="Sede">${a.sede_usb || '-'}</td>
-                    <td data-label="Carnet">${a.carnet_estudiante || '-'}</td>
-                    <td data-label="Comunidad">${a.comunidad || '-'}</td>
-                    <td data-label="Grupo">${a.grupo || '-'}</td>
                     <td data-label="Estado Res.">${a.estado_residencial || '-'}</td>
-                    <td data-label="Eje">${a.eje_logistico || '-'}</td>
-                    <td data-label="Dirección"><div class="text-truncate-clamp">${a.direccion_residencial || '-'}</div></td>
-                    <td data-label="Afectación Viv.">${a.afectacion_vivienda || '-'}</td>
-                    <td data-label="Refugio">${a.requiere_refugio || '-'}</td>
-                    <td data-label="Servicios">${a.servicios_afectados || '-'}</td>
                     <td data-label="Situación">${a.estado || '-'}</td>
-                    <td data-label="Lesiones">${a.lesiones_fisicas || '-'}</td>
-                    <td data-label="Damnificado">${a.damnificado || '-'}</td>
-                    <td data-label="Ubicación Actual"><div class="text-truncate-clamp">${a.ubicacion || '-'}</div></td>
                     <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
-                    <td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button><button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button></td>
+                    ${botonesAccion}
                 </tr>`;
             });
             cuerpo.innerHTML = htmlFinal;
