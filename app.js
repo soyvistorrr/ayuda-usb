@@ -443,7 +443,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
                             .order('created_at', { ascending: false }).limit(500),
                         supabaseClient.from('solicitudes_ayuda')
-                            .select('id, created_at, punto_usb, estado_despacho, tipo_reporte, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, servicios_afectados, es_damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
+                            .select('id, created_at, punto_usb, estado_despacho, tipo_reporte, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, servicios_afectados, es_damnificado, damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
                             .order('created_at', { ascending: false }).limit(500),
                         supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false })
                     ]);
