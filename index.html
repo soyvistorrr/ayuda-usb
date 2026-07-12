@@ -1016,5 +1016,30 @@
     </button>
 
     <script src="app.js" defer></script>
+
+    <div id="modal-login" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div class="panel-card" style="width: 90%; max-width: 400px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--accent);">
+            <div class="panel-header">
+                <div class="panel-title" style="text-transform: uppercase;">Acceso de Personal Oficial</div>
+            </div>
+            <div class="panel-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" id="login_email" class="form-input" required placeholder="usuario@ayudausb.org">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" id="login_password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    <div style="display:flex; gap:15px; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary" style="flex:1; font-weight: bold;" id="btn-login-submit">Ingresar al Sistema</button>
+                        <button type="button" class="btn btn-delete" style="flex:1; background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; font-weight: bold;" onclick="document.getElementById('modal-login').style.display='none'">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

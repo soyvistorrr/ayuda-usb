@@ -225,37 +225,23 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function conmutarAccesoSeguro() {
-            const malla = document.getElementById('mallaPrincipal');
-            const mallaAyuda = document.getElementById('mallaAyuda');
-            const mallaColab = document.getElementById('mallaColaboradores');
+        let perfilUsuarioActual = null;
 
+        window.conmutarAccesoSeguro = async function() {
             if (!esAdministrador) {
-                let pass = prompt("Introduzca la clave de seguridad de Administrador de la USB:");
-                if (pass === "USB2026") {
-                    esAdministrador = true;
-                    document.getElementById('btn-toggle-role').innerText = "Cerrar Sesión";
-                    
-                    if (malla) malla.classList.add('admin-columns-layout');
-                    if (mallaAyuda) mallaAyuda.classList.add('admin-columns-layout');
-                    if (mallaColab) mallaColab.classList.add('admin-columns-layout');
-                    
-                    document.getElementById('panel-formulario-afectado').style.display = "block";
-                    document.getElementById('btn-acceso-logistica').style.display = "flex";
-                    document.getElementById('panel-tabla-solicitudes').style.display = "block";
-                    document.getElementById('dropZone').style.display = "block";
-                    
-                    document.getElementById('btnExportar').style.display = "inline-flex";
-                    document.getElementById('btnExportarColab').style.display = "inline-flex";
-                    document.getElementById('btnExportarAyuda').style.display = "inline-flex";
-
-                    document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
-                    
-                    cargarDatosDesdeNube();
-                } else { alert("Clave incorrecta. Acceso denegado."); }
+                document.getElementById('modal-login').style.display = 'flex';
             } else {
+                if(!confirm("¿Seguro que deseas cerrar sesión?")) return;
+                
+                await supabaseClient.auth.signOut();
                 esAdministrador = false;
-                document.getElementById('btn-toggle-role').innerText = "🔒 Acceso Administrador";
+                perfilUsuarioActual = null;
+                
+                document.getElementById('btn-toggle-role').innerHTML = "🔒 Acceso Administrador";
+                
+                const malla = document.getElementById('mallaPrincipal');
+                const mallaAyuda = document.getElementById('mallaAyuda');
+                const mallaColab = document.getElementById('mallaColaboradores');
                 
                 if (malla) malla.classList.remove('admin-columns-layout');
                 if (mallaAyuda) mallaAyuda.classList.remove('admin-columns-layout');
@@ -264,7 +250,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 document.getElementById('panel-formulario-afectado').style.display = "none";
                 document.getElementById('panel-tabla-solicitudes').style.display = "none";
                 document.getElementById('dropZone').style.display = "none";
-                document.getElementById('btn-acceso-logistica').style.display = "none"; // <-- ¡Aquí!
+                document.getElementById('btn-acceso-logistica').style.display = "none";
                 
                 document.getElementById('btnExportar').style.display = "none";
                 document.getElementById('btnExportarColab').style.display = "none";
@@ -277,11 +263,77 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 document.getElementById('modal-admin-novedades').style.display = 'none';
 
                 cancelarEdicion();
+                filtrarYActualizarTablero();
+                actualizarInterfazColaboradores(colaboradoresNube);
+                actualizarInterfazAyuda(ayudaNube);
+                
+                mostrarNotificacion("Sesión cerrada correctamente.");
             }
-            filtrarYActualizarTablero();
-            actualizarInterfazColaboradores(colaboradoresNube);
-            actualizarInterfazAyuda(ayudaNube);
-        }
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login_email').value.trim();
+            const password = document.getElementById('login_password').value;
+            const btnSubmit = document.getElementById('btn-login-submit');
+            
+            btnSubmit.innerText = "Verificando...";
+            btnSubmit.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                const { data: perfilData, error: perfilError } = await supabaseClient
+                    .from('perfiles_admin')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (perfilError) throw new Error("No se encontró un perfil asignado a este usuario.");
+
+                perfilUsuarioActual = perfilData;
+                esAdministrador = true;
+                
+                document.getElementById('modal-login').style.display = 'none';
+                document.getElementById('loginForm').reset();
+                document.getElementById('btn-toggle-role').innerText = `Cerrar Sesión (${perfilUsuarioActual.rol})`;
+                
+                const malla = document.getElementById('mallaPrincipal');
+                const mallaAyuda = document.getElementById('mallaAyuda');
+                const mallaColab = document.getElementById('mallaColaboradores');
+                
+                if (malla) malla.classList.add('admin-columns-layout');
+                if (mallaAyuda) mallaAyuda.classList.add('admin-columns-layout');
+                if (mallaColab) mallaColab.classList.add('admin-columns-layout');
+                
+                document.getElementById('panel-formulario-afectado').style.display = "block";
+                document.getElementById('btn-acceso-logistica').style.display = "flex";
+                document.getElementById('panel-tabla-solicitudes').style.display = "block";
+                document.getElementById('dropZone').style.display = "block";
+                
+                document.getElementById('btnExportar').style.display = "inline-flex";
+                document.getElementById('btnExportarColab').style.display = "inline-flex";
+                document.getElementById('btnExportarAyuda').style.display = "inline-flex";
+
+                document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
+                
+                mostrarNotificacion(`¡Bienvenido! Sede asignada: ${perfilUsuarioActual.centro_acopio}`);
+                
+                await cargarDatosDesdeNube();
+
+            } catch (err) {
+                alert("Error de acceso: " + (err.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : err.message));
+            } finally {
+                btnSubmit.innerText = "Ingresar al Sistema";
+                btnSubmit.disabled = false;
+            }
+        });
 
         function enmascararTelefono(tlf) {
             let t = String(tlf || '').trim();
