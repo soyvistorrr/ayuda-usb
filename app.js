@@ -304,50 +304,29 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
 
             try {
-                const [resAfectados, resColabs, resAyudas, resNoticias, resLogistica] = await Promise.all([
+                const [resAfectados, resNoticias] = await Promise.all([
                     supabaseClient
                         .from('registros_ciudadanos')
                         .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
                         .order('created_at', { ascending: false })
                         .limit(1000),
-
-                    supabaseClient
-                        .from('colaboradores')
-                        .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
-                        .order('created_at', { ascending: false })
-                        .limit(500),
-
-                    supabaseClient
-                        .from('solicitudes_ayuda')
-                        .select('id, tipo_reporte, nombre, cedula, telefono, correo, sede_usb, carnet_estudiante, comunidad, grupo, estado_residencial, eje_logistico, direccion_residencial, afectacion_vivienda, requiere_refugio, servicios_afectados, estado, lesiones_fisicas, damnificado, ubicacion, descripcion_ayuda')
-                        .order('created_at', { ascending: false })
-                        .limit(500),
-
                     supabaseClient
                         .from('noticias_oficiales')
                         .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
                         .order('fecha_publicacion', { ascending: false })
-                        .limit(15),
-
-                    supabaseClient
-                        .from('etiquetas_logistica')
-                        .select('id, encargado, centro_acopio, lista_insumos, estado, created_at')
-                        .order('created_at', { ascending: false })
-                        .limit(200)
+                        .limit(15)
                 ]);
 
-                registrosNube = resAfectados.data || [];
-                if (resColabs.data) colaboradoresNube = resColabs.data;
-                if (resAyudas.data) ayudaNube = resAyudas.data;
-
                 let tempAfectados = resAfectados.data || [];
-                
                 if (tempAfectados.length === 1000) {
                     let rangoInicio = 1000;
                     let rangoFin = 1999;
                     let hayMasDatos = true;
                     while (hayMasDatos) {
-                        const { data } = await supabaseClient.from('registros_ciudadanos').select('*').order('created_at', { ascending: false }).range(rangoInicio, rangoFin);
+                        const { data } = await supabaseClient.from('registros_ciudadanos')
+                            .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
+                            .order('created_at', { ascending: false }).range(rangoInicio, rangoFin);
+                        
                         if (data && data.length > 0) {
                             tempAfectados = tempAfectados.concat(data);
                             rangoInicio += 1000;
@@ -356,10 +335,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if (!data || data.length < 1000) hayMasDatos = false; 
                     }
                 }
-
                 registrosNube = tempAfectados;
-                if (resColabs.data) colaboradoresNube = resColabs.data;
-                if (resAyudas.data) ayudaNube = resAyudas.data;
 
                 if (resNoticias && resNoticias.data) {
                     noticiasNube = resNoticias.data; 
@@ -381,7 +357,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             else if (eVal.includes('alerta')) { colBorde = "var(--warning)"; colFondo = "#ea580c"; }
 
                             let thumbHtml = '';
-                            
                             let urlMini = (n.imagen_miniatura && n.imagen_miniatura.trim() !== '') ? n.imagen_miniatura : n.imagen_url;
                             
                             if (urlMini && urlMini.trim() !== '') {
@@ -405,24 +380,27 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         
                         if(contenedorCarrusel) { contenedorCarrusel.innerHTML = htmlCarrusel; iniciarCarruselAutomatico(); }
                         if(contenedorPagina) contenedorPagina.innerHTML = htmlPagina;
-                        
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const idNoticiaParam = urlParams.get('noticia');
-                        if (idNoticiaParam && !window.noticiaAutoAbierta) {
-                            window.noticiaAutoAbierta = true;
-                            setTimeout(() => abrirNoticiaCompleta(idNoticiaParam), 600);
-                        }
                     }
                 }
 
-                if (resLogistica && resLogistica.data) {
-                pedidosLogistica = resLogistica.data;
-                renderizarTablaLogistica();
-                }
+                filtrarYActualizarTablero();
 
                 if (esAdministrador) {
-                    const { data: nov } = await supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false });
+                    const [resColabs, resAyudas, resNov] = await Promise.all([
+                        supabaseClient.from('colaboradores')
+                            .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
+                            .order('created_at', { ascending: false }).limit(500),
+                        supabaseClient.from('solicitudes_ayuda')
+                            .select('id, tipo_reporte, nombre, cedula, telefono, correo, sede_usb, carnet_estudiante, comunidad, grupo, estado_residencial, eje_logistico, direccion_residencial, afectacion_vivienda, requiere_refugio, servicios_afectados, estado, lesiones_fisicas, damnificado, ubicacion, descripcion_ayuda')
+                            .order('created_at', { ascending: false }).limit(500),
+                        supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false })
+                    ]);
+
+                    colaboradoresNube = resColabs.data || [];
+                    ayudaNube = resAyudas.data || [];
+                    
                     const btnAdmin = document.getElementById('btn-novedades-admin');
+                    let nov = resNov.data || [];
                     
                     if (nov && nov.length > 0) {
                         if (btnAdmin) {
@@ -478,11 +456,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if (btnAdmin) btnAdmin.style.setProperty('display', 'none', 'important');
                         document.getElementById('contenedor-lista-novedades').innerHTML = '<p style="text-align:center; padding: 20px; color: #64748b;">✅ No hay reportes pendientes de revisión.</p>';
                     }
+                    actualizarInterfazColaboradores(colaboradoresNube);
+                    actualizarInterfazAyuda(ayudaNube);
                 }
-
-                filtrarYActualizarTablero();
-                actualizarInterfazColaboradores(colaboradoresNube);
-                actualizarInterfazAyuda(ayudaNube);
 
             } catch (error) {
                 console.error("Error en sincronización:", error);
@@ -1290,8 +1266,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 }
             }
         };
-
-        setInterval(cargarDatosDesdeNube, 300000);
 
         window.addEventListener('popstate', function(event) {
             if (event.state && event.state.vistaActiva) {
