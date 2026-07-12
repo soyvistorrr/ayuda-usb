@@ -684,17 +684,25 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if (!thead || !cuerpo) return;
 
             const puedeEditar = perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin';
-
             let encabezadoAcciones = puedeEditar ? `<th class="admin-action-header">ACCIONES</th>` : '';
 
             thead.innerHTML = `<tr>
-                <th onclick="ordenarTablaAyuda('tipo_reporte')" style="cursor:pointer">TIPO ↕</th>
+                <th onclick="ordenarTablaAyuda('punto_usb')" style="cursor:pointer">PUNTO ACOPIO ↕</th>
                 <th onclick="ordenarTablaAyuda('nombre')" style="cursor:pointer">AFECTADO ↕</th>
                 <th onclick="ordenarTablaAyuda('cedula')" style="cursor:pointer">CÉDULA ↕</th>
                 <th onclick="ordenarTablaAyuda('telefono')" style="cursor:pointer">TELÉFONO ↕</th>
-                <th onclick="ordenarTablaAyuda('estado_residencial')" style="cursor:pointer">ESTADO RES. ↕</th>
-                <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">SITUACIÓN ↕</th>
-                <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">REQUERIMIENTO ↕</th>
+                <th onclick="ordenarTablaAyuda('grupo')" style="cursor:pointer">RELACIÓN USB ↕</th>
+                <th onclick="ordenarTablaAyuda('estado')" style="cursor:pointer">VITAL ↕</th>
+                <th onclick="ordenarTablaAyuda('ubicacion')" style="cursor:pointer">UBICACIÓN ↕</th>
+                <th onclick="ordenarTablaAyuda('servicios_afectados')" style="cursor:pointer">SERVICIOS ↕</th>
+                <th onclick="ordenarTablaAyuda('es_damnificado')" style="cursor:pointer">DAMNIFICADO ↕</th>
+                <th onclick="ordenarTablaAyuda('requiere_atencion_medica')" style="cursor:pointer">MÉDICO URG. ↕</th>
+                <th onclick="ordenarTablaAyuda('personas_hogar')" style="cursor:pointer">FAMILIA ↕</th>
+                <th onclick="ordenarTablaAyuda('req_medicina')" style="cursor:pointer">MEDICINA ↕</th>
+                <th onclick="ordenarTablaAyuda('req_alimentos')" style="cursor:pointer">ALIMENTOS ↕</th>
+                <th onclick="ordenarTablaAyuda('req_limpieza')" style="cursor:pointer">LIMPIEZA ↕</th>
+                <th onclick="ordenarTablaAyuda('req_general')" style="cursor:pointer">GENERAL ↕</th>
+                <th onclick="ordenarTablaAyuda('descripcion_ayuda')" style="cursor:pointer">OBSERVACIONES ↕</th>
                 ${encabezadoAcciones}
             </tr>`;
 
@@ -703,20 +711,31 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             datosOrdenados.forEach(a => {
                 let botonesAccion = puedeEditar 
-                    ? `<td class="actions-cell admin-action-header" data-label="Acciones">
+                    ? `<td class="actions-cell admin-action-header">
                         <button class="btn-edit-table" onclick="activarEdicionAyuda('${a.id}')">Editar</button>
                         <button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button>
-                       </td>` 
-                    : '';
+                    </td>` : '';
+
+                let badgeDamnificado = a.es_damnificado ? `<span style="background: #dc3545; color: white; padding: 3px 6px; border-radius: 4px;">SÍ</span>` : `NO`;
+                let badgeMedico = a.requiere_atencion_medica ? `<span style="background: #ff9800; color: white; padding: 3px 6px; border-radius: 4px;">SÍ</span>` : `NO`;
 
                 htmlFinal += `<tr>
-                    <td data-label="Tipo">${a.tipo_reporte || '-'}</td>
-                    <td data-label="Afectado"><strong>${a.nombre}</strong></td>
-                    <td data-label="Cédula">${enmascararCedula(a.cedula)}</td>
-                    <td data-label="Teléfono">${enmascararTelefono(a.telefono)}</td>
-                    <td data-label="Estado Res.">${a.estado_residencial || '-'}</td>
-                    <td data-label="Situación">${a.estado || '-'}</td>
-                    <td data-label="Requerimiento"><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
+                    <td><strong>${a.punto_usb || '-'}</strong></td>
+                    <td><strong>${a.nombre}</strong></td>
+                    <td>${a.cedula || '-'}</td>
+                    <td>${a.telefono || '-'}</td>
+                    <td>${a.grupo || '-'}</td>
+                    <td><strong>${a.estado || '-'}</strong></td>
+                    <td><div class="text-truncate-clamp" title="${a.ubicacion || ''}">${a.ubicacion || '-'}</div></td>
+                    <td><div class="text-truncate-clamp">${a.servicios_afectados || '-'}</div></td>
+                    <td>${badgeDamnificado}</td>
+                    <td>${badgeMedico}</td>
+                    <td>${a.personas_hogar || '-'}</td>
+                    <td><div class="text-truncate-clamp">${a.req_medicina || '-'}</div></td>
+                    <td><div class="text-truncate-clamp">${a.req_alimentos || '-'}</div></td>
+                    <td><div class="text-truncate-clamp">${a.req_limpieza || '-'}</div></td>
+                    <td><div class="text-truncate-clamp">${a.req_general || '-'}</div></td>
+                    <td><div class="text-truncate-clamp">${a.descripcion_ayuda || '-'}</div></td>
                     ${botonesAccion}
                 </tr>`;
             });
@@ -727,114 +746,142 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const reg = ayudaNube.find(r => r.id == id);
             if (!reg) return;
             idEdicionAyuda = id;
-            document.getElementById('form-mode-title-ayuda').innerText = "Modificar Solicitud de Auxilio";
-
-            document.getElementById('ayuda_tipo').value = reg.tipo_reporte || 'Para mí';
-            document.getElementById('ayuda_nombre').value = reg.nombre || '';
-            document.getElementById('ayuda_cedula').value = reg.cedula === '-' ? '' : (reg.cedula || '');
-            document.getElementById('ayuda_telefono').value = reg.telefono || '';
-            document.getElementById('ayuda_sede_usb').value = reg.sede_usb || 'Sartenejas';
-            document.getElementById('ayuda_carnet').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
-            document.getElementById('comunidad_ayuda').value = reg.comunidad || 'Universidad Simón Bolívar';
-            document.getElementById('grupo_ayuda').value = reg.grupo || 'Estudiante';
-            document.getElementById('ayuda_state_res').value = reg.estado_residencial || 'La Guaira';
-            document.getElementById('ayuda_eje').value = reg.eje_logistico || 'Eje 1. Naiguatá-Camurí Grande';
-            document.getElementById('ayuda_direccion_res').value = reg.direccion_residencial || '';
-            document.getElementById('ayuda_afectacion_viv').value = reg.afectacion_vivienda || 'Afectación parcial';
-            document.getElementById('ayuda_refugio').value = reg.requiere_refugio || 'No';
-            document.getElementById('ayuda_estado').value = reg.estado || 'Sin Información';
-            document.getElementById('ayuda_lesiones').value = reg.lesiones_fisicas || 'No';
-            document.getElementById('ayuda_damnificado').value = reg.damnificado || 'No';
-            document.getElementById('ayuda_correo').value = reg.correo || '';
-            document.getElementById('ayuda_ubicacion').value = reg.ubicacion || '';
-            document.getElementById('ayuda_descripcion').value = reg.descripcion_ayuda || '';
-
-            let servs = reg.servicios_afectados ? reg.servicios_afectados.split(', ') : [];
-            document.querySelectorAll('input[name="servicio_afectado"]').forEach(cb => {
-                cb.checked = servs.includes(cb.value);
-            });
-
-            document.getElementById('btn-submit-ayuda').innerText = "Actualizar Solicitud";
-            document.getElementById('cancel-edit-container-ayuda').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionAyuda()">Cancelar</button>`;
             
-            window.scrollTo({ top: document.getElementById('ayudaForm').offsetTop - 20, behavior: 'smooth' });
+            document.getElementById('tipoReporteForm').value = reg.tipo_reporte || 'Para mí';
+            document.getElementById('estadoVitalForm').value = reg.estado || 'Con vida';
+            document.getElementById('puntoUsbForm').value = reg.punto_usb || '';
+            document.getElementById('ubicacionAfectado').value = reg.ubicacion || '';
+            document.getElementById('nombreAfectado').value = reg.nombre || '';
+            document.getElementById('cedulaAfectado').value = reg.cedula === '-' ? '' : (reg.cedula || '');
+            document.getElementById('telefonoAfectado').value = reg.telefono || '';
+            document.getElementById('correoAfectado').value = reg.correo || '';
+            document.getElementById('carnetAfectado').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
+            document.getElementById('grupoAfectado').value = reg.grupo || '';
+            
+            document.getElementById('damnificadoAfectado').checked = reg.es_damnificado || false;
+            document.getElementById('atencionMedica').checked = reg.requiere_atencion_medica || false;
+            document.getElementById('serviciosAfectados').value = reg.servicios_afectados || '';
+            
+            document.getElementById('personasHogar').value = reg.personas_hogar || 1;
+            document.getElementById('ninosHogar').value = reg.ninos_hogar || 0;
+            document.getElementById('adultosMayores').value = reg.adultos_mayores_hogar || 0;
+            
+            document.getElementById('reqMedicina').value = reg.req_medicina || '';
+            document.getElementById('reqAlimentos').value = reg.req_alimentos || '';
+            document.getElementById('reqLimpieza').value = reg.req_limpieza || '';
+            document.getElementById('reqGeneral').value = reg.req_general || '';
+            document.getElementById('observacionesAfectado').value = reg.descripcion_ayuda || '';
+
+            const formSubmitBtn = document.querySelector('#formSolicitudAyuda button[type="submit"]');
+            if(formSubmitBtn) formSubmitBtn.innerText = "Actualizar Solicitud";
+            
+            let cancelBtn = document.getElementById('btn-cancelar-edicion-ayuda');
+            if(!cancelBtn) {
+                cancelBtn = document.createElement('button');
+                cancelBtn.id = 'btn-cancelar-edicion-ayuda';
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'btn btn-delete btn-block';
+                cancelBtn.style.marginTop = '0.5rem';
+                cancelBtn.innerText = 'Cancelar Edición';
+                cancelBtn.onclick = cancelarEdicionAyuda;
+                document.getElementById('formSolicitudAyuda').appendChild(cancelBtn);
+            }
+            cancelBtn.style.display = 'block';
+            
+            window.scrollTo({ top: document.getElementById('formSolicitudAyuda').offsetTop - 20, behavior: 'smooth' });
         };
 
         function cancelarEdicionAyuda() {
             idEdicionAyuda = null;
-            document.getElementById('ayudaForm').reset();
-            document.getElementById('form-mode-title-ayuda').innerText = "Formulario de Solicitud de Auxilio";
-            document.getElementById('btn-submit-ayuda').innerText = "Enviar Requerimiento";
-            document.getElementById('cancel-edit-container-ayuda').innerHTML = '';
+            document.getElementById('formSolicitudAyuda').reset();
+            const formSubmitBtn = document.querySelector('#formSolicitudAyuda button[type="submit"]');
+            if(formSubmitBtn) formSubmitBtn.innerText = "Registrar Solicitud";
+            const cancelBtn = document.getElementById('btn-cancelar-edicion-ayuda');
+            if(cancelBtn) cancelBtn.style.display = 'none';
         }
 
-        window.activarEdicionColab = function(id) {
-            const reg = colaboradoresNube.find(r => r.id == id);
-            if (!reg) return;
-            idEdicionColab = id;
-            document.getElementById('form-mode-title-colab').innerText = "Modificar Ficha Voluntario";
-            document.getElementById('colab_nombre').value = reg.nombre;
-            document.getElementById('colab_telefono').value = reg.telefono;
-            document.getElementById('colab_cargo').value = reg.cargo_usb;
-            document.getElementById('colab_area').value = reg.area_apoyo;
-            document.getElementById('colab_lugar').value = reg.lugar_voluntariado;
-            document.getElementById('colab_vehiculo').value = reg.vehiculo;
-            document.getElementById('colab_notas').value = reg.disponibilidad;
-
-            document.getElementById('btn-submit-colab').innerText = "Actualizar Voluntario";
-            document.getElementById('cancel-edit-container-colab').innerHTML = `<button type="button" class="btn btn-delete btn-block" style="margin-top:0.5rem" onclick="cancelarEdicionColab()">Cancelar</button>`;
-            
-            window.scrollTo({ top: document.getElementById('colaboradorForm').offsetTop - 20, behavior: 'smooth' });
-        };
-
-        function cancelarEdicionColab() {
-            idEdicionColab = null;
-            document.getElementById('colaboradorForm').reset();
-            document.getElementById('form-mode-title-colab').innerText = "Inscripción de Voluntarios";
-            document.getElementById('btn-submit-colab').innerText = "Registrarse como Voluntario";
-            document.getElementById('cancel-edit-container-colab').innerHTML = '';
-        }
-
-        document.getElementById('ayudaForm').addEventListener('submit', async function(e) {
+        document.getElementById('formSolicitudAyuda').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            let serviciosMarcados = [];
-            document.querySelectorAll('input[name="servicio_afectado"]:checked').forEach(cb => {
-                serviciosMarcados.push(cb.value);
-            });
+            const reqMed = document.getElementById('reqMedicina').value.trim();
+            const reqAli = document.getElementById('reqAlimentos').value.trim();
+            const reqHig = document.getElementById('reqLimpieza').value.trim();
+            const reqGen = document.getElementById('reqGeneral').value.trim();
+            const puntoSeleccionado = document.getElementById('puntoUsbForm').value;
+            const grupoSeleccionado = document.getElementById('grupoAfectado').value;
 
-            const payload = {
-                nombre: document.getElementById('ayuda_nombre').value.trim(),
-                cedula: document.getElementById('ayuda_cedula').value.trim() || '-',
-                telefono: document.getElementById('ayuda_telefono').value.trim(),
-                ubicacion: document.getElementById('ayuda_ubicacion').value.trim(),
-                descripcion_ayuda: document.getElementById('ayuda_descripcion').value.trim(),
-                tipo_reporte: document.getElementById('ayuda_tipo').value,
-                comunidad: document.getElementById('comunidad_ayuda').value,
-                grupo: document.getElementById('grupo_ayuda').value,
-                estado: document.getElementById('ayuda_estado').value,
-                damnificado: document.getElementById('ayuda_damnificado').value,
-                sede_usb: document.getElementById('ayuda_sede_usb').value,
-                carnet_estudiante: document.getElementById('ayuda_carnet').value.trim() || 'N/A',
-                estado_residencial: document.getElementById('ayuda_state_res').value,
-                eje_logistico: document.getElementById('ayuda_eje').value,
-                direccion_residencial: document.getElementById('ayuda_direccion_res').value.trim(),
-                afectacion_vivienda: document.getElementById('ayuda_afectacion_viv').value,
-                requiere_refugio: document.getElementById('ayuda_refugio').value,
-                lesiones_fisicas: document.getElementById('ayuda_lesiones').value,
-                servicios_afectados: serviciosMarcados.join(', ') || 'Ninguno',
-                correo: document.getElementById('ayuda_correo').value.trim()
+            const payloadAyuda = {
+                tipo_reporte: document.getElementById('tipoReporteForm').value,
+                estado: document.getElementById('estadoVitalForm').value,
+                estado_despacho: 'Pendiente', 
+                punto_usb: puntoSeleccionado,
+                ubicacion: document.getElementById('ubicacionAfectado').value, 
+                nombre: document.getElementById('nombreAfectado').value,
+                cedula: document.getElementById('cedulaAfectado').value || '-',
+                telefono: document.getElementById('telefonoAfectado').value || '-',
+                correo: document.getElementById('correoAfectado').value,
+                carnet_estudiante: document.getElementById('carnetAfectado').value || 'N/A', 
+                grupo: grupoSeleccionado,
+                comunidad: (grupoSeleccionado === 'Externo') ? 'Externo' : 'Universidad Simón Bolívar',
+                es_damnificado: document.getElementById('damnificadoAfectado').checked, 
+                requiere_atencion_medica: document.getElementById('atencionMedica').checked,
+                servicios_afectados: document.getElementById('serviciosAfectados').value || 'Ninguno',
+                personas_hogar: parseInt(document.getElementById('personasHogar').value) || 1,
+                ninos_hogar: parseInt(document.getElementById('ninosHogar').value) || 0,
+                adultos_mayores_hogar: parseInt(document.getElementById('adultosMayores').value) || 0,
+                req_medicina: reqMed,
+                req_alimentos: reqAli,
+                req_limpieza: reqHig,
+                req_general: reqGen,
+                descripcion_ayuda: document.getElementById('observacionesAfectado').value 
             };
 
-            if (idEdicionAyuda !== null) {
-                await supabaseClient.from('solicitudes_ayuda').update(payload).eq('id', idEdicionAyuda);
-                cancelarEdicionAyuda();
-            } else {
-                await supabaseClient.from('solicitudes_ayuda').insert([payload]);
-                document.getElementById('ayudaForm').reset();
-                mostrarNotificacion("¡Solicitud registrada exitosamente!");
+            try {
+                mostrarNotificacion("Procesando solicitud...", true);
+                
+                if (idEdicionAyuda !== null) {\
+                    const { error: updateError } = await supabaseClient
+                        .from('solicitudes_ayuda')
+                        .update(payloadAyuda)
+                        .eq('id', idEdicionAyuda);
+                        
+                    if (updateError) throw updateError;
+                    
+                    mostrarNotificacion("✅ Solicitud actualizada correctamente.");
+                    cancelarEdicionAyuda();
+                } else {\
+                    const { data: ayudaData, error: ayudaError } = await supabaseClient
+                        .from('solicitudes_ayuda')
+                        .insert([payloadAyuda])
+                        .select();
+
+                    if (ayudaError) throw ayudaError;
+
+                    const solicitudId = ayudaData[0].id;
+
+                    const ticketsLogistica = [];
+                    if (reqMed) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'medicina', requerimiento: reqMed, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
+                    if (reqAli) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'alimentos', requerimiento: reqAli, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
+                    if (reqHig) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'higiene', requerimiento: reqHig, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
+                    if (reqGen) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'general', requerimiento: reqGen, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
+
+                    if (ticketsLogistica.length > 0) {
+                        const { error: logisticaError } = await supabaseClient
+                            .from('etiquetas_logistica')
+                            .insert(ticketsLogistica);
+                        if (logisticaError) console.error("Error al generar tickets:", logisticaError);
+                    }
+                    
+                    document.getElementById('formSolicitudAyuda').reset();
+                    mostrarNotificacion("✅ Solicitud registrada y enviada a almacenes.");
+                }
+
+                await cargarDatosDesdeNube(); 
+                
+            } catch (err) {
+                console.error("Error guardando:", err);
+                alert("Ocurrió un error al enviar tu solicitud. Intenta de nuevo.");
             }
-            await cargarDatosDesdeNube();
         });
 
         document.getElementById('colaboradorForm').addEventListener('submit', async function(e) {
@@ -1186,11 +1233,49 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         });
 
         document.getElementById('btnExportarAyuda').addEventListener('click', function() {
-            let matriz = [["Tipo Reporte", "Afectado/Solicitante", "Cedula", "Teléfono Móvil", "Correo Electrónico", "Sede USB", "Carnet", "Comunidad", "Grupo", "Estado Residencial", "Eje Logístico", "Dirección Completa", "Afectación Vivienda", "Requieres Refugio", "Servicios Afectados", "Situación Actual", "Lesiones Físicas", "Damnificado", "Ubicacion Actual Exacta", "Descripción Requerimiento"]];
-            ayudaNube.forEach(a => matriz.push([
-                a.tipo_reporte || '-', a.nombre, a.cedula || '-', a.telefono || '-', a.correo || '-', a.sede_usb || '-', a.carnet_estudiante || '-', a.comunidad || '-', a.grupo || '-', a.estado_residencial || '-', a.eje_logistico || '-', a.direccion_residencial || '-', a.afectacion_vivienda || '-', a.requiere_refugio || '-', a.servicios_afectados || '-', a.estado || '-', a.lesiones_fisicas || '-', a.damnificado || '-', a.ubicacion, a.descripcion_ayuda
-            ]));
-            descargarMatrizComoExcel(matriz, "Data_Ayudas_Afectados_Vivienda_USB");
+            if (!ayudaNube || ayudaNube.length === 0) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let matriz = [[
+                "Fecha Reporte", "Punto Acopio", "Estado Despacho", "Tipo Reporte", 
+                "Afectado", "Cédula", "Teléfono", "Correo", "Comunidad", "Relación USB", 
+                "Estado Vital", "Ubicación", "Servicios Afectados", "Es Damnificado", 
+                "Atención Médica", "Total Personas", "Niños", "Adultos Mayores", 
+                "Req. Medicina", "Req. Alimentos", "Req. Limpieza", "Req. General", "Observaciones"
+            ]];
+
+            ayudaNube.forEach(a => {
+                let fecha = a.created_at ? new Date(a.created_at).toLocaleString('es-VE') : '';
+                matriz.push([
+                    fecha,
+                    a.punto_usb || 'Sin Asignar',
+                    a.estado_despacho || 'Pendiente',
+                    a.tipo_reporte || '-',
+                    a.nombre || '-',
+                    a.cedula || '-',
+                    a.telefono || '-',
+                    a.correo || '-',
+                    a.comunidad || '-',
+                    a.grupo || '-',
+                    a.estado || '-',
+                    a.ubicacion || '-',
+                    a.servicios_afectados || '-',
+                    a.es_damnificado ? "SÍ" : "NO",
+                    a.requiere_atencion_medica ? "SÍ" : "NO",
+                    a.personas_hogar || 1,
+                    a.ninos_hogar || 0,
+                    a.adultos_mayores_hogar || 0,
+                    a.req_medicina || '-',
+                    a.req_alimentos || '-',
+                    a.req_limpieza || '-',
+                    a.req_general || '-',
+                    a.descripcion_ayuda || '-'
+                ]);
+            });
+
+            descargarMatrizComoExcel(matriz, "Reporte_Ayuda_USB");
         });
 
         function descargarMatrizComoExcel(matriz, nombreArchivo) {

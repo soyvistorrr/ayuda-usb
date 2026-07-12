@@ -268,141 +268,129 @@
                         <div class="panel-card" style="border-top: 4px solid var(--warning);">
                             <div class="panel-header"><div class="panel-title" id="form-mode-title-ayuda">Formulario de Solicitud de Auxilio</div></div>
                             <div class="panel-body">
-                                <form id="ayudaForm">
-                                    <div class="form-group">
-                                        <label class="form-label">¿Para quién es este reporte? *</label>
-                                        <select id="ayuda_tipo" class="form-select" required>
-                                            <option value="Para mí">Es para mí (Autosolicitud)</option>
-                                            <option value="Para otra persona">Es para otra persona</option>
-                                        </select>
+                                <form id="formSolicitudAyuda" class="formulario-registro">
+                                    <div class="seccion-formulario">
+                                        <h3>🚨 Información del Reporte</h3>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="tipoReporteForm">¿Para quién es esta solicitud?</label>
+                                                <select id="tipoReporteForm" required>
+                                                    <option value="">Seleccione...</option>
+                                                    <option value="Para mí">Para mí</option>
+                                                    <option value="Para otra persona">Para otra persona</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="estadoVitalForm" style="color: #dc3545; font-weight: bold;">Estado actual del afectado:</label>
+                                                <select id="estadoVitalForm" required>
+                                                    <option value="">Seleccione situación...</option>
+                                                    <option value="Con vida">Con vida</option>
+                                                    <option value="Atrapado">Atrapado / En riesgo inminente</option>
+                                                    <option value="Desaparecido">Desaparecido / Sin comunicación</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Nombre Completo del Afectado *</label><input type="text" id="ayuda_nombre" class="form-input" required></div>
-                                    <div class="form-row">
-                                        <div class="form-group"><label class="form-label">Cédula</label><input type="text" id="ayuda_cedula" class="form-input"></div>
-                                        <div class="form-group"><label class="form-label">Teléfono Móvil *</label><input type="text" id="ayuda_telefono" class="form-input" required></div>
-                                    </div>
-                                    <div class="form-row">
+
+                                    <div class="seccion-formulario">
+                                        <h3>📍 Recepción y Ubicación</h3>
                                         <div class="form-group">
-                                            <label class="form-label">Sede USB Vinculada *</label>
-                                            <select id="ayuda_sede_usb" class="form-select" required>
-                                                <option value="Sartenejas">Sartenejas</option>
-                                                <option value="Litoral">Litoral</option>
-                                                <option value="No aplica">No aplica (Externo)</option>
+                                            <label for="puntoUsbForm">Punto USB de Acopio más cercano:</label>
+                                            <select id="puntoUsbForm" required>
+                                                <option value="">Seleccione una sede...</option>
+                                                <option value="Catia la Mar Centro">Catia la Mar Centro</option>
+                                                <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
+                                                <option value="Caraballeda">Caraballeda</option>
+                                                <option value="Naiguatá - Camurí">Naiguatá - Camurí</option>
+                                                <option value="Maiquetía">Maiquetía</option>
+                                                <option value="La Guaira - Macuto">La Guaira - Macuto</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Carnet (Estudiantes)</label>
-                                            <input type="text" id="ayuda_carnet" class="form-input" placeholder="Ej: 15-10234">
+                                            <label for="ubicacionAfectado">Dirección Completa (Estado, Ciudad, Sector exacto):</label>
+                                            <textarea id="ubicacionAfectado" rows="2" placeholder="Ej: La Guaira, Maiquetía, Calle Los Baños..." required></textarea>
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Comunidad *</label>
-                                            <select id="comunidad_ayuda" class="form-select" required>
-                                                <option value="Universidad Simón Bolívar">Universidad Simón Bolívar</option>
-                                                <option value="Externo">Externo</option>
-                                            </select>
+
+                                    <div class="seccion-formulario">
+                                        <h3>👤 Datos Personales</h3>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="text" id="nombreAfectado" placeholder="Nombre Completo" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="number" id="cedulaAfectado" placeholder="Cédula de Identidad" required>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Grupo (Cargo) *</label>
-                                            <select id="grupo_ayuda" class="form-select" required>
-                                                <option value="Estudiante">Estudiante</option>
-                                                <option value="Profesor">Profesor</option>
-                                                <option value="Egresado">Egresado</option>
-                                                <option value="Administrativo">Administrativo</option>
-                                                <option value="Obrero">Obrero</option>
-                                                <option value="Externo">Externo</option>
-                                            </select>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="text" id="telefonoAfectado" placeholder="Nro de WhatsApp" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="email" id="correoAfectado" placeholder="Correo Electrónico">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Estado Residencial *</label>
-                                            <select id="ayuda_state_res" class="form-select" required>
-                                                <option value="La Guaira">La Guaira</option>
-                                                <option value="Miranda">Miranda</option>
-                                                <option value="Distrito Capital">Distrito Capital</option>
-                                                <option value="Otro Estado">Otro Estado</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Eje Geográfico *</label>
-                                            <select id="ayuda_eje" class="form-select" required>
-                                                <option value="Eje 1. Naiguatá-Camurí Grande">Eje 1. Naiguatá-Camurí Grande</option>
-                                                <option value="Eje 2. Maiquetia-Caribe-Tanaguarena">Eje 2. Maiquetia-Caribe-Tanaguarena</option>
-                                                <option value="Eje 3. Catia La Mar-Carayaca">Eje 3. Catia La Mar-Carayaca</option>
-                                                <option value="Eje 4. Caracas - Miranda">Eje 4. Caracas - Miranda</option>
-                                                <option value="Otro Eje Geográfico">Otro Eje</option>
-                                            </select>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="text" id="carnetAfectado" placeholder="Nro de Carnet (Opcional)">
+                                            </div>
+                                            <div class="form-group">
+                                                <select id="grupoAfectado" required>
+                                                    <option value="">Relación con la USB...</option>
+                                                    <option value="Estudiante">Estudiante</option>
+                                                    <option value="Profesor">Profesor</option>
+                                                    <option value="Administrativo">Empleado / Administrativo</option>
+                                                    <option value="Egresado">Egresado</option>
+                                                    <option value="Externo">Ninguna / Externo</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Dirección Residencial Completa *</label>
-                                        <input type="text" id="ayuda_direccion_res" class="form-input" required placeholder="Sector, Calle, Casa/Apto, Nivel">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Afectación Vivienda *</label>
-                                            <select id="ayuda_afectacion_viv" class="form-select" required>
-                                                <option value="Afectación parcial">Afectación parcial</option>
-                                                <option value="Afectación total/ Inhabitable">Afectación total / Inhabitable</option>
-                                                <option value="Ninguna">Ninguna</option>
-                                            </select>
+
+                                    <div class="seccion-formulario">
+                                        <h3>🏠 Situación Actual y Carga Familiar</h3>
+                                        
+                                        <div class="form-group-checkbox" style="display: flex; gap: 20px; margin-bottom: 15px;">
+                                            <label style="font-weight: bold; color: #dc3545;">
+                                                <input type="checkbox" id="damnificadoAfectado"> ¿Es Damnificado?
+                                            </label>
+                                            <label style="font-weight: bold; color: #ff9800;">
+                                                <input type="checkbox" id="atencionMedica"> ¿Requiere Atención Médica Urgente?
+                                            </label>
                                         </div>
+
                                         <div class="form-group">
-                                            <label class="form-label">¿Requieres Refugio? *</label>
-                                            <select id="ayuda_refugio" class="form-select" required>
-                                                <option value="No">No</option>
-                                                <option value="Sí">Sí</option>
-                                            </select>
+                                            <label for="serviciosAfectados">Servicios Afectados (Agua, Luz, Gas, Internet):</label>
+                                            <input type="text" id="serviciosAfectados" placeholder="Ej: Sin luz desde hace 3 días...">
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Servicios Afectados en su Vivienda</label>
-                                        <div class="checkbox-grid">
-                                            <label class="checkbox-label"><input type="checkbox" name="servicio_afectado" value="Agua"> Agua</label>
-                                            <label class="checkbox-label"><input type="checkbox" name="servicio_afectado" value="Luz"> Luz</label>
-                                            <label class="checkbox-label"><input type="checkbox" name="servicio_afectado" value="Gas"> Gas</label>
-                                            <label class="checkbox-label"><input type="checkbox" name="servicio_afectado" value="Internet"> Internet/Teléfono</label>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Situación General Actual *</label>
-                                            <select id="ayuda_estado" class="form-select" required>
-                                                <option value="Sin Información">Sin Información</option>
-                                                <option value="Desaparecido">Desaparecido</option>
-                                                <option value="Con Vida">Reportados Bien / Con Vida</option>
-                                                <option value="Atrapado">En Situación de Emergencia / Atrapado</option>
-                                                <option value="Fallecido">Fallecido</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">¿Lesiones Físicas por Sismo? *</label>
-                                            <select id="ayuda_lesiones" class="form-select" required>
-                                                <option value="No">No</option>
-                                                <option value="Sí">Sí</option>
-                                            </select>
+
+                                        <div class="form-row tres-columnas">
+                                            <div class="form-group">
+                                                <label>Total Personas:</label>
+                                                <input type="number" id="personasHogar" min="1" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Niños:</label>
+                                                <input type="number" id="ninosHogar" min="0" value="0" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Adultos Mayores:</label>
+                                                <input type="number" id="adultosMayores" min="0" value="0" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">¿Es Damnificado? *</label>
-                                            <select id="ayuda_damnificado" class="form-select" required>
-                                                <option value="Sí">Sí</option>
-                                                <option value="No">No</option>
-                                                <option value="No sé">No sé</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Correo Electrónico *</label>
-                                            <input type="email" id="ayuda_correo" class="form-input" required placeholder="correo@ejemplo.com">
-                                        </div>
+
+                                    <div class="seccion-formulario">
+                                        <h3>📦 Requerimientos Logísticos (Opcional)</h3>
+                                        <p class="ayuda-texto" style="font-size: 0.85em; color: gray;">Llene únicamente los rubros donde necesite insumos.</p>
+                                        <div class="form-group"><textarea id="reqMedicina" rows="2" placeholder="💊 Medicina e Insumos Médicos..."></textarea></div>
+                                        <div class="form-group"><textarea id="reqAlimentos" rows="2" placeholder="🥫 Alimentos y Bebidas..."></textarea></div>
+                                        <div class="form-group"><textarea id="reqLimpieza" rows="2" placeholder="🧼 Limpieza e Higiene..."></textarea></div>
+                                        <div class="form-group"><textarea id="reqGeneral" rows="2" placeholder="🛠️ General (Colchones, Ropa, etc)..."></textarea></div>
+                                        <div class="form-group"><textarea id="observacionesAfectado" rows="2" placeholder="📝 Observaciones extra del caso..."></textarea></div>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Ubicación Física Actual Exacta *</label><input type="text" id="ayuda_ubicacion" class="form-input" required placeholder="Donde se encuentra físicamente hoy"></div>
-                                    <div class="form-group"><label class="form-label">Descripción de lo que Necesitas / Observación *</label><textarea id="ayuda_descripcion" class="form-textarea" required placeholder="Ej: Medicamento de tensión, agua potable, rescate..."></textarea></div>
-                                    <button type="submit" class="btn btn-warning btn-block" id="btn-submit-ayuda">Enviar Requerimiento</button>
-                                    <div id="cancel-edit-container-ayuda"></div>
+
+                                    <button type="submit" class="btn-principal">Registrar Solicitud</button>
                                 </form>
                             </div>
                         </div>
