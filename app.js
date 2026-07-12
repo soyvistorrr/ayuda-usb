@@ -716,7 +716,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         <button class="btn-delete" onclick="eliminarAyuda('${a.id}', this)">Eliminar</button>
                     </td>` : '';
 
-                let badgeDamnificado = a.es_damnificado ? `<span style="background: #dc3545; color: white; padding: 3px 6px; border-radius: 4px;">SÍ</span>` : `NO`;
+                let esDam = a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si';
+                let badgeDamnificado = esDam ? `<span style="background: #dc3545; color: white; padding: 3px 6px; border-radius: 4px;">SÍ</span>` : `NO`;
                 let badgeMedico = a.requiere_atencion_medica ? `<span style="background: #ff9800; color: white; padding: 3px 6px; border-radius: 4px;">SÍ</span>` : `NO`;
 
                 htmlFinal += `<tr>
@@ -758,7 +759,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             document.getElementById('carnetAfectado').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
             document.getElementById('grupoAfectado').value = reg.grupo || '';
             
-            document.getElementById('damnificadoAfectado').checked = reg.es_damnificado || false;
+            let esDamEdit = reg.es_damnificado === true || String(reg.damnificado).trim().toLowerCase() === 'sí' || String(reg.damnificado).trim().toLowerCase() === 'si';
+            document.getElementById('damnificadoAfectado').checked = esDamEdit;
             document.getElementById('atencionMedica').checked = reg.requiere_atencion_medica || false;
             document.getElementById('serviciosAfectados').value = reg.servicios_afectados || '';
             
@@ -1262,7 +1264,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     a.estado || '-',
                     a.ubicacion || '-',
                     a.servicios_afectados || '-',
-                    a.es_damnificado ? "SÍ" : "NO",
+                    (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO",
                     a.requiere_atencion_medica ? "SÍ" : "NO",
                     a.personas_hogar || 1,
                     a.ninos_hogar || 0,
