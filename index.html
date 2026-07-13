@@ -1092,19 +1092,16 @@
             </div>
             <div class="panel-body">
                 <form id="loginForm">
-                    <div class="form-group">
-                        <label class="form-label">Correo Electrónico</label>
-                        <input type="text" id="adminUser" class="form-input" required placeholder="Nombre de usuario">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Contraseña</label>
-                        <input type="password" id="login_password" class="form-input" required placeholder="••••••••">
-                    </div>
-                    <div style="display:flex; gap:15px; margin-top: 1.5rem;">
-                        <button type="submit" class="btn btn-primary" style="flex:1; font-weight: bold;" id="btn-login-submit">Ingresar al Sistema</button>
-                        <button type="button" class="btn btn-delete" style="flex:1; background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; font-weight: bold;" onclick="document.getElementById('modal-login').style.display='none'">Cancelar</button>
-                    </div>
-                </form>
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: bold; color: var(--secondary);">Usuario</label>
+                            <input type="text" id="adminUser" class="form-input" required placeholder="Ej: victor_admin" style="font-size: 1rem; padding: 0.8rem;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: bold; color: var(--secondary);">Contraseña</label>
+                            <input type="password" id="adminPass" class="form-input" required placeholder="••••••••" style="font-size: 1rem; padding: 0.8rem;">
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-block" id="btn-login" style="font-weight: 700; padding: 0.8rem; font-size: 1.1rem; margin-top: 1rem;">Ingresar al Sistema</button>
+                    </form>
             </div>
         </div>
     </div>
