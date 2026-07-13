@@ -49,9 +49,19 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const carrusel = document.getElementById('carrusel-noticias');
             if(carrusel) {
                 if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+                
                 const tarjeta = carrusel.querySelector('.news-card');
                 const avance = tarjeta ? tarjeta.offsetWidth + 24 : 320;
-                carrusel.scrollBy({ left: avance * direccion, behavior: 'smooth' });
+                const scrollMaximo = carrusel.scrollWidth - carrusel.clientWidth;
+
+                if (direccion === 1 && carrusel.scrollLeft >= scrollMaximo - 10) {
+                    carrusel.scrollTo({ left: 0, behavior: 'smooth' });
+                } else if (direccion === -1 && carrusel.scrollLeft <= 10) {
+                    carrusel.scrollTo({ left: scrollMaximo, behavior: 'smooth' });
+                } else {
+                    carrusel.scrollBy({ left: avance * direccion, behavior: 'smooth' });
+                }
+                
                 setTimeout(iniciarCarruselAutomatico, 6000);
             }
         };
@@ -1397,7 +1407,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             thead.innerHTML = `
                 <tr>
                     <th>ESTADO VITAL</th>
-                    <th>PUNTO ACÓPIO</th>
+                    <th>PUNTO ACOPIO</th>
                     <th>AFECTADO</th>
                     <th>CONTACTO</th>
                     <th>DAMNIFICADO</th>
