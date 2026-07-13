@@ -332,9 +332,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     try {
                         if(typeof navegarA === 'function') navegarA('view-home');
 
-                        const elementosAyuda = document.querySelectorAll('[onclick*="view-ayuda"]');
-                        const elementosLogistica = document.querySelectorAll('[onclick*="view-logistica"]');
-                        const elementosBusqueda = document.querySelectorAll('[onclick*="view-busqueda"]');
+                        const elementosAyuda = document.querySelectorAll('[onclick*="view-necesito-ayuda"]');
+                        const elementosLogistica = document.querySelectorAll('[onclick*="view-etiquetas-logistica"]');
+                        const elementosBusqueda = document.querySelectorAll('[onclick*="view-buscar"]');
 
                         const mostrarElementos = (nodos, mostrar) => {
                             nodos.forEach(nodo => { nodo.style.display = mostrar ? "" : "none"; });
