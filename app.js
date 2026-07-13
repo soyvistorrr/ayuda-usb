@@ -1992,7 +1992,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if(cabecera.length === 0) { alert("No se reconoció el formato de la plantilla."); return; }
                     rawData.shift(); 
                     
-                    let esExcelAyuda = cabecera.some(c => c.includes('req. medicina') || c.includes('afectado') || c.includes('nombre'));
+                    let esExcelPedidos = cabecera.some(c => c.includes('fecha'));
+                    let esExcelAyuda = cabecera.some(c => c.includes('damnificado') || c.includes('comunidad')) && !esExcelPedidos;
 
                     document.getElementById(dropZoneId).innerHTML = "<p><strong>⏳ Procesando archivo. Cruzando datos con el servidor...</strong></p>";
 
@@ -2001,7 +2002,49 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const resLog = await supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb');
                     let inventarioLogistico = resLog.data || [];
 
-                    if (esExcelAyuda) {
+                    if (esExcelPedidos) {
+                        let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula') || c.includes('afectado'));
+                        let iNom = cabecera.findIndex(c => c.includes('nombre'));
+                        let iMed = cabecera.findIndex(c => c.includes('medicina'));
+                        let iAli = cabecera.findIndex(c => c.includes('alimento') || c.includes('agua'));
+                        let iOtr = cabecera.findIndex(c => c.includes('otras') || c.includes('solicitudes'));
+
+                        let ticketsAInsertar = [];
+
+                        for (let row of rawData) {
+                            let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
+                            let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
+                            if (!nomVal && cedVal === '-') continue;
+
+                            let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
+                            let idAsignado = personaExistente ? personaExistente.id : null;
+
+                            let reqsObj = [
+                                { cat: 'medicina', val: iMed !== -1 ? String(row[iMed] || '').trim() : '' },
+                                { cat: 'alimentos_limpieza', val: iAli !== -1 ? String(row[iAli] || '').trim() : '' },
+                                { cat: 'otras', val: iOtr !== -1 ? String(row[iOtr] || '').trim() : '' }
+                            ];
+
+                            for (let c of reqsObj) {
+                                if (c.val && c.val !== '-' && c.val.toLowerCase() !== 'ninguno') {
+                                    ticketsAInsertar.push({ 
+                                        solicitud_id: idAsignado, 
+                                        categoria_insumo: c.cat, 
+                                        requerimiento: c.val, 
+                                        punto_usb: sedeArchivo, 
+                                        estado: 'Pendiente',
+                                        encargado: 'Carga Masiva Excel' 
+                                    });
+                                    ticketsNuevosGenerados++;
+                                }
+                            }
+                        }
+                        
+                        if (ticketsAInsertar.length > 0) {
+                            await supabaseClient.from('etiquetas_logistica').insert(ticketsAInsertar);
+                        }
+
+                    } else if (esExcelAyuda) {
                         let iNom = cabecera.findIndex(c => c.includes('nombre'));
                         let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
                         let iCar = cabecera.findIndex(c => c.includes('carnet'));
@@ -2014,10 +2057,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         let iNin = cabecera.findIndex(c => c.includes('niños') || c.includes('ninos'));
                         let iAdu = cabecera.findIndex(c => c.includes('adultos'));
                         let iObs = cabecera.findIndex(c => c.includes('observaciones'));
-                        let iMed = cabecera.findIndex(c => c.includes('medicina'));
-                        let iAli = cabecera.findIndex(c => c.includes('alimento'));
-                        let iLim = cabecera.findIndex(c => c.includes('limpieza') || c.includes('higiene'));
-                        let iGen = cabecera.findIndex(c => c.includes('general'));
 
                         for (let row of rawData) {
                             let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
@@ -2025,13 +2064,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                             let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
                             let isDam = iDam !== -1 ? String(row[iDam] || '').toLowerCase().includes('si') || String(row[iDam] || '').toLowerCase().includes('sí') : false;
-                            
-                            let reqsObj = [
-                                { cat: 'medicina', val: iMed !== -1 ? String(row[iMed] || '').trim() : '' },
-                                { cat: 'alimentos', val: iAli !== -1 ? String(row[iAli] || '').trim() : '' },
-                                { cat: 'higiene', val: iLim !== -1 ? String(row[iLim] || '').trim() : '' },
-                                { cat: 'general', val: iGen !== -1 ? String(row[iGen] || '').trim() : '' }
-                            ];
 
                             let payloadPersona = {
                                 nombre: nomVal, cedula: cedVal, telefono: iTel !== -1 ? String(row[iTel] || '-').trim() : '-',
@@ -2040,48 +2072,27 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 ubicacion: iDir !== -1 ? String(row[iDir] || '-').trim() : '-', es_damnificado: isDam,
                                 personas_hogar: iPer !== -1 ? (parseInt(row[iPer]) || 1) : 1, ninos_hogar: iNin !== -1 ? (parseInt(row[iNin]) || 0) : 0,
                                 adultos_mayores_hogar: iAdu !== -1 ? (parseInt(row[iAdu]) || 0) : 0, descripcion_ayuda: iObs !== -1 ? String(row[iObs] || '').trim() : '',
-                                req_medicina: reqsObj[0].val, req_alimentos: reqsObj[1].val, req_limpieza: reqsObj[2].val, req_general: reqsObj[3].val,
                                 punto_usb: sedeArchivo 
                             };
 
                             let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
-                            let idAsignado = null;
 
                             if (personaExistente) {
-                                idAsignado = personaExistente.id;
-                                await supabaseClient.from('solicitudes_ayuda').update(payloadPersona).eq('id', idAsignado);
+                                await supabaseClient.from('solicitudes_ayuda').update(payloadPersona).eq('id', personaExistente.id);
                                 personasActualizadas++;
                             } else {
-                                payloadPersona.estado = 'Sin Información'; payloadPersona.estado_despacho = 'Pendiente';
-                                const { data: insertada, error: errIns } = await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]).select();
-                                if(!errIns && insertada) { idAsignado = insertada[0].id; personasNuevas++; }
-                            }
-
-                            if (idAsignado) {
-                                let ticketsAInsertar = [];
-                                for (let c of reqsObj) {
-                                    if (c.val && c.val !== '-' && c.val.toLowerCase() !== 'ninguno') {
-                                        let ticketPrevio = inventarioLogistico.find(t => t.solicitud_id === idAsignado && t.categoria_insumo === c.cat);
-                                        if (!ticketPrevio) {
-                                            ticketsAInsertar.push({ solicitud_id: idAsignado, categoria_insumo: c.cat, requerimiento: c.val, punto_usb: sedeArchivo, estado: 'Pendiente', encargado: 'Sin Asignar' });
-                                            ticketsNuevosGenerados++;
-                                        } else if (ticketPrevio.requerimiento !== c.val) {
-                                            await supabaseClient.from('etiquetas_logistica').update({ requerimiento: c.val }).eq('id', ticketPrevio.id);
-                                        }
-                                    }
-                                }
-                                if (ticketsAInsertar.length > 0) await supabaseClient.from('etiquetas_logistica').insert(ticketsAInsertar);
+                                payloadPersona.estado = 'Sin Información'; payloadPersona.estado_despacho = 'Sin Pedido';
+                                await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]);
+                                personasNuevas++;
                             }
                         }
+
                     } else {
                         let iReq = cabecera.findIndex(c => c.includes('requerimiento') || c.includes('insumo'));
-                        if (iReq === -1) { alert("Error: El Excel debe tener una columna 'Requerimiento'."); return; }
+                        if (iReq === -1) { alert("Error: El Excel debe tener una columna 'Requerimiento' o usar los formatos oficiales."); return; }
                         for (let row of rawData) {
                             let reqVal = String(row[iReq] || '').trim();
                             if (!reqVal) continue;
-                            let esDuplicado = inventarioLogistico.some(p => p.requerimiento.toLowerCase() === reqVal.toLowerCase() && p.punto_usb.toLowerCase() === sedeArchivo.toLowerCase());
-                            if (esDuplicado) { duplicadosOmitidos++; continue; }
-                            
                             let nuevoTicket = { punto_usb: sedeArchivo, categoria_insumo: 'general', requerimiento: reqVal, estado: 'Pendiente', encargado: 'Sin Asignar' };
                             await supabaseClient.from('etiquetas_logistica').insert([nuevoTicket]);
                             ticketsNuevosGenerados++;
