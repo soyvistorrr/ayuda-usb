@@ -315,6 +315,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 document.getElementById('panel-formulario-afectado').style.display = "block";
                 document.getElementById('btn-acceso-logistica').style.display = "flex";
                 document.getElementById('panel-tabla-solicitudes').style.display = "block";
+                document.getElementById('dropZoneAyuda').style.display = "block";
+                if (perfilUsuarioActual.rol === 'super_admin') document.getElementById('filtroCentro').style.display = "inline-block";
                 document.getElementById('dropZone').style.display = "block";
                 
                 document.getElementById('btnExportar').style.display = "inline-flex";
@@ -438,18 +440,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 filtrarYActualizarTablero();
 
                 if (esAdministrador) {
-                    const [resColabs, resAyudas, resNov] = await Promise.all([
+                    const [resColabs, resAyudas, resNov, resLogistica] = await Promise.all([
                         supabaseClient.from('colaboradores')
                             .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
                             .order('created_at', { ascending: false }).limit(500),
                         supabaseClient.from('solicitudes_ayuda')
-                            .select('id, created_at, punto_usb, estado_despacho, tipo_reporte, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, servicios_afectados, es_damnificado, damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
+                            .select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
                             .order('created_at', { ascending: false }).limit(500),
-                        supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false })
+                        supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false }),
+                        supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb').order('created_at', { ascending: false })
                     ]);
 
                     colaboradoresNube = resColabs.data || [];
                     ayudaNube = resAyudas.data || [];
+                    pedidosLogistica = resLogistica.data || [];
                     
                     const btnAdmin = document.getElementById('btn-novedades-admin');
                     let nov = resNov.data || [];
@@ -509,7 +513,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         document.getElementById('contenedor-lista-novedades').innerHTML = '<p style="text-align:center; padding: 20px; color: #64748b;">✅ No hay reportes pendientes de revisión.</p>';
                     }
                     actualizarInterfazColaboradores(colaboradoresNube);
-                    actualizarInterfazAyuda(ayudaNube);
+                    
+                    if (typeof filtrarYActualizarAyuda === 'function') {
+                        filtrarYActualizarAyuda();
+                    } else {
+                        actualizarInterfazAyuda(ayudaNube);
+                    }
                 }
 
             } catch (error) {
@@ -748,7 +757,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if (!reg) return;
             idEdicionAyuda = id;
             
-            document.getElementById('tipoReporteForm').value = reg.tipo_reporte || 'Para mí';
             document.getElementById('estadoVitalForm').value = reg.estado || 'Con vida';
             document.getElementById('puntoUsbForm').value = reg.punto_usb || '';
             document.getElementById('ubicacionAfectado').value = reg.ubicacion || '';
@@ -760,9 +768,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             document.getElementById('grupoAfectado').value = reg.grupo || '';
             
             let esDamEdit = reg.es_damnificado === true || String(reg.damnificado).trim().toLowerCase() === 'sí' || String(reg.damnificado).trim().toLowerCase() === 'si';
-            document.getElementById('damnificadoAfectado').checked = esDamEdit;
-            document.getElementById('atencionMedica').checked = reg.requiere_atencion_medica || false;
-            document.getElementById('serviciosAfectados').value = reg.servicios_afectados || '';
+            let radioSi = document.querySelector('input[name="damnificadoAfectado"][value="si"]');
+            let radioNo = document.querySelector('input[name="damnificadoAfectado"][value="no"]');
+            if(radioSi && radioNo) {
+                if(esDamEdit) radioSi.checked = true;
+                else radioNo.checked = true;
+            }
+
+            document.getElementById('atencionMedica').value = reg.requiere_atencion_medica ? "Paciente reportó necesitar atención. Revise las observaciones." : "";
             
             document.getElementById('personasHogar').value = reg.personas_hogar || 1;
             document.getElementById('ninosHogar').value = reg.ninos_hogar || 0;
@@ -811,11 +824,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const reqGen = document.getElementById('reqGeneral').value.trim();
             const puntoSeleccionado = document.getElementById('puntoUsbForm').value;
             const grupoSeleccionado = document.getElementById('grupoAfectado').value;
+            
+            const radioDam = document.querySelector('input[name="damnificadoAfectado"]:checked');
+            const esDamnificadoForm = radioDam ? (radioDam.value === 'si') : false;
+
+            const atencionTxt = document.getElementById('atencionMedica').value.trim();
+            const obsOriginal = document.getElementById('observacionesAfectado').value.trim();
+            
+            const requiereMedicaBool = atencionTxt !== '';
+            const observacionesFinales = requiereMedicaBool 
+                ? `[ATENCIÓN MÉDICA REQUERIDA: ${atencionTxt}] \n${obsOriginal}`
+                : obsOriginal;
 
             const payloadAyuda = {
-                tipo_reporte: document.getElementById('tipoReporteForm').value,
                 estado: document.getElementById('estadoVitalForm').value,
-                estado_despacho: 'Pendiente', 
                 punto_usb: puntoSeleccionado,
                 ubicacion: document.getElementById('ubicacionAfectado').value, 
                 nombre: document.getElementById('nombreAfectado').value,
@@ -825,9 +847,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 carnet_estudiante: document.getElementById('carnetAfectado').value || 'N/A', 
                 grupo: grupoSeleccionado,
                 comunidad: (grupoSeleccionado === 'Externo') ? 'Externo' : 'Universidad Simón Bolívar',
-                es_damnificado: document.getElementById('damnificadoAfectado').checked, 
-                requiere_atencion_medica: document.getElementById('atencionMedica').checked,
-                servicios_afectados: document.getElementById('serviciosAfectados').value || 'Ninguno',
+                es_damnificado: esDamnificadoForm, 
+                requiere_atencion_medica: requiereMedicaBool,
                 personas_hogar: parseInt(document.getElementById('personasHogar').value) || 1,
                 ninos_hogar: parseInt(document.getElementById('ninosHogar').value) || 0,
                 adultos_mayores_hogar: parseInt(document.getElementById('adultosMayores').value) || 0,
@@ -835,7 +856,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 req_alimentos: reqAli,
                 req_limpieza: reqHig,
                 req_general: reqGen,
-                descripcion_ayuda: document.getElementById('observacionesAfectado').value 
+                descripcion_ayuda: observacionesFinales 
             };
 
             try {
@@ -848,30 +869,54 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         .eq('id', idEdicionAyuda);
                         
                     if (updateError) throw updateError;
+
+                    const { data: ticketsExistentes } = await supabaseClient
+                        .from('etiquetas_logistica')
+                        .select('categoria_insumo, id, requerimiento')
+                        .eq('solicitud_id', idEdicionAyuda);
+
+                    let ticketsAInsertar = [];
+                    const categorias = [
+                        { cat: 'medicina', val: reqMed }, { cat: 'alimentos', val: reqAli },
+                        { cat: 'higiene', val: reqHig }, { cat: 'general', val: reqGen }
+                    ];
+
+                    for (let c of categorias) {
+                        if (c.val) {
+                            let ticketPrevio = ticketsExistentes ? ticketsExistentes.find(t => t.categoria_insumo === c.cat) : null;
+                            if (!ticketPrevio) {
+                                ticketsAInsertar.push({
+                                    solicitud_id: idEdicionAyuda, categoria_insumo: c.cat,
+                                    requerimiento: c.val, punto_usb: puntoSeleccionado,
+                                    estado: 'Pendiente', encargado: 'Sin Asignar'
+                                });
+                            } else if (ticketPrevio.requerimiento !== c.val) {
+                                await supabaseClient.from('etiquetas_logistica').update({ requerimiento: c.val }).eq('id', ticketPrevio.id);
+                            }
+                        }
+                    }
+
+                    if (ticketsAInsertar.length > 0) {
+                        await supabaseClient.from('etiquetas_logistica').insert(ticketsAInsertar);
+                    }
                     
-                    mostrarNotificacion("✅ Solicitud actualizada correctamente.");
+                    mostrarNotificacion("✅ Información y pedidos actualizados.");
                     cancelarEdicionAyuda();
                 } else {
-                    const { data: ayudaData, error: ayudaError } = await supabaseClient
-                        .from('solicitudes_ayuda')
-                        .insert([payloadAyuda])
-                        .select();
-
+                    payloadAyuda.estado_despacho = 'Pendiente';
+                    const { data: ayudaData, error: ayudaError } = await supabaseClient.from('solicitudes_ayuda').insert([payloadAyuda]).select();
                     if (ayudaError) throw ayudaError;
 
                     const solicitudId = ayudaData[0].id;
-
                     const ticketsLogistica = [];
-                    if (reqMed) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'medicina', requerimiento: reqMed, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
-                    if (reqAli) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'alimentos', requerimiento: reqAli, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
-                    if (reqHig) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'higiene', requerimiento: reqHig, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
-                    if (reqGen) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'general', requerimiento: reqGen, punto_usb: puntoSeleccionado, estado: 'Pendiente' });
+                    
+                    if (reqMed) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'medicina', requerimiento: reqMed, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                    if (reqAli) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'alimentos', requerimiento: reqAli, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                    if (reqHig) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'higiene', requerimiento: reqHig, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                    if (reqGen) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'general', requerimiento: reqGen, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
 
                     if (ticketsLogistica.length > 0) {
-                        const { error: logisticaError } = await supabaseClient
-                            .from('etiquetas_logistica')
-                            .insert(ticketsLogistica);
-                        if (logisticaError) console.error("Error al generar tickets:", logisticaError);
+                        await supabaseClient.from('etiquetas_logistica').insert(ticketsLogistica);
                     }
                     
                     document.getElementById('formSolicitudAyuda').reset();
@@ -879,10 +924,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 }
 
                 await cargarDatosDesdeNube(); 
+                if (typeof cargarTablaLogisticaFuerza === "function") cargarTablaLogisticaFuerza();
                 
             } catch (err) {
                 console.error("Error guardando:", err);
-                alert("Ocurrió un error al enviar tu solicitud. Intenta de nuevo.");
+                alert("Ocurrió un error al procesar tu solicitud. Intenta de nuevo.");
             }
         });
 
@@ -1234,50 +1280,88 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             descargarMatrizComoExcel(matriz, "Data_Ofrecimientos_Colaboradores_USB");
         });
 
+        window.filtrarYActualizarAyuda = function() {
+            if (!ayudaNube) return;
+            
+            const texto = document.getElementById('buscarAyudaInput').value.toLowerCase();
+            const fDam = document.getElementById('filtroDamnificado').value;
+            const fDesp = document.getElementById('filtroDespacho').value;
+            const fCen = document.getElementById('filtroCentro').value;
+
+            let filtrados = ayudaNube.filter(a => {
+                
+                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') {
+                    if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
+                }
+                
+                if (perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin') {
+                    if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
+                }
+
+                const cumpleTexto = (a.nombre || '').toLowerCase().includes(texto) || (a.cedula || '').toLowerCase().includes(texto);
+                
+                let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+                const cumpleDam = (fDam === 'Todos') || (isDamStr === fDam);
+
+                let estadoCalculado = 'Sin Pedido';
+                let ticketsPersona = pedidosLogistica.filter(p => p.solicitud_id === a.id);
+                
+                if (ticketsPersona.length > 0) {
+                    if (ticketsPersona.some(t => t.estado === 'Pendiente')) estadoCalculado = 'Pendiente';
+                    else if (ticketsPersona.some(t => t.estado === 'Empacando')) estadoCalculado = 'En Proceso';
+                    else estadoCalculado = 'Despachado';
+                }
+                a.estado_despacho_calculado = estadoCalculado; 
+                
+                const cumpleDesp = (fDesp === 'Todos') || (estadoCalculado === fDesp);
+
+                return cumpleTexto && cumpleDam && cumpleDesp;
+            });
+            actualizarInterfazAyuda(filtrados);
+        };
+
+        document.getElementById('buscarAyudaInput').addEventListener('input', filtrarYActualizarAyuda);
+        document.getElementById('filtroDamnificado').addEventListener('change', filtrarYActualizarAyuda);
+        document.getElementById('filtroDespacho').addEventListener('change', filtrarYActualizarAyuda);
+        document.getElementById('filtroCentro').addEventListener('change', filtrarYActualizarAyuda);
+
         document.getElementById('btnExportarAyuda').addEventListener('click', function() {
-            if (!ayudaNube || ayudaNube.length === 0) {
-                alert("No hay datos para exportar.");
-                return;
+            if (!ayudaNube || ayudaNube.length === 0) { alert("No hay datos para exportar."); return; }
+
+            let datosAExportar = ayudaNube;
+            if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') {
+                datosAExportar = ayudaNube.filter(a => a.punto_usb === perfilUsuarioActual.centro_acopio);
+            } else {
+                const fCen = document.getElementById('filtroCentro').value;
+                if (fCen !== 'Todos') datosAExportar = ayudaNube.filter(a => a.punto_usb === fCen);
             }
 
+            if(datosAExportar.length === 0) { alert("No hay datos en este centro para exportar."); return; }
+
             let matriz = [[
-                "Fecha Reporte", "Punto Acopio", "Estado Despacho", "Tipo Reporte", 
+                "ID Solicitud", "Fecha Reporte", "Punto Acopio", "Estado Despacho", 
                 "Afectado", "Cédula", "Teléfono", "Correo", "Comunidad", "Relación USB", 
-                "Estado Vital", "Ubicación", "Servicios Afectados", "Es Damnificado", 
+                "Estado Vital", "Ubicación", "Es Damnificado", 
                 "Atención Médica", "Total Personas", "Niños", "Adultos Mayores", 
                 "Req. Medicina", "Req. Alimentos", "Req. Limpieza", "Req. General", "Observaciones"
             ]];
 
-            ayudaNube.forEach(a => {
+            datosAExportar.forEach(a => {
                 let fecha = a.created_at ? new Date(a.created_at).toLocaleString('es-VE') : '';
                 matriz.push([
-                    fecha,
-                    a.punto_usb || 'Sin Asignar',
-                    a.estado_despacho || 'Pendiente',
-                    a.tipo_reporte || '-',
-                    a.nombre || '-',
-                    a.cedula || '-',
-                    a.telefono || '-',
-                    a.correo || '-',
-                    a.comunidad || '-',
-                    a.grupo || '-',
-                    a.estado || '-',
-                    a.ubicacion || '-',
-                    a.servicios_afectados || '-',
+                    a.id, fecha, a.punto_usb || 'Sin Asignar', a.estado_despacho_calculado || 'Pendiente',
+                    a.nombre || '-', a.cedula || '-', a.telefono || '-', a.correo || '-', a.comunidad || '-',
+                    a.grupo || '-', a.estado || '-', a.ubicacion || '-',
                     (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO",
                     a.requiere_atencion_medica ? "SÍ" : "NO",
-                    a.personas_hogar || 1,
-                    a.ninos_hogar || 0,
-                    a.adultos_mayores_hogar || 0,
-                    a.req_medicina || '-',
-                    a.req_alimentos || '-',
-                    a.req_limpieza || '-',
-                    a.req_general || '-',
-                    a.descripcion_ayuda || '-'
+                    a.personas_hogar || 1, a.ninos_hogar || 0, a.adultos_mayores_hogar || 0,
+                    a.req_medicina || '-', a.req_alimentos || '-', a.req_limpieza || '-', a.req_general || '-', a.descripcion_ayuda || '-'
                 ]);
             });
 
-            descargarMatrizComoExcel(matriz, "Reporte_Ayuda_USB");
+            let nombreArchivo = "Reporte_Ayuda_USB";
+            if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') nombreArchivo += "_" + perfilUsuarioActual.centro_acopio;
+            descargarMatrizComoExcel(matriz, nombreArchivo);
         });
 
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
@@ -1411,270 +1495,351 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         cargarDatosDesdeNube();
 
-        window.agregarFilaInsumo = function() {
-            const contenedor = document.getElementById('contenedor-filas-insumos');
-            const div = document.createElement('div');
-            div.className = 'fila-insumo';
-            div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
-            div.innerHTML = `
-                <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 100px; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px;" min="1" required>
-                <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px;" required>
-                <button type="button" class="btn btn-delete" style="padding: 0 0.8rem; background-color: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; color: #b91c1c; font-size: 0.85rem; height: 42px;" onclick="this.parentElement.remove()">❌</button>
-            `;
-            contenedor.appendChild(div);
-        };
-
         document.getElementById('etiquetaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const encargado = document.getElementById('etiqueta_encargado').value.trim();
-            const centro = document.getElementById('etiqueta_centro').value;
-            
-            let insumos = [];
-            document.querySelectorAll('.fila-insumo').forEach(fila => {
-                const cant = fila.querySelector('.input-cantidad').value;
-                const desc = fila.querySelector('.input-nombre-insumo').value.trim();
-                if(cant && desc) insumos.push({ cantidad: cant, descripcion: desc });
-            });
-            
-            if(insumos.length === 0) return alert("Debes agregar al menos un insumo.");
             
             const btn = this.querySelector('button[type="submit"]');
             btn.innerText = "Guardando..."; btn.disabled = true;
             
             const payload = {
-                encargado: encargado,
-                centro_acopio: centro,
-                lista_insumos: insumos,
-                estado: "Pendiente"
+                punto_usb: document.getElementById('etiqueta_centro').value,
+                categoria_insumo: document.getElementById('etiqueta_categoria').value,
+                requerimiento: document.getElementById('etiqueta_requerimiento').value.trim(),
+                estado: "Pendiente",
+                encargado: "Sin Asignar"
             };
             
             const { error } = await supabaseClient.from('etiquetas_logistica').insert([payload]);
             
-            if(error) { alert("Error: " + error.message); } 
-            else {
-                mostrarNotificacion("¡Pedido guardado en la bandeja!");
+            if(error) { 
+                alert("Error: " + error.message); 
+            } else {
+                mostrarNotificacion("¡Ticket logístico añadido al almacén!");
                 this.reset();
-                document.getElementById('contenedor-filas-insumos').innerHTML = `
-                    <div class="fila-insumo" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 90px;" min="1" required>
-                        <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1;" required>
-                    </div>`;
                 cargarTablaLogisticaFuerza();
             }
-            btn.innerText = "Guardar Petición en el Sistema"; btn.disabled = false;
+            btn.innerText = "AÑADIR AL SISTEMA"; btn.disabled = false;
         });
-
-        function renderizarTablaLogistica() {
-            const cuerpo = document.getElementById('tablaLogisticaCuerpo');
-            if(!cuerpo || !pedidosLogistica) return;
-            
-            cuerpo.innerHTML = pedidosLogistica.map(p => {
-                let badgeColor = p.estado === 'Despachado' ? 'badge-success' : 'badge-warning';
-                let resumenInsumos = p.lista_insumos.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ');
-                if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
-
-                let btnAccion = p.estado === 'Pendiente' 
-                    ? `<button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
-                    : `<button class="btn" style="background-color: #e2e8f0; color: #64748b; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: not-allowed;" disabled>✅ Ya enviado</button>`;
-
-                return `
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 1rem;"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
-                        <td style="padding: 1rem;"><strong>${p.centro_acopio}</strong><br><span style="font-size:0.8rem; color:#64748b;">${p.encargado}</span></td>
-                        <td style="padding: 1rem; font-size: 0.9rem;">${resumenInsumos}</td>
-                        <td style="padding: 1rem;">${btnAccion}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        window.imprimirYDespachar = async function(idRegistro) {
-            try {
-                const pedido = pedidosLogistica.find(p => p.id === idRegistro);
-                if(!pedido) {
-                    alert("Error: No se encontró el pedido.");
-                    return;
-                }
-
-                if(!confirm(`¿Generar factura de despacho para ${pedido.centro_acopio}? Esto marcará el pedido como enviado.`)) return;
-
-                const ventanita = window.open('', '_blank');
-                if(!ventanita) {
-                    alert("⚠️ Tu navegador bloqueó la ventana. Por favor, permite las ventanas emergentes en esta página.");
-                    return;
-                }
-
-                const { error } = await supabaseClient
-                    .from('etiquetas_logistica')
-                    .update({ estado: 'Despachado' })
-                    .eq('id', idRegistro);
-
-                if(error) {
-                    ventanita.close();
-                    alert("Error al actualizar la base de datos: " + error.message);
-                    return;
-                }
-
-                if (typeof cargarTablaLogisticaFuerza === "function") {
-                    cargarTablaLogisticaFuerza();
-                }
-
-                let insumosArray = pedido.lista_insumos;
-                if (typeof insumosArray === 'string') {
-                    try { insumosArray = JSON.parse(insumosArray); } catch(e) { insumosArray = []; }
-                }
-
-                let filasHTML = insumosArray.map(i => `
-                    <tr style="border-bottom: 1px solid #000;">
-                        <td style="padding: 8px; text-align: center; border-right: 1px solid #000; font-weight: bold; font-size: 18px;">${i.cantidad}</td>
-                        <td style="padding: 8px; font-size: 18px;">${i.descripcion}</td>
-                    </tr>
-                `).join('');
-                
-                const fecha = new Date().toLocaleString('es-VE');
-                const idCorto = idRegistro.split('-')[0].toUpperCase();
-
-                ventanita.document.write(`
-                    <html>
-                    <head>
-                        <title>Guía de Despacho - ${pedido.centro_acopio}</title>
-                        <style>
-                            body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
-                            .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
-                            h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
-                            .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
-                            th { background-color: #f0f0f0; padding: 12px; border-bottom: 2px solid #000; text-align: left; border-right: 2px solid #000; }
-                            td { border-right: 2px solid #000; border-bottom: 2px solid #000;}
-                            @media print { @page { margin: 0; } body { margin: 1cm; } }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="ticket">
-                            <h1>TICKET DE DESPACHO</h1>
-                            <hr style="border: 1px solid #000; margin-bottom: 15px;">
-                            <div class="info-header">
-                                <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.centro_acopio}</span><br>
-                                <strong>ENCARGADO:</strong> ${pedido.encargado}<br>
-                                <strong>FECHA:</strong> ${fecha}<br>
-                                <strong>CÓDIGO:</strong> #${idCorto}
-                            </div>
-                            <table>
-                                <thead><tr><th style="width: 80px; text-align: center;">CANT.</th><th>DESCRIPCIÓN</th></tr></thead>
-                                <tbody>${filasHTML}</tbody>
-                            </table>
-                        </div>
-                        <script>
-                            // Activa la impresora de inmediato y cierra al terminar
-                            window.onload = function() { 
-                                window.print(); 
-                                window.onafterprint = function() { window.close(); } 
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
-                ventanita.document.close();
-
-            } catch (error) {
-                console.error("Error crítico: ", error);
-                alert("Hubo un fallo en el sistema. Revisa la consola.");
-            }
-        };
 
         window.cargarTablaLogisticaFuerza = async function() {
             const cuerpo = document.getElementById('tablaLogisticaCuerpo');
             if(!cuerpo) return;
 
-            cuerpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem; font-weight: bold;">Cargando base de datos...</td></tr>';
+            cuerpo.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; font-weight: bold; color: var(--primary);">Cargando inventario y pedidos...</td></tr>';
 
             const { data, error } = await supabaseClient
                 .from('etiquetas_logistica')
-                .select('*')
+                .select('id, created_at, solicitud_id, punto_usb, categoria_insumo, requerimiento, estado, encargado')
                 .order('created_at', { ascending: false });
-            
+
             if(error) {
-                console.error(error);
-                cuerpo.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 1rem; color: red;">Error Supabase: ${error.message}</td></tr>`;
+                cuerpo.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 1rem; color: red;">Error: ${error.message}</td></tr>`;
                 return;
             }
 
             if(!data || data.length === 0) {
-                cuerpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1rem;">No hay pedidos registrados en la nube.</td></tr>';
+                cuerpo.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No hay tickets registrados en el almacén.</td></tr>';
                 return;
             }
 
             pedidosLogistica = data;
 
             cuerpo.innerHTML = data.map(p => {
-                let badgeColor = p.estado === 'Despachado' ? 'badge-success' : 'badge-warning';
-                let insumosArray = p.lista_insumos;
+                let badgeColor = 'badge-gray';
+                if (p.estado === 'Pendiente') badgeColor = 'badge-danger';
+                if (p.estado === 'Empacando') badgeColor = 'badge-warning';
+                if (p.estado === 'Despachado') badgeColor = 'badge-success';
+
+                let iconoCategoria = '📦';
+                if (p.categoria_insumo === 'medicina') iconoCategoria = '💊';
+                if (p.categoria_insumo === 'alimentos') iconoCategoria = '🥫';
+                if (p.categoria_insumo === 'higiene') iconoCategoria = '🧼';
                 
-                if (typeof insumosArray === 'string') {
-                    try { insumosArray = JSON.parse(insumosArray); } 
-                    catch(e) { insumosArray = []; }
+                let btnAccion = '';
+                if (p.estado === 'Pendiente') {
+                    btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
+                } else if (p.estado === 'Empacando') {
+                    btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="imprimirYDespachar('${p.id}')">🖨️ Despachar</button>`;
+                } else {
+                    btnAccion = `<button class="btn" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%; cursor:not-allowed;" disabled>✅ Finalizado</button>`;
                 }
 
-                let resumenInsumos = Array.isArray(insumosArray) 
-                    ? insumosArray.map(i => `${i.cantidad}x ${i.descripcion}`).join(', ')
-                    : 'Error de lectura';
-                
-                if(resumenInsumos.length > 50) resumenInsumos = resumenInsumos.substring(0, 50) + '...';
-
-                let btnAccion = p.estado === 'Pendiente' 
-                    ? `<button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="imprimirYDespachar('${p.id}')">🖨️ Imprimir y Enviar</button>`
-                    : `<button class="btn" style="background-color: #e2e8f0; color: #64748b; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: not-allowed;" disabled>✅ Ya enviado</button>`;
+                let reqTexto = p.requerimiento || '-';
+                if(reqTexto.length > 80) reqTexto = reqTexto.substring(0, 80) + '...';
 
                 return `
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 1rem;"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
-                        <td style="padding: 1rem;"><strong>${p.centro_acopio}</strong><br><span style="font-size:0.8rem; color:#64748b;">${p.encargado}</span></td>
-                        <td style="padding: 1rem; font-size: 0.9rem;">${resumenInsumos}</td>
-                        <td style="padding: 1rem;">${btnAccion}</td>
+                    <tr>
+                        <td data-label="Estado"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
+                        <td data-label="Destino"><strong>${p.punto_usb || 'Sin Asignar'}</strong></td>
+                        <td data-label="Categoría" style="text-transform: capitalize;">${iconoCategoria} ${p.categoria_insumo || '-'}</td>
+                        <td data-label="Requerimiento"><div class="text-truncate-clamp">${reqTexto}</div></td>
+                        <td data-label="Encargado" style="color: #3b82f6; font-weight: bold;">${p.encargado || 'Sin Asignar'}</td>
+                        <td data-label="Acción" class="actions-cell">${btnAccion}</td>
                     </tr>
                 `;
             }).join('');
         };
 
-        window.descargarExcelLogistica = function() {
-            if (!pedidosLogistica || pedidosLogistica.length === 0) {
-                alert("No hay pedidos registrados para descargar.");
+        window.tomarPedidoLogistica = async function(id) {
+            const nombreGuardia = document.getElementById('nombreGuardiaLogistica').value.trim();
+            if(!nombreGuardia) {
+                alert("⚠️ Por favor, ingresa tu nombre de guardia en la barra superior antes de tomar un pedido.");
+                document.getElementById('nombreGuardiaLogistica').focus();
                 return;
             }
 
-            let csvContent = "\uFEFF"; 
-            csvContent += "ID del Pedido,Fecha de Registro,Encargado,Centro de Acopio Destino,Estado,Resumen de Insumos\n";
+            const { error } = await supabaseClient.from('etiquetas_logistica')
+                .update({ estado: 'Empacando', encargado: nombreGuardia })
+                .eq('id', id);
 
+            if(error) {
+                alert("Error: " + error.message);
+            } else {
+                mostrarNotificacion(`Pedido asignado a ${nombreGuardia}`);
+                cargarTablaLogisticaFuerza();
+            }
+        };
+
+        window.imprimirYDespachar = async function(idRegistro) {
+            const pedido = pedidosLogistica.find(p => p.id === idRegistro);
+            if(!pedido) return;
+
+            if(!confirm(`¿Finalizar el empaque y generar guía para ${pedido.punto_usb}?`)) return;
+
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes (pop-ups) en tu navegador para imprimir."); return; }
+
+            const { error } = await supabaseClient.from('etiquetas_logistica')
+                .update({ estado: 'Despachado' })
+                .eq('id', idRegistro);
+
+            if(error) { ventanita.close(); alert("Error: " + error.message); return; }
+            cargarTablaLogisticaFuerza();
+
+            const fecha = new Date().toLocaleString('es-VE');
+            const idCorto = idRegistro.split('-')[0].toUpperCase();
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Guía Logística - ${pedido.punto_usb}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
+                        .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
+                        .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
+                        @media print { @page { margin: 0; } body { margin: 1cm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="ticket">
+                        <h1>TICKET DE DESPACHO</h1>
+                        <hr style="border: 1px solid #000; margin-bottom: 15px;">
+                        <div class="info-header">
+                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.punto_usb || '-'}</span><br>
+                            <strong>CATEGORÍA:</strong> ${String(pedido.categoria_insumo).toUpperCase()}<br>
+                            <strong>PREPARADO POR:</strong> ${pedido.encargado}<br>
+                            <strong>FECHA:</strong> ${fecha}<br>
+                            <strong>CÓDIGO:</strong> #${idCorto}
+                        </div>
+                        <hr style="border: 1px solid #000; margin-bottom: 15px;">
+                        <h3 style="margin-bottom: 5px;">REQUERIMIENTOS SOLICITADOS:</h3>
+                        <p style="font-size: 20px; border: 1px solid #000; padding: 15px;">${pedido.requerimiento}</p>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }
+                    </script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        };
+
+        window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
+            let sedeArchivo = file.name.replace(/\.[^/.]+$/, "").trim(); 
+
+            const lector = new FileReader();
+            lector.onload = async function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const libro = XLSX.read(data, { type: 'array' });
+                    const hoja = libro.Sheets[libro.SheetNames[0]];
+                    const rawData = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" });
+
+                    let cabecera = [];
+                    while (rawData.length > 0) {
+                        let tempCabecera = rawData[0].map(c => String(c).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+                        if (tempCabecera.some(c => c.includes('nombre') || c.includes('cedula') || c.includes('requerimiento'))) {
+                            cabecera = tempCabecera;
+                            break;
+                        }
+                        rawData.shift();
+                    }
+
+                    if(cabecera.length === 0) { alert("No se reconoció el formato de la plantilla."); return; }
+                    rawData.shift(); 
+                    
+                    let esExcelAyuda = cabecera.some(c => c.includes('req. medicina') || c.includes('afectado') || c.includes('nombre'));
+
+                    document.getElementById(dropZoneId).innerHTML = "<p><strong>⏳ Procesando archivo. Cruzando datos con el servidor...</strong></p>";
+
+                    let ticketsNuevosGenerados = 0; let personasActualizadas = 0; let personasNuevas = 0; let duplicadosOmitidos = 0;
+
+                    const resLog = await supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb');
+                    let inventarioLogistico = resLog.data || [];
+
+                    if (esExcelAyuda) {
+                        let iNom = cabecera.findIndex(c => c.includes('nombre'));
+                        let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
+                        let iCar = cabecera.findIndex(c => c.includes('carnet'));
+                        let iCom = cabecera.findIndex(c => c.includes('comunidad'));
+                        let iDir = cabecera.findIndex(c => c.includes('direccion') || c.includes('ubicacion'));
+                        let iTel = cabecera.findIndex(c => c.includes('whatsapp') || c.includes('telefono'));
+                        let iCor = cabecera.findIndex(c => c.includes('correo'));
+                        let iDam = cabecera.findIndex(c => c.includes('damnificado'));
+                        let iPer = cabecera.findIndex(c => c.includes('personas'));
+                        let iNin = cabecera.findIndex(c => c.includes('niños') || c.includes('ninos'));
+                        let iAdu = cabecera.findIndex(c => c.includes('adultos'));
+                        let iObs = cabecera.findIndex(c => c.includes('observaciones'));
+                        let iMed = cabecera.findIndex(c => c.includes('medicina'));
+                        let iAli = cabecera.findIndex(c => c.includes('alimento'));
+                        let iLim = cabecera.findIndex(c => c.includes('limpieza') || c.includes('higiene'));
+                        let iGen = cabecera.findIndex(c => c.includes('general'));
+
+                        for (let row of rawData) {
+                            let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
+                            if (!nomVal) continue; 
+
+                            let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
+                            let isDam = iDam !== -1 ? String(row[iDam] || '').toLowerCase().includes('si') || String(row[iDam] || '').toLowerCase().includes('sí') : false;
+                            
+                            let reqsObj = [
+                                { cat: 'medicina', val: iMed !== -1 ? String(row[iMed] || '').trim() : '' },
+                                { cat: 'alimentos', val: iAli !== -1 ? String(row[iAli] || '').trim() : '' },
+                                { cat: 'higiene', val: iLim !== -1 ? String(row[iLim] || '').trim() : '' },
+                                { cat: 'general', val: iGen !== -1 ? String(row[iGen] || '').trim() : '' }
+                            ];
+
+                            let payloadPersona = {
+                                nombre: nomVal, cedula: cedVal, telefono: iTel !== -1 ? String(row[iTel] || '-').trim() : '-',
+                                correo: iCor !== -1 ? String(row[iCor] || '').trim() : '', carnet_estudiante: iCar !== -1 ? String(row[iCar] || 'N/A').trim() : 'N/A',
+                                grupo: iCom !== -1 ? String(row[iCom] || 'Externo').trim() : 'Externo', comunidad: 'Universidad Simón Bolívar',
+                                ubicacion: iDir !== -1 ? String(row[iDir] || '-').trim() : '-', es_damnificado: isDam,
+                                personas_hogar: iPer !== -1 ? (parseInt(row[iPer]) || 1) : 1, ninos_hogar: iNin !== -1 ? (parseInt(row[iNin]) || 0) : 0,
+                                adultos_mayores_hogar: iAdu !== -1 ? (parseInt(row[iAdu]) || 0) : 0, descripcion_ayuda: iObs !== -1 ? String(row[iObs] || '').trim() : '',
+                                req_medicina: reqsObj[0].val, req_alimentos: reqsObj[1].val, req_limpieza: reqsObj[2].val, req_general: reqsObj[3].val,
+                                punto_usb: sedeArchivo 
+                            };
+
+                            let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
+                            let idAsignado = null;
+
+                            if (personaExistente) {
+                                idAsignado = personaExistente.id;
+                                await supabaseClient.from('solicitudes_ayuda').update(payloadPersona).eq('id', idAsignado);
+                                personasActualizadas++;
+                            } else {
+                                payloadPersona.estado = 'Sin Información'; payloadPersona.estado_despacho = 'Pendiente';
+                                const { data: insertada, error: errIns } = await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]).select();
+                                if(!errIns && insertada) { idAsignado = insertada[0].id; personasNuevas++; }
+                            }
+
+                            if (idAsignado) {
+                                let ticketsAInsertar = [];
+                                for (let c of reqsObj) {
+                                    if (c.val && c.val !== '-' && c.val.toLowerCase() !== 'ninguno') {
+                                        let ticketPrevio = inventarioLogistico.find(t => t.solicitud_id === idAsignado && t.categoria_insumo === c.cat);
+                                        if (!ticketPrevio) {
+                                            ticketsAInsertar.push({ solicitud_id: idAsignado, categoria_insumo: c.cat, requerimiento: c.val, punto_usb: sedeArchivo, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                                            ticketsNuevosGenerados++;
+                                        } else if (ticketPrevio.requerimiento !== c.val) {
+                                            await supabaseClient.from('etiquetas_logistica').update({ requerimiento: c.val }).eq('id', ticketPrevio.id);
+                                        }
+                                    }
+                                }
+                                if (ticketsAInsertar.length > 0) await supabaseClient.from('etiquetas_logistica').insert(ticketsAInsertar);
+                            }
+                        }
+                    } else {
+                        // MODO EXCEL LOGÍSTICO BÁSICO 
+                        let iReq = cabecera.findIndex(c => c.includes('requerimiento') || c.includes('insumo'));
+                        if (iReq === -1) { alert("Error: El Excel debe tener una columna 'Requerimiento'."); return; }
+                        for (let row of rawData) {
+                            let reqVal = String(row[iReq] || '').trim();
+                            if (!reqVal) continue;
+                            let esDuplicado = inventarioLogistico.some(p => p.requerimiento.toLowerCase() === reqVal.toLowerCase() && p.punto_usb.toLowerCase() === sedeArchivo.toLowerCase());
+                            if (esDuplicado) { duplicadosOmitidos++; continue; }
+                            
+                            let nuevoTicket = { punto_usb: sedeArchivo, categoria_insumo: 'general', requerimiento: reqVal, estado: 'Pendiente', encargado: 'Sin Asignar' };
+                            await supabaseClient.from('etiquetas_logistica').insert([nuevoTicket]);
+                            ticketsNuevosGenerados++;
+                        }
+                    }
+
+                    alert(`✅ Carga Maestra Finalizada:\n\n👤 ${personasNuevas} personas nuevas.\n🔄 ${personasActualizadas} personas actualizadas.\n📦 ${ticketsNuevosGenerados} tickets nuevos.\n⚠️ ${duplicadosOmitidos} duplicados omitidos.`);
+                    
+                    document.getElementById(inputId).value = ''; 
+                    document.getElementById(dropZoneId).innerHTML = `<p><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel</strong></p><input type="file" id="${inputId}" accept=".xlsx, .xls, .csv" style="display:none">`;
+                    
+                    await cargarDatosDesdeNube();
+                    if(typeof filtrarYActualizarAyuda === "function") filtrarYActualizarAyuda();
+                    if(typeof cargarTablaLogisticaFuerza === "function") cargarTablaLogisticaFuerza();
+
+                } catch (err) { 
+                    alert('Error en el procesamiento. Revisa el archivo.'); console.error(err); 
+                    document.getElementById(inputId).value = ''; 
+                    document.getElementById(dropZoneId).innerHTML = `<p><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel</strong></p><input type="file" id="${inputId}" accept=".xlsx, .xls, .csv" style="display:none">`;
+                }
+            };
+            lector.readAsArrayBuffer(file);
+        };
+
+        const fileLogistica = document.getElementById('excelFileLogistica');
+        if(fileLogistica) fileLogistica.addEventListener('change', function(e) { if(e.target.files[0]) procesarExcelMaestro(e.target.files[0], 'dropZoneLogistica', 'excelFileLogistica'); });
+
+        const fileAyuda = document.getElementById('excelFileAyuda');
+        if(fileAyuda) fileAyuda.addEventListener('change', function(e) { if(e.target.files[0]) procesarExcelMaestro(e.target.files[0], 'dropZoneAyuda', 'excelFileAyuda'); });
+
+        window.descargarExcelLogistica = function() {
+            if (!pedidosLogistica || pedidosLogistica.length === 0) {
+                alert("No hay tickets en el almacén.");
+                return;
+            }
+            
+            let matriz = [[
+                "ID Ticket Logístico", "Fecha de Creación", "Estado Logístico", "Voluntario Encargado", 
+                "Centro de Acopio", "Categoría Insumo", "Requerimiento Solicitado",
+                "ID Solicitud", "Nombre del Beneficiario", "Cédula", "Teléfono", "Ubicación / Sector"
+            ]];
+            
             pedidosLogistica.forEach(p => {
-                let fecha = p.created_at ? new Date(p.created_at).toLocaleString('es-VE') : 'Fecha no disponible';
+                let fecha = p.created_at ? new Date(p.created_at).toLocaleString('es-VE') : '';
                 
-                let insumosArray = p.lista_insumos;
-                if (typeof insumosArray === 'string') {
-                    try { insumosArray = JSON.parse(insumosArray); } catch(e) { insumosArray = []; }
+                let persona = null;
+                if (p.solicitud_id) {
+                    persona = ayudaNube.find(a => a.id == p.solicitud_id);
                 }
                 
-                let insumosTexto = Array.isArray(insumosArray) 
-                    ? insumosArray.map(i => `${i.cantidad}x ${i.descripcion}`).join(' | ') 
-                    : 'Error de lectura';
-
-                let fila = [
-                    p.id,
-                    fecha,
-                    `"${(p.encargado || '').replace(/"/g, '""')}"`,
-                    `"${(p.centro_acopio || '').replace(/"/g, '""')}"`,
-                    p.estado || 'Pendiente',
-                    `"${insumosTexto.replace(/"/g, '""')}"`
-                ].join(",");
-
-                csvContent += fila + "\n";
+                let nombrePersona = persona ? persona.nombre : 'No Registrado / Carga Manual';
+                let cedulaPersona = persona ? (persona.cedula || '-') : '-';
+                let telPersona = persona ? (persona.telefono || '-') : '-';
+                let ubiPersona = persona ? (persona.ubicacion || '-') : '-';
+                
+                matriz.push([ 
+                    p.id, 
+                    fecha, 
+                    p.estado || 'Pendiente', 
+                    p.encargado || 'Sin Asignar',
+                    p.punto_usb || '-', 
+                    p.categoria_insumo || '-', 
+                    p.requerimiento || '-',
+                    p.solicitud_id || 'N/A', 
+                    nombrePersona,
+                    cedulaPersona, 
+                    telPersona, 
+                    ubiPersona
+                ]);
             });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Reporte_Logistica_Despachos_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            
+            descargarMatrizComoExcel(matriz, "Reporte_Auditoria_Despachos_y_Beneficiarios");
         };

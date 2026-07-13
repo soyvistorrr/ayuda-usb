@@ -271,14 +271,6 @@
                                 <form id="formSolicitudAyuda">
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">¿Para quién es esta solicitud? *</label>
-                                            <select id="tipoReporteForm" class="form-select" required>
-                                                <option value="">Seleccione...</option>
-                                                <option value="Para mí">Para mí</option>
-                                                <option value="Para otra persona">Para otra persona</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
                                             <label class="form-label" style="color: var(--danger);">Estado actual del afectado *</label>
                                             <select id="estadoVitalForm" class="form-select" required>
                                                 <option value="">Seleccione situación...</option>
@@ -287,9 +279,6 @@
                                                 <option value="Desaparecido">Desaparecido / Sin comunicación</option>
                                             </select>
                                         </div>
-                                    </div>
-
-                                    <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Punto USB de Acopio más cercano *</label>
                                             <select id="puntoUsbForm" class="form-select" required>
@@ -302,9 +291,16 @@
                                                 <option value="La Guaira - Macuto">La Guaira - Macuto</option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Nombre Completo *</label>
                                             <input type="text" id="nombreAfectado" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Cédula de Identidad *</label>
+                                            <input type="text" id="cedulaAfectado" class="form-input" required>
                                         </div>
                                     </div>
 
@@ -315,23 +311,12 @@
 
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">Cédula de Identidad *</label>
-                                            <input type="text" id="cedulaAfectado" class="form-input" required>
-                                        </div>
-                                        <div class="form-group">
                                             <label class="form-label">Teléfono Móvil *</label>
                                             <input type="text" id="telefonoAfectado" class="form-input" required>
                                         </div>
-                                    </div>
-
-                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">Correo Electrónico</label>
-                                            <input type="email" id="correoAfectado" class="form-input" placeholder="usuario@correo.com">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Carnet USB (Opcional)</label>
-                                            <input type="text" id="carnetAfectado" class="form-input" placeholder="Ej: 15-10123">
+                                            <label class="form-label">Correo Electrónico *</label>
+                                            <input type="email" id="correoAfectado" class="form-input" required placeholder="usuario@correo.com">
                                         </div>
                                     </div>
 
@@ -349,39 +334,38 @@
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Servicios Afectados</label>
-                                            <input type="text" id="serviciosAfectados" class="form-input" placeholder="Ej: Sin luz por 3 días, sin agua...">
+                                            <label class="form-label">Carnet USB (Opcional)</label>
+                                            <input type="text" id="carnetAfectado" class="form-input" placeholder="Ej: 15-10123">
                                         </div>
                                     </div>
 
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label" style="color: var(--danger);">¿Es Damnificado?</label>
-                                            <div class="checkbox-grid">
-                                                <label class="checkbox-label"><input type="checkbox" id="damnificadoAfectado"> Sí, pérdida de vivienda</label>
+                                            <label class="form-label" style="color: var(--danger);">¿Es Damnificado? *</label>
+                                            <div class="checkbox-grid" style="display: flex; gap: 15px;">
+                                                <label class="checkbox-label"><input type="radio" name="damnificadoAfectado" value="si" required> Sí</label>
+                                                <label class="checkbox-label"><input type="radio" name="damnificadoAfectado" value="no" required> No</label>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label" style="color: var(--warning);">¿Requiere Atención Médica?</label>
-                                            <div class="checkbox-grid">
-                                                <label class="checkbox-label"><input type="checkbox" id="atencionMedica"> Sí, atención urgente</label>
-                                            </div>
+                                            <label class="form-label" style="color: var(--warning);">Atención Médica Requerida</label>
+                                            <textarea id="atencionMedica" class="form-textarea" rows="2" placeholder="Especifique qué atención médica necesita..."></textarea>
                                         </div>
                                     </div>
 
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">Total Personas *</label>
+                                            <label class="form-label">Total de personas viviendo con usted actualmente *</label>
                                             <input type="number" id="personasHogar" class="form-input" min="1" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Niños en el hogar *</label>
+                                            <label class="form-label">Cuántos niños en el hogar *</label>
                                             <input type="number" id="ninosHogar" class="form-input" min="0" value="0" required>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label">Adultos Mayores *</label>
+                                        <label class="form-label">Cuántos adultos mayores en el hogar *</label>
                                         <input type="number" id="adultosMayores" class="form-input" min="0" value="0" required>
                                     </div>
 
@@ -421,10 +405,46 @@
                         </div>
                     </div>
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
-                        <div class="toolbar">
-                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--warning);">Casos de Auxilio Recibidos</div>
-                            <button id="btnExportarAyuda" class="btn btn-success" style="display: none;">Descargar Excel Ayuda</button>
+                        
+                        <div class="import-zone" id="dropZoneAyuda" onclick="document.getElementById('excelFileAyuda').click()" style="display: none; margin-bottom: 1.5rem; border-color: var(--warning); background-color: #fffbeb;">
+                            <p style="color: #b45309;"><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel de Censo</strong></p>
+                            <input type="file" id="excelFileAyuda" accept=".xlsx, .xls, .csv" style="display:none">
                         </div>
+
+                        <div class="toolbar" style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-200); gap: 10px; display: flex; flex-wrap: wrap;">
+                            <div style="font-family:'Montserrat'; font-weight:800; text-transform:uppercase; font-size:0.9rem; width: 100%; color: var(--warning); margin-bottom: 5px;">Filtros de Búsqueda y Control</div>
+                            
+                            <div class="search-box" style="flex: 1; min-width: 200px;">
+                                <input type="text" id="buscarAyudaInput" placeholder="🔍 Buscar nombre o cédula...">
+                            </div>
+                            
+                            <select id="filtroDamnificado" class="form-select" style="width: auto; flex: 1; min-width: 140px;">
+                                <option value="Todos">Damnificado: Todos</option>
+                                <option value="SÍ">Sí, perdió vivienda</option>
+                                <option value="NO">No</option>
+                            </select>
+                            
+                            <select id="filtroDespacho" class="form-select" style="width: auto; flex: 1; min-width: 140px;">
+                                <option value="Todos">Despacho: Todos</option>
+                                <option value="Sin Pedido">Sin Pedido</option>
+                                <option value="Pendiente">Pendiente por armar</option>
+                                <option value="En Proceso">En Proceso (Empacando)</option>
+                                <option value="Despachado">Entregado / Despachado</option>
+                            </select>
+                            
+                            <select id="filtroCentro" class="form-select" style="width: auto; flex: 1; min-width: 150px; display: none;">
+                                <option value="Todos">Centro: Todos</option>
+                                <option value="Catia la Mar Centro">Catia la Mar Centro</option>
+                                <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
+                                <option value="Caraballeda">Caraballeda</option>
+                                <option value="Naiguatá - Camurí">Naiguatá - Camurí</option>
+                                <option value="Maiquetía">Maiquetía</option>
+                                <option value="La Guaira - Macuto">La Guaira - Macuto</option>
+                            </select>
+                            
+                            <button id="btnExportarAyuda" class="btn btn-warning" style="display: none; min-width: 150px; flex: 1;">⬇️ Descargar Excel</button>
+                        </div>
+                        
                         <div class="table-container">
                             <table>
                                 <thead id="theadAyuda"></thead>
@@ -871,69 +891,90 @@
                         <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">⬅ VOLVER AL MENÚ PRINCIPAL</button>
                     </div>
 
-                    <div class="panel-card" style="margin-bottom: 2rem; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 6px; overflow: hidden; background-color: #ffffff;">
-                        <div class="panel-header" style="background-color: #f8fafc; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
-                            <h3 class="panel-title" style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; color: #0f172a; margin: 0;">FORMULARIO DE REGISTRO DE PEDIDO</h3>
+                    <div class="panel-card" style="margin-bottom: 2rem; border-top: 4px solid #3b82f6;">
+                        <div class="panel-body" style="padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; background-color: #eff6ff;">
+                            <div>
+                                <h3 style="font-size: 1.1rem; color: #1e3a8a; margin-bottom: 0.25rem;">👷‍♂️ Identificación de Guardia</h3>
+                                <p style="font-size: 0.85rem; color: #3b82f6; margin: 0;">Ingresa tu nombre antes de procesar o tomar pedidos del almacén.</p>
+                            </div>
+                            <div style="flex: 1; max-width: 400px;">
+                                <input type="text" id="nombreGuardiaLogistica" class="form-input" style="border-color: #bfdbfe; font-weight: bold;" placeholder="Ej: Luis de Quintal" required>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="grid-system" style="grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
                         
-                        <div class="panel-body" style="padding: 1.5rem;">
-                            <form id="etiquetaForm">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
-                                    <div class="form-group" style="margin: 0;">
-                                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #334155; margin-bottom: 0.5rem; display: block;">NOMBRE DEL RESPONSABLE *</label>
-                                        <input type="text" id="etiqueta_encargado" class="form-control" style="width: 100%; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px;" placeholder="Ej. Luis de Quintal" required>
-                                    </div>
-                                    <div class="form-group" style="margin: 0;">
-                                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #334155; margin-bottom: 0.5rem; display: block;">CENTRO DE ACOPIO DESTINO *</label>
-                                        <select id="etiqueta_centro" class="form-control" style="width: 100%; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px; background-color: white;" required>
+                        <div class="panel-card" style="margin: 0;">
+                            <div class="panel-header">
+                                <h3 class="panel-title">📝 CREAR TICKET MANUAL</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form id="etiquetaForm">
+                                    <div class="form-group">
+                                        <label class="form-label">Centro de Acopio Destino *</label>
+                                        <select id="etiqueta_centro" class="form-select" required>
                                             <option value="Catia la Mar Centro">Catia la Mar Centro</option>
                                             <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
                                             <option value="Caraballeda">Caraballeda</option>
                                             <option value="Naiguatá - Camurí">Naiguatá - Camurí</option>
                                             <option value="Maiquetía">Maiquetía</option>
-                                            <option value="La Guaira-Macuto">La Guaira-Macuto</option>
+                                            <option value="La Guaira - Macuto">La Guaira - Macuto</option>
                                         </select>
                                     </div>
-                                </div>
-
-                                <div style="background-color: #f8fafc; padding: 1.5rem; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
-                                    <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #334155; margin-bottom: 1rem; display: block;">LISTA DE INSUMOS REQUERIDOS *</label>
-                                    <div id="contenedor-filas-insumos">
-                                        <div class="fila-insumo" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                                            <input type="number" class="form-control input-cantidad" placeholder="Cant." style="width: 100px; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px;" min="1" required>
-                                            <input type="text" class="form-control input-nombre-insumo" placeholder="Descripción (Ej. Bulto de Harina)" style="flex: 1; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.95rem; height: 42px;" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Categoría del Insumo *</label>
+                                        <select id="etiqueta_categoria" class="form-select" required>
+                                            <option value="medicina">💊 Medicina e Insumos Médicos</option>
+                                            <option value="alimentos">🥫 Alimentos y Bebidas</option>
+                                            <option value="higiene">🧼 Limpieza e Higiene</option>
+                                            <option value="general">🛠️ General (Ropa, Colchones, etc.)</option>
+                                        </select>
                                     </div>
-                                    <button type="button" class="btn" style="background-color: #e2e8f0; color: #0f172a; font-size: 0.85rem; font-weight: 700; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="agregarFilaInsumo()">+ AÑADIR OTRO INSUMO</button>
+                                    <div class="form-group">
+                                        <label class="form-label">Requerimiento Detallado *</label>
+                                        <textarea id="etiqueta_requerimiento" class="form-textarea" placeholder="Ej: 2 Bultos de Harina, 1 Paquete de Pañales..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-block">AÑADIR AL SISTEMA</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="panel-card" style="margin: 0; display: flex; flex-direction: column;">
+                            <div class="panel-header">
+                                <h3 class="panel-title">📤 IMPORTACIÓN MASIVA (EXCEL)</h3>
+                            </div>
+                            <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Sube una plantilla Excel para crear cientos de tickets al instante. Columnas necesarias: <strong>Centro</strong>, <strong>Categoria</strong> y <strong>Requerimiento</strong>.</p>
+                                <div class="import-zone" id="dropZoneLogistica" onclick="document.getElementById('excelFileLogistica').click()" style="margin-bottom: 0;">
+                                    <p><strong>Haz clic aquí o arrastra tu archivo Excel de Logística</strong></p>
+                                    <input type="file" id="excelFileLogistica" accept=".xlsx, .xls, .csv" style="display:none">
                                 </div>
-
-                                <button type="submit" class="btn btn-success btn-block" style="background-color: #16a34a; color: white; padding: 0.8rem; border: none; border-radius: 4px; font-weight: 700; font-size: 0.95rem; cursor: pointer;">GUARDAR REGISTRO Y ENVIAR AL SISTEMA</button>
-                            </form>
+                            </div>
                         </div>
+
                     </div>
 
-                    <div class="panel-card" style="margin-top: 2rem; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                        <div class="panel-header" style="background-color: #f8fafc; border-bottom: 1px solid #e5e7eb; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-                            <h3 class="panel-title" style="font-size: 0.95rem; font-weight: 700; text-transform: uppercase; color: #0f172a; margin: 0;">LISTA DE INSUMOS REQUERIDOS</h3>
-                            <button type="button" class="btn btn-success" style="background-color: #16a34a; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; font-weight: 700; font-size: 0.8rem; cursor: pointer;" onclick="descargarExcelLogistica()">DESCARGAR EXCEL</button>
-                        </div>
-                        <div class="table-responsive" style="padding: 0;">
-                            <table class="data-table" style="width: 100%; border-collapse: collapse;">
-                                <thead style="background-color: #0f172a; color: white;">
-                                    <tr>
-                                        <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;">ESTADO</th>
-                                        <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;">DESTINO</th>
-                                        <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;">INSUMOS (RESUMEN)</th>
-                                        <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;">ACCIÓN</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaLogisticaCuerpo">
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="toolbar" style="margin-top: 2rem;">
+                        <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--primary);">PANEL DE DESPACHO EN TIEMPO REAL</div>
+                        <button type="button" class="btn btn-success" onclick="descargarExcelLogistica()">DESCARGAR REPORTE</button>
                     </div>
-
-                    <div id="etiqueta-imprimible" style="display: none;"></div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ESTADO</th>
+                                    <th>DESTINO</th>
+                                    <th>CATEGORÍA</th>
+                                    <th>REQUERIMIENTO</th>
+                                    <th>ENCARGADO</th>
+                                    <th>ACCIÓN LOGÍSTICA</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaLogisticaCuerpo">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
     </main>
