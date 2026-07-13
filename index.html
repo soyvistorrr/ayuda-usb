@@ -370,28 +370,22 @@
                                     </div>
 
                                     <h4 style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; text-transform: uppercase;">📦 Requerimientos Logísticos (Opcional)</h4>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Medicina e Insumos</label>
-                                            <textarea id="reqMedicina" class="form-textarea" placeholder="Ej: Losartán 50mg, Inyectadoras..."></textarea>
+    
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">Medicina e Insumos Médicos</label>
+                                                <textarea id="reqMedicina" class="form-textarea" placeholder="Ej: Losartán 50mg, Inyectadoras..."></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label" style="color: #0284c7; font-weight: 700;">Alimentos, Agua, Limpieza e Higiene</label>
+                                                <textarea id="reqAliLim" class="form-textarea" placeholder="Ej: Harina, Agua potable, Pañales, Jabón..."></textarea>
+                                            </div>
                                         </div>
+                                        
                                         <div class="form-group">
-                                            <label class="form-label">Alimentos y Bebidas</label>
-                                            <textarea id="reqAlimentos" class="form-textarea" placeholder="Ej: Harina, Fórmulas lácteas..."></textarea>
+                                            <label class="form-label">Otras Solicitudes (General)</label>
+                                            <textarea id="reqOtras" class="form-textarea" placeholder="Ej: Ropa niño talla 6, Cobijas, Colchones..."></textarea>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Limpieza e Higiene</label>
-                                            <textarea id="reqLimpieza" class="form-textarea" placeholder="Ej: Pañales, Jabón azul..."></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">General (Ropa, Colchones)</label>
-                                            <textarea id="reqGeneral" class="form-textarea" placeholder="Ej: Ropa niño talla 6, Cobijas..."></textarea>
-                                        </div>
-                                    </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Observaciones Adicionales</label>
@@ -667,14 +661,14 @@
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 <div class="donation-hero-banner">
-                    <h2>¡Con tu apoyo ayudaremos a la comunidad uesebista!</h2>
-                    <p>Cada aporte financiero se traduce de forma inmediata en la compra centralizada de medicinas críticas, raciones de comida y equipamiento táctico de rescate para las cuadrillas de voluntarios de la USB.</p>
+                    <h2>¡Con tu apoyo ayudaremos a la comunidad de la USB afectada por los Terremotos!</h2>
+                    <p>Cada aporte se traduce de inmediato en soluciones concretas. Gracias a tu donación, adquirimos de forma centralizada alimentos, medicamentos esenciales, kits de higiene y limpieza, y asistencia médica para los miembros de nuestra comunidad. Asimismo, destinamos recursos clave para dotar al Cuerpo de Bomberos de la USB, asegurando que cuenten con lo necesario para seguir protegiéndonos a todos.</p>
                 </div>
                 <div class="donation-data-row">
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
                         <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
-                            <p style="line-height:1.6; margin-bottom:1rem;">Canaliza tu soporte financiero de forma digital desde el exterior utilizando tarjetas de crédito internacionales <strong>Visa, Mastercard, pasarela PayPal o cuentas Zelle</strong> directamente respaldadas por la Asociación.</p>
+                            <p style="line-height:1.6; margin-bottom:1rem;">Apoyar a la Simón desde la distancia es rápido, fácil y 100% seguro. Ponemos a tu disposición canales digitales oficiales para recibir tu contribución desde el extranjero a través de <strong>Zelle, PayPal o tarjetas de crédito internacionales Visa y Mastercard</strong>. Todo el proceso es gestionado directamente por la Asociación de Egresados de la Universidad Simón Bolívar (@aeusb), bajo estrictos estándares de transparencia y rendición de cuentas, asegurando que cada dólar sume al bienestar y fortalecimiento de nuestra comunidad USB</p>
                             <a href="https://www.aeusb.org/product/fondo-de-asistencia-de-emergencia-comunidad-usb-el-litoral" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none;">Acceder a Pasarela AEUSB</a>
                         </div>
                     </div>
@@ -943,9 +937,8 @@
                                                 <label class="form-label" style="font-size: 0.75rem;">Categoría</label>
                                                 <select class="form-select manual-cat" required>
                                                     <option value="medicina">💊 Medicina</option>
-                                                    <option value="alimentos">🥫 Alimentos</option>
-                                                    <option value="higiene">🧼 Limpieza</option>
-                                                    <option value="general">🛠️ General</option>
+                                                    <option value="alimentos_limpieza">🥫🧼 Alimentos, Agua y Limpieza</option>
+                                                    <option value="otras">🛠️ Otras Solicitudes</option>
                                                 </select>
                                             </div>
                                             <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">

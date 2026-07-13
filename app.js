@@ -273,68 +273,74 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('login_email').value.trim();
-            const password = document.getElementById('login_password').value;
-            const btnSubmit = document.getElementById('btn-login-submit');
-            
-            btnSubmit.innerText = "Verificando...";
-            btnSubmit.disabled = true;
+            const btn = document.getElementById('btn-login');
+            btn.innerText = "Verificando..."; btn.disabled = true;
+
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
 
             try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
+                const { data, error } = await supabaseClient.from('admin_users').select('*').eq('usuario', u).eq('clave', p);
+                
                 if (error) throw error;
 
-                const { data: perfilData, error: perfilError } = await supabaseClient
-                    .from('perfiles_admin')
-                    .select('*')
-                    .eq('id', data.user.id)
-                    .single();
+                if (data && data.length > 0) {
+                    const usuarioBD = data[0];
+                    esAdministrador = true;
+                    perfilUsuarioActual = usuarioBD; 
 
-                if (perfilError) throw new Error("No se encontró un perfil asignado a este usuario.");
+                    document.getElementById('view-login').style.display = "none";
+                    
+                    const rol = perfilUsuarioActual.rol;
 
-                perfilUsuarioActual = perfilData;
-                esAdministrador = true;
-                
-                document.getElementById('modal-login').style.display = 'none';
-                document.getElementById('loginForm').reset();
-                document.getElementById('btn-toggle-role').innerText = `Cerrar Sesión (${perfilUsuarioActual.rol})`;
-                
-                const malla = document.getElementById('mallaPrincipal');
-                const mallaAyuda = document.getElementById('mallaAyuda');
-                const mallaColab = document.getElementById('mallaColaboradores');
-                
-                if (malla) malla.classList.add('admin-columns-layout');
-                if (mallaAyuda) mallaAyuda.classList.add('admin-columns-layout');
-                if (mallaColab) mallaColab.classList.add('admin-columns-layout');
-                
-                document.getElementById('panel-formulario-afectado').style.display = "block";
-                document.getElementById('btn-acceso-logistica').style.display = "flex";
-                document.getElementById('panel-tabla-solicitudes').style.display = "block";
-                document.getElementById('dropZoneAyuda').style.display = "block";
-                if (perfilUsuarioActual.rol === 'super_admin') document.getElementById('filtroCentro').style.display = "inline-block";
-                document.getElementById('dropZone').style.display = "block";
-                
-                document.getElementById('btnExportar').style.display = "inline-flex";
-                document.getElementById('btnExportarColab').style.display = "inline-flex";
-                document.getElementById('btnExportarAyuda').style.display = "inline-flex";
+                    const dropAyuda = document.getElementById('dropZoneAyuda');
+                    const dropLogistica = document.getElementById('dropZoneLogistica');
+                    const filtroCen = document.getElementById('filtroCentro');
+                    if(dropAyuda) dropAyuda.style.display = "none";
+                    if(dropLogistica) dropLogistica.style.display = "none";
+                    if(filtroCen) filtroCen.style.display = "none";
 
-                document.querySelectorAll('.admin-action-header').forEach(el => el.style.display = "table-cell");
-                
-                mostrarNotificacion(`¡Bienvenido! Sede asignada: ${perfilUsuarioActual.centro_acopio}`);
-                
-                await cargarDatosDesdeNube();
+                    const panelAyuda = document.getElementById('panel-tabla-solicitudes');
+                    const panelForm = document.getElementById('panel-formulario-afectado');
+                    const btnLogisticaAcceso = document.getElementById('btn-acceso-logistica');
+                    
+                    if(panelAyuda) panelAyuda.style.display = "block";
+                    if(panelForm) panelForm.style.display = "block";
+                    if(btnLogisticaAcceso) btnLogisticaAcceso.style.display = "flex";
 
+                    if (rol === 'super_admin') {
+                        navegarA('view-home');
+                        if(dropAyuda) dropAyuda.style.display = "block";
+                        if(dropLogistica) dropLogistica.style.display = "block";
+                        if(filtroCen) filtroCen.style.display = "inline-block";
+                        
+                    } else if (rol === 'auditor') {
+                        navegarA('view-home');
+                        if(filtroCen) filtroCen.style.display = "inline-block";
+                        
+                    } else if (rol === 'admin_busqueda') {
+                        navegarA('view-busqueda');
+                        
+                    } else if (rol === 'admin_centro') {
+                        if(dropAyuda) dropAyuda.style.display = "block";
+                        if(dropLogistica) dropLogistica.style.display = "block";
+                        
+                        navegarA('view-ayuda'); 
+                        
+                    } else if (rol === 'especialista_cva') {
+                        navegarA('view-logistica');
+                    }
+
+                    cargarDatosDesdeNube();
+
+                } else {
+                    alert("Credenciales incorrectas.");
+                }
             } catch (err) {
-                alert("Error de acceso: " + (err.message === "Invalid login credentials" ? "Correo o contraseña incorrectos." : err.message));
-            } finally {
-                btnSubmit.innerText = "Ingresar al Sistema";
-                btnSubmit.disabled = false;
+                console.error("Error login:", err);
+                alert("Error de conexión al verificar credenciales.");
             }
+            btn.innerText = "Ingresar"; btn.disabled = false;
         });
 
         function enmascararTelefono(tlf) {
@@ -782,9 +788,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             document.getElementById('adultosMayores').value = reg.adultos_mayores_hogar || 0;
             
             document.getElementById('reqMedicina').value = reg.req_medicina || '';
-            document.getElementById('reqAlimentos').value = reg.req_alimentos || '';
-            document.getElementById('reqLimpieza').value = reg.req_limpieza || '';
-            document.getElementById('reqGeneral').value = reg.req_general || '';
+            document.getElementById('reqAliLim').value = reg.req_alimentos || '';
+            document.getElementById('reqOtras').value = reg.req_general || '';
             document.getElementById('observacionesAfectado').value = reg.descripcion_ayuda || '';
 
             const formSubmitBtn = document.querySelector('#formSolicitudAyuda button[type="submit"]');
@@ -819,9 +824,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             e.preventDefault();
             
             const reqMed = document.getElementById('reqMedicina').value.trim();
-            const reqAli = document.getElementById('reqAlimentos').value.trim();
-            const reqHig = document.getElementById('reqLimpieza').value.trim();
-            const reqGen = document.getElementById('reqGeneral').value.trim();
+            const reqAliLim = document.getElementById('reqAliLim').value.trim();
+            const reqOtras = document.getElementById('reqOtras').value.trim();
+            
             const puntoSeleccionado = document.getElementById('puntoUsbForm').value;
             const grupoSeleccionado = document.getElementById('grupoAfectado').value;
             
@@ -853,9 +858,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 ninos_hogar: parseInt(document.getElementById('ninosHogar').value) || 0,
                 adultos_mayores_hogar: parseInt(document.getElementById('adultosMayores').value) || 0,
                 req_medicina: reqMed,
-                req_alimentos: reqAli,
-                req_limpieza: reqHig,
-                req_general: reqGen,
+                req_alimentos: reqAliLim,
+                req_limpieza: '',
+                req_general: reqOtras,
                 descripcion_ayuda: observacionesFinales 
             };
 
@@ -877,8 +882,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                     let ticketsAInsertar = [];
                     const categorias = [
-                        { cat: 'medicina', val: reqMed }, { cat: 'alimentos', val: reqAli },
-                        { cat: 'higiene', val: reqHig }, { cat: 'general', val: reqGen }
+                        { cat: 'medicina', val: reqMed }, 
+                        { cat: 'alimentos_limpieza', val: reqAliLim },
+                        { cat: 'otras', val: reqOtras }
                     ];
 
                     for (let c of categorias) {
@@ -911,9 +917,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const ticketsLogistica = [];
                     
                     if (reqMed) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'medicina', requerimiento: reqMed, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
-                    if (reqAli) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'alimentos', requerimiento: reqAli, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
-                    if (reqHig) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'higiene', requerimiento: reqHig, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
-                    if (reqGen) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'general', requerimiento: reqGen, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                    if (reqAliLim) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'alimentos_limpieza', requerimiento: reqAliLim, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
+                    if (reqOtras) ticketsLogistica.push({ solicitud_id: solicitudId, categoria_insumo: 'otras', requerimiento: reqOtras, punto_usb: puntoSeleccionado, estado: 'Pendiente', encargado: 'Sin Asignar' });
 
                     if (ticketsLogistica.length > 0) {
                         await supabaseClient.from('etiquetas_logistica').insert(ticketsLogistica);
@@ -1290,11 +1295,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             let filtrados = ayudaNube.filter(a => {
                 
-                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') {
+                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
                     if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
                 }
                 
-                if (perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin') {
+                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'auditor')) {
                     if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
                 }
 
@@ -1317,7 +1322,74 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                 return cumpleTexto && cumpleDam && cumpleDesp;
             });
-            actualizarInterfazAyuda(filtrados);
+
+            const thead = document.getElementById('theadAyuda');
+            const tbody = document.getElementById('tablaAyudaCuerpo');
+            if(!thead || !tbody) return;
+
+            thead.innerHTML = `
+                <tr>
+                    <th>ESTADO VITAL</th>
+                    <th>PUNTO ACÓPIO</th>
+                    <th>AFECTADO</th>
+                    <th>CONTACTO</th>
+                    <th>DAMNIFICADO</th>
+                    <th>ESTADO DESPACHO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            `;
+
+            tbody.innerHTML = '';
+            if(filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">No hay registros que coincidan con la búsqueda.</td></tr>';
+                return;
+            }
+
+            filtrados.forEach(a => {
+                let colorEstado = 'var(--gray-500)';
+                if(a.estado === 'Con vida') colorEstado = 'var(--success)';
+                if(a.estado === 'Atrapado') colorEstado = 'var(--danger)';
+                if(a.estado === 'Desaparecido') colorEstado = 'var(--dark)';
+
+                let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+                let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
+                
+                let alertaMedica = a.requiere_atencion_medica ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Req. Atención Médica</div>` : '';
+
+                let colorDespacho = '#64748b'; 
+                let estDespacho = a.estado_despacho_calculado || 'Sin Pedido';
+                if(estDespacho === 'Pendiente') colorDespacho = '#dc2626';     
+                if(estDespacho === 'En Proceso') colorDespacho = '#f59e0b';    
+                if(estDespacho === 'Despachado') colorDespacho = '#10b981';    
+                let badgeDespacho = `<span class="badge" style="background:${colorDespacho}; color:white; font-size: 0.8rem; padding: 4px 8px;">${estDespacho}</span>`;
+
+                let btnEditar = '';
+                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda' || perfilUsuarioActual.rol === 'especialista_cva')) {
+                    btnEditar = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Lectura</span>`;
+                } else {
+                    btnEditar = `<button class="btn btn-warning" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar / Ver</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td data-label="Estado Vital"><span style="color:${colorEstado}; font-weight:bold;">●</span> ${a.estado || 'Desconocido'}</td>
+                        <td data-label="Punto Acopio"><strong>${a.punto_usb || 'Sin Asignar'}</strong></td>
+                        <td data-label="Afectado">
+                            <div style="font-weight:bold;">${a.nombre || '-'}</div>
+                            <div style="font-size:0.8rem; color:#64748b;">C.I: ${a.cedula || '-'}</div>
+                        </td>
+                        <td data-label="Contacto">
+                            <div>${a.telefono || '-'}</div>
+                            <div style="font-size:0.8rem; color:#64748b;">${a.ubicacion || '-'}</div>
+                        </td>
+                        <td data-label="Damnificado">${badgeDam} ${alertaMedica}</td>
+                        <td data-label="Despacho">${badgeDespacho}</td>
+                        <td data-label="Acciones" class="actions-cell">
+                            ${btnEditar}
+                        </td>
+                    </tr>
+                `;
+            });
         };
 
         document.getElementById('buscarAyudaInput').addEventListener('input', filtrarYActualizarAyuda);
@@ -1343,7 +1415,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 "Afectado", "Cédula", "Teléfono", "Correo", "Comunidad", "Relación USB", 
                 "Estado Vital", "Ubicación", "Es Damnificado", 
                 "Atención Médica", "Total Personas", "Niños", "Adultos Mayores", 
-                "Req. Medicina", "Req. Alimentos", "Req. Limpieza", "Req. General", "Observaciones"
+                "Req. Medicina", "Req. Alimentos/Agua/Limpieza", "Otras Solicitudes", "Observaciones"
             ]];
 
             datosAExportar.forEach(a => {
@@ -1355,7 +1427,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO",
                     a.requiere_atencion_medica ? "SÍ" : "NO",
                     a.personas_hogar || 1, a.ninos_hogar || 0, a.adultos_mayores_hogar || 0,
-                    a.req_medicina || '-', a.req_alimentos || '-', a.req_limpieza || '-', a.req_general || '-', a.descripcion_ayuda || '-'
+                    a.req_medicina || '-', a.req_alimentos || '-', a.req_general || '-', a.descripcion_ayuda || '-'
                 ]);
             });
 
@@ -1508,9 +1580,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     <div class="form-group" style="flex: 2; margin-bottom: 0;">
                         <select class="form-select manual-cat" required>
                             <option value="medicina">💊 Medicina</option>
-                            <option value="alimentos">🥫 Alimentos</option>
-                            <option value="higiene">🧼 Limpieza</option>
-                            <option value="general">🛠️ General</option>
+                            <option value="alimentos_limpieza">🥫🧼 Alimentos, Agua y Limpieza</option>
+                            <option value="otras">🛠️ Otras Solicitudes</option>
                         </select>
                     </div>
                     <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
@@ -1532,7 +1603,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const nombreDestino = beneficiarioTxt ? `Para: ${beneficiarioTxt}` : 'Sin Asignar';
             const filas = document.querySelectorAll('.insumo-row');
             
-            let agrupados = { medicina: [], alimentos: [], higiene: [], general: [] };
+            let agrupados = { medicina: [], alimentos_limpieza: [], otras: [] };
             
             filas.forEach(fila => {
                 let cant = fila.querySelector('.manual-cant').value;
@@ -1627,18 +1698,24 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 if (p.estado === 'Empacando') badgeColor = 'badge-warning';
                 if (p.estado === 'Despachado') badgeColor = 'badge-success';
 
-                let iconoCategoria = '📦';
-                if (p.categoria_insumo === 'medicina') iconoCategoria = '💊';
-                if (p.categoria_insumo === 'alimentos') iconoCategoria = '🥫';
-                if (p.categoria_insumo === 'higiene') iconoCategoria = '🧼';
+                let icono = '📦';
+                if(p.categoria_insumo === 'medicina') icono = '💊';
+                if(p.categoria_insumo === 'alimentos_limpieza') icono = '🥫🧼';
+                if(p.categoria_insumo === 'otras') icono = '🛠️';
                 
                 let btnAccion = '';
-                if (p.estado === 'Pendiente') {
-                    btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
-                } else if (p.estado === 'Empacando') {
-                    btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="imprimirYDespachar('${p.id}')">🖨️ Despachar</button>`;
-                } else {
-                    btnAccion = `<button class="btn" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%; cursor:not-allowed;" disabled>✅ Finalizado</button>`;
+                
+                if (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda') {
+                    btnAccion = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Vista</span>`;
+                } 
+                else {
+                    if (p.estado === 'Pendiente') {
+                        btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
+                    } else if (p.estado === 'Empacando') {
+                        btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="imprimirYDespachar('${p.id}')">🖨️ Despachar</button>`;
+                    } else {
+                        btnAccion = `<button class="btn" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%; cursor:not-allowed;" disabled>✅ Finalizado</button>`;
+                    }
                 }
 
                 let reqTexto = p.requerimiento || '-';
