@@ -1979,10 +1979,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         };
 
         window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
-            let sedeArchivo = file.name.replace(/\.[^/.]+$/, "").trim(); 
+            let sedeArchivo = file.name.replace(/\.[^/.]+$/, "").trim();
 
             const lector = new FileReader();
             lector.onload = async function(evt) {
+                const dropZone = document.getElementById(dropZoneId);
+                const pElement = dropZone.querySelector('p');
+                const textoOriginal = pElement.innerHTML;
+                
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const libro = XLSX.read(data, { type: 'array' });
@@ -1992,32 +1996,33 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     let cabecera = [];
                     while (rawData.length > 0) {
                         let tempCabecera = rawData[0].map(c => String(c).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
-                        if (tempCabecera.some(c => c.includes('nombre') || c.includes('cedula') || c.includes('requerimiento'))) {
+                        if (tempCabecera.some(c => c.includes('nombre') || c.includes('cedula') || c.includes('requerimiento') || c.includes('afectado'))) {
                             cabecera = tempCabecera;
                             break;
                         }
                         rawData.shift();
                     }
 
-                    if(cabecera.length === 0) { alert("No se reconoció el formato de la plantilla."); return; }
+                    if(cabecera.length === 0) { 
+                        alert("No se reconoció el formato de la plantilla."); 
+                        document.getElementById(inputId).value = '';
+                        return; 
+                    }
                     rawData.shift(); 
                     
-                    let esExcelPedidos = cabecera.some(c => c.includes('fecha'));
-                    let esExcelAyuda = cabecera.some(c => c.includes('damnificado') || c.includes('comunidad')) && !esExcelPedidos;
+                    let esExcelAyuda = cabecera.some(c => c.includes('damnificado') || c.includes('estado vital') || c.includes('afectado'));
+                    let esExcelPedidos = cabecera.some(c => c.includes('categoria insumo') || c.includes('ticket logistico'));
 
-                    document.getElementById(dropZoneId).innerHTML = "<p><strong>⏳ Procesando archivo. Cruzando datos con el servidor...</strong></p>";
+                    pElement.innerHTML = "<strong>⏳ Procesando archivo. Cruzando datos con el servidor...</strong>";
 
                     let ticketsNuevosGenerados = 0; let personasActualizadas = 0; let personasNuevas = 0; let duplicadosOmitidos = 0;
 
-                    const resLog = await supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb');
-                    let inventarioLogistico = resLog.data || [];
-
                     if (esExcelPedidos) {
-                        let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula') || c.includes('afectado'));
-                        let iNom = cabecera.findIndex(c => c.includes('nombre'));
+                        let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
+                        let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('beneficiario'));
                         let iMed = cabecera.findIndex(c => c.includes('medicina'));
                         let iAli = cabecera.findIndex(c => c.includes('alimento') || c.includes('agua'));
-                        let iOtr = cabecera.findIndex(c => c.includes('otras') || c.includes('solicitudes'));
+                        let iOtr = cabecera.findIndex(c => c.includes('otras') || c.includes('solicitudes') || c.includes('requerimiento'));
 
                         let ticketsAInsertar = [];
 
@@ -2026,7 +2031,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
                             if (!nomVal && cedVal === '-') continue;
 
-                            let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
+                            let personaExistente = ayudaNube.find(p => {
+                                if (cedVal !== '-' && p.cedula === cedVal) return true;
+                                if (nomVal && p.nombre && p.nombre.toLowerCase() === nomVal.toLowerCase()) return true;
+                                return false;
+                            });
                             let idAsignado = personaExistente ? personaExistente.id : null;
 
                             let reqsObj = [
@@ -2055,18 +2064,24 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         }
 
                     } else if (esExcelAyuda) {
-                        let iNom = cabecera.findIndex(c => c.includes('nombre'));
+                        let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
                         let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
                         let iCar = cabecera.findIndex(c => c.includes('carnet'));
-                        let iCom = cabecera.findIndex(c => c.includes('comunidad'));
+                        let iCom = cabecera.findIndex(c => c.includes('comunidad') || c.includes('relacion usb'));
                         let iDir = cabecera.findIndex(c => c.includes('direccion') || c.includes('ubicacion'));
-                        let iTel = cabecera.findIndex(c => c.includes('whatsapp') || c.includes('telefono'));
+                        let iTel = cabecera.findIndex(c => c.includes('whatsapp') || c.includes('telefono') || c.includes('contacto'));
                         let iCor = cabecera.findIndex(c => c.includes('correo'));
                         let iDam = cabecera.findIndex(c => c.includes('damnificado'));
-                        let iPer = cabecera.findIndex(c => c.includes('personas'));
+                        let iPer = cabecera.findIndex(c => c.includes('personas') || c.includes('total personas'));
                         let iNin = cabecera.findIndex(c => c.includes('niños') || c.includes('ninos'));
                         let iAdu = cabecera.findIndex(c => c.includes('adultos'));
                         let iObs = cabecera.findIndex(c => c.includes('observaciones'));
+                        
+                        let iEst = cabecera.findIndex(c => c.includes('estado vital'));
+                        let iReqMed = cabecera.findIndex(c => c.includes('req. medicina') || c.includes('medicina'));
+                        let iReqAli = cabecera.findIndex(c => c.includes('req. alimento') || c.includes('agua/limpieza') || c.includes('alimento'));
+                        let iReqGen = cabecera.findIndex(c => c.includes('otras solicitudes') || c.includes('general'));
+                        let iAtencion = cabecera.findIndex(c => c.includes('atencion medica'));
 
                         for (let row of rawData) {
                             let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
@@ -2074,6 +2089,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                             let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
                             let isDam = iDam !== -1 ? String(row[iDam] || '').toLowerCase().includes('si') || String(row[iDam] || '').toLowerCase().includes('sí') : false;
+                            
+                            let estVital = iEst !== -1 ? String(row[iEst] || 'Sin Información').trim() : 'Sin Información';
+                            let reqMedVal = iReqMed !== -1 ? String(row[iReqMed] || '').trim() : '';
+                            let reqAliVal = iReqAli !== -1 ? String(row[iReqAli] || '').trim() : '';
+                            let reqGenVal = iReqGen !== -1 ? String(row[iReqGen] || '').trim() : '';
+                            let atencionVal = iAtencion !== -1 ? String(row[iAtencion] || '').toLowerCase().includes('si') : false;
 
                             let payloadPersona = {
                                 nombre: nomVal, cedula: cedVal, telefono: iTel !== -1 ? String(row[iTel] || '-').trim() : '-',
@@ -2082,16 +2103,25 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 ubicacion: iDir !== -1 ? String(row[iDir] || '-').trim() : '-', es_damnificado: isDam,
                                 personas_hogar: iPer !== -1 ? (parseInt(row[iPer]) || 1) : 1, ninos_hogar: iNin !== -1 ? (parseInt(row[iNin]) || 0) : 0,
                                 adultos_mayores_hogar: iAdu !== -1 ? (parseInt(row[iAdu]) || 0) : 0, descripcion_ayuda: iObs !== -1 ? String(row[iObs] || '').trim() : '',
-                                punto_usb: sedeArchivo 
+                                punto_usb: sedeArchivo,
+                                estado: estVital,
+                                req_medicina: reqMedVal !== '-' ? reqMedVal : '',
+                                req_alimentos: reqAliVal !== '-' ? reqAliVal : '',
+                                req_general: reqGenVal !== '-' ? reqGenVal : '',
+                                requiere_atencion_medica: atencionVal
                             };
 
-                            let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
+                            let personaExistente = ayudaNube.find(p => {
+                                if (cedVal !== '-' && p.cedula === cedVal) return true;
+                                if (nomVal && p.nombre && p.nombre.toLowerCase() === nomVal.toLowerCase()) return true;
+                                return false;
+                            });
 
                             if (personaExistente) {
                                 await supabaseClient.from('solicitudes_ayuda').update(payloadPersona).eq('id', personaExistente.id);
                                 personasActualizadas++;
                             } else {
-                                payloadPersona.estado = 'Sin Información'; payloadPersona.estado_despacho = 'Sin Pedido';
+                                payloadPersona.estado_despacho = 'Sin Pedido';
                                 await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]);
                                 personasNuevas++;
                             }
@@ -2099,7 +2129,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                     } else {
                         let iReq = cabecera.findIndex(c => c.includes('requerimiento') || c.includes('insumo'));
-                        if (iReq === -1) { alert("Error: El Excel debe tener una columna 'Requerimiento' o usar los formatos oficiales."); return; }
+                        if (iReq === -1) { 
+                            alert("Error: El Excel debe tener una columna 'Requerimiento' o usar los formatos oficiales."); 
+                            pElement.innerHTML = textoOriginal;
+                            document.getElementById(inputId).value = '';
+                            return; 
+                        }
                         for (let row of rawData) {
                             let reqVal = String(row[iReq] || '').trim();
                             if (!reqVal) continue;
@@ -2111,17 +2146,18 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                     alert(`✅ Carga Maestra Finalizada:\n\n👤 ${personasNuevas} personas nuevas.\n🔄 ${personasActualizadas} personas actualizadas.\n📦 ${ticketsNuevosGenerados} tickets nuevos.\n⚠️ ${duplicadosOmitidos} duplicados omitidos.`);
                     
+                    pElement.innerHTML = textoOriginal;
                     document.getElementById(inputId).value = ''; 
-                    document.getElementById(dropZoneId).innerHTML = `<p><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel</strong></p><input type="file" id="${inputId}" accept=".xlsx, .xls, .csv" style="display:none">`;
                     
                     await cargarDatosDesdeNube();
                     if(typeof filtrarYActualizarAyuda === "function") filtrarYActualizarAyuda();
                     if(typeof cargarTablaLogisticaFuerza === "function") cargarTablaLogisticaFuerza();
 
                 } catch (err) { 
-                    alert('Error en el procesamiento. Revisa el archivo.'); console.error(err); 
+                    alert('Error en el procesamiento. Revisa el archivo.'); 
+                    console.error(err); 
+                    pElement.innerHTML = textoOriginal;
                     document.getElementById(inputId).value = ''; 
-                    document.getElementById(dropZoneId).innerHTML = `<p><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel</strong></p><input type="file" id="${inputId}" accept=".xlsx, .xls, .csv" style="display:none">`;
                 }
             };
             lector.readAsArrayBuffer(file);
