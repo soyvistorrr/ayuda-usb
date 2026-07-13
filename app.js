@@ -293,11 +293,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     esAdministrador = true;
                     perfilUsuarioActual = usuarioBD; 
 
-                    const pantallaLogin = document.getElementById('view-login') || document.getElementById('loginModal') || document.getElementById('modalLogin');
-                    if (pantallaLogin) {
-                        pantallaLogin.style.display = "none";
-                    } else {
-                        console.log("Aviso: No se ocultó el login porque el ID no coincide, pero el acceso fue exitoso.");
+                    const formLogin = document.getElementById('loginForm');
+                    if (formLogin) {
+                        const contenedorPrincipal = formLogin.closest('section') || formLogin.closest('div[id^="view"]');
+                        if (contenedorPrincipal) {
+                            contenedorPrincipal.style.display = 'none';
+                        } else {
+                            formLogin.style.display = 'none'; 
+                        }
                     }
                     
                     const rol = perfilUsuarioActual.rol;
@@ -309,50 +312,43 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if(dropLogistica) dropLogistica.style.display = "none";
                     if(filtroCen) filtroCen.style.display = "none";
 
-                    const panelAyuda = document.getElementById('panel-tabla-solicitudes');
-                    const panelForm = document.getElementById('panel-formulario-afectado');
-                    const btnLogisticaAcceso = document.getElementById('btn-acceso-logistica');
-                    
-                    if(panelAyuda) panelAyuda.style.display = "block";
-                    if(panelForm) panelForm.style.display = "block";
-                    if(btnLogisticaAcceso) btnLogisticaAcceso.style.display = "flex";
-
                     try {
-                        const btnHome = document.querySelector('[onclick*="view-home"]');
-                        const btnAyuda = document.querySelector('[onclick*="view-ayuda"]');
-                        const btnLogistica = document.querySelector('[onclick*="view-logistica"]');
-                        const btnBusqueda = document.querySelector('[onclick*="view-busqueda"]');
+                        if(typeof navegarA === 'function') navegarA('view-home');
 
-                        if(btnHome) btnHome.style.display = "inline-block";
-                        if(btnAyuda) btnAyuda.style.display = "inline-block";
-                        if(btnLogistica) btnLogistica.style.display = "inline-block";
-                        if(btnBusqueda) btnBusqueda.style.display = "inline-block";
+                        const elementosAyuda = document.querySelectorAll('[onclick*="view-ayuda"]');
+                        const elementosLogistica = document.querySelectorAll('[onclick*="view-logistica"]');
+                        const elementosBusqueda = document.querySelectorAll('[onclick*="view-busqueda"]');
+
+                        const mostrarElementos = (nodos, mostrar) => {
+                            nodos.forEach(nodo => { nodo.style.display = mostrar ? "" : "none"; });
+                        };
 
                         if (rol === 'super_admin' || rol === 'auditor') {
-                            if(dropAyuda) dropAyuda.style.display = "block";
-                            if(dropLogistica) dropLogistica.style.display = "block";
-                            if(filtroCen) filtroCen.style.display = "inline-block";
-                            if(typeof navegarA === 'function') navegarA('view-home');
-
-                        } else if (rol === 'admin_busqueda') {
-                            if(btnHome) btnHome.style.display = "none";
-                            if(btnAyuda) btnAyuda.style.display = "none";
-                            if(btnLogistica) btnLogistica.style.display = "none";
-                            if(typeof navegarA === 'function') navegarA('view-busqueda');
-
-                        } else if (rol === 'admin_centro') {
-                            if(btnHome) btnHome.style.display = "none";
-                            if(btnBusqueda) btnBusqueda.style.display = "none";
+                            mostrarElementos(elementosAyuda, true);
+                            mostrarElementos(elementosLogistica, true);
+                            mostrarElementos(elementosBusqueda, true);
                             
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
-                            if(typeof navegarA === 'function') navegarA('view-ayuda'); 
+                            if(filtroCen) filtroCen.style.display = "inline-block";
+
+                        } else if (rol === 'admin_busqueda') {
+                            mostrarElementos(elementosAyuda, false);
+                            mostrarElementos(elementosLogistica, false);
+                            mostrarElementos(elementosBusqueda, true);
+
+                        } else if (rol === 'admin_centro') {
+                            mostrarElementos(elementosAyuda, true);
+                            mostrarElementos(elementosLogistica, true);
+                            mostrarElementos(elementosBusqueda, false);
+                            
+                            if(dropAyuda) dropAyuda.style.display = "block";
+                            if(dropLogistica) dropLogistica.style.display = "block";
 
                         } else if (rol === 'especialista_cva') {
-                            if(btnHome) btnHome.style.display = "none";
-                            if(btnAyuda) btnAyuda.style.display = "none";
-                            if(btnBusqueda) btnBusqueda.style.display = "none";
-                            if(typeof navegarA === 'function') navegarA('view-logistica');
+                            mostrarElementos(elementosAyuda, false);
+                            mostrarElementos(elementosLogistica, true);
+                            mostrarElementos(elementosBusqueda, false);
                         }
 
                     } catch(navErr) {
