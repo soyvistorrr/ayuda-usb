@@ -335,6 +335,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         const elementosAyuda = document.querySelectorAll('[onclick*="view-necesito-ayuda"]');
                         const elementosLogistica = document.querySelectorAll('[onclick*="view-etiquetas-logistica"]');
                         const elementosBusqueda = document.querySelectorAll('[onclick*="view-buscar"]');
+                        const elementosColaborar = document.querySelectorAll('[onclick*="view-colaborar"]'); // Agregamos Colaborar
 
                         const mostrarElementos = (nodos, mostrar) => {
                             nodos.forEach(nodo => { nodo.style.display = mostrar ? "" : "none"; });
@@ -344,6 +345,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             mostrarElementos(elementosAyuda, true);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, true);
+                            mostrarElementos(elementosColaborar, true); 
                             
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
@@ -353,11 +355,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             mostrarElementos(elementosAyuda, false);
                             mostrarElementos(elementosLogistica, false);
                             mostrarElementos(elementosBusqueda, true);
+                            mostrarElementos(elementosColaborar, true);
 
                         } else if (rol === 'admin_centro') {
                             mostrarElementos(elementosAyuda, true);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, false);
+                            mostrarElementos(elementosColaborar, false);
+                            
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
 
@@ -365,6 +370,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             mostrarElementos(elementosAyuda, false);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, false);
+                            mostrarElementos(elementosColaborar, false);
+                            
                         } else {
                             console.warn("Rol no reconocido:", rol);
                             alert("Atención: Tu usuario no tiene un rol válido asignado.");
