@@ -295,13 +295,19 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                     const formLogin = document.getElementById('loginForm');
                     if (formLogin) {
-                        const contenedorPrincipal = formLogin.closest('section') || formLogin.closest('div[id^="view"]');
-                        if (contenedorPrincipal) {
-                            contenedorPrincipal.style.display = 'none';
+                        const modalPadre = formLogin.closest('.modal') || formLogin.closest('[class*="modal"]') || formLogin.closest('[id*="modal"]');
+                        
+                        if (modalPadre) {
+                            modalPadre.style.display = 'none';
                         } else {
-                            formLogin.style.display = 'none'; 
+                            formLogin.parentElement.style.display = 'none';
+                            if(formLogin.parentElement.parentElement) {
+                                formLogin.parentElement.parentElement.style.display = 'none';
+                            }
                         }
                     }
+                    
+                    document.body.style.overflow = "auto";
                     
                     const rol = perfilUsuarioActual.rol;
 
