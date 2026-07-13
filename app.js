@@ -293,7 +293,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     esAdministrador = true;
                     perfilUsuarioActual = usuarioBD; 
 
-                    document.getElementById('view-login').style.display = "none";
+                    const pantallaLogin = document.getElementById('view-login') || document.getElementById('loginModal') || document.getElementById('modalLogin');
+                    if (pantallaLogin) {
+                        pantallaLogin.style.display = "none";
+                    } else {
+                        console.log("Aviso: No se ocultó el login porque el ID no coincide, pero el acceso fue exitoso.");
+                    }
                     
                     const rol = perfilUsuarioActual.rol;
 
@@ -312,22 +317,46 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if(panelForm) panelForm.style.display = "block";
                     if(btnLogisticaAcceso) btnLogisticaAcceso.style.display = "flex";
 
-                    if (rol === 'super_admin') {
-                        navegarA('view-home');
-                        if(dropAyuda) dropAyuda.style.display = "block";
-                        if(dropLogistica) dropLogistica.style.display = "block";
-                        if(filtroCen) filtroCen.style.display = "inline-block";
-                    } else if (rol === 'auditor') {
-                        navegarA('view-home');
-                        if(filtroCen) filtroCen.style.display = "inline-block";
-                    } else if (rol === 'admin_busqueda') {
-                        navegarA('view-busqueda');
-                    } else if (rol === 'admin_centro') {
-                        if(dropAyuda) dropAyuda.style.display = "block";
-                        if(dropLogistica) dropLogistica.style.display = "block";
-                        navegarA('view-ayuda'); 
-                    } else if (rol === 'especialista_cva') {
-                        navegarA('view-logistica');
+                    try {
+                        const btnHome = document.querySelector('[onclick*="view-home"]');
+                        const btnAyuda = document.querySelector('[onclick*="view-ayuda"]');
+                        const btnLogistica = document.querySelector('[onclick*="view-logistica"]');
+                        const btnBusqueda = document.querySelector('[onclick*="view-busqueda"]');
+
+                        if(btnHome) btnHome.style.display = "inline-block";
+                        if(btnAyuda) btnAyuda.style.display = "inline-block";
+                        if(btnLogistica) btnLogistica.style.display = "inline-block";
+                        if(btnBusqueda) btnBusqueda.style.display = "inline-block";
+
+                        if (rol === 'super_admin' || rol === 'auditor') {
+                            if(dropAyuda) dropAyuda.style.display = "block";
+                            if(dropLogistica) dropLogistica.style.display = "block";
+                            if(filtroCen) filtroCen.style.display = "inline-block";
+                            if(typeof navegarA === 'function') navegarA('view-home');
+
+                        } else if (rol === 'admin_busqueda') {
+                            if(btnHome) btnHome.style.display = "none";
+                            if(btnAyuda) btnAyuda.style.display = "none";
+                            if(btnLogistica) btnLogistica.style.display = "none";
+                            if(typeof navegarA === 'function') navegarA('view-busqueda');
+
+                        } else if (rol === 'admin_centro') {
+                            if(btnHome) btnHome.style.display = "none";
+                            if(btnBusqueda) btnBusqueda.style.display = "none";
+                            
+                            if(dropAyuda) dropAyuda.style.display = "block";
+                            if(dropLogistica) dropLogistica.style.display = "block";
+                            if(typeof navegarA === 'function') navegarA('view-ayuda'); 
+
+                        } else if (rol === 'especialista_cva') {
+                            if(btnHome) btnHome.style.display = "none";
+                            if(btnAyuda) btnAyuda.style.display = "none";
+                            if(btnBusqueda) btnBusqueda.style.display = "none";
+                            if(typeof navegarA === 'function') navegarA('view-logistica');
+                        }
+
+                    } catch(navErr) {
+                        console.log("Aviso visual en la navegación:", navErr);
                     }
 
                     await cargarDatosDesdeNube();
