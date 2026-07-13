@@ -280,7 +280,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const p = document.getElementById('adminPass').value;
 
             try {
-                const { data, error } = await supabaseClient.from('admin_users').select('*').eq('usuario', u).eq('clave', p);
+                const { data, error } = await supabaseClient.from('perfiles_admin').select('*').eq('usuario', u).eq('clave', p);
                 
                 if (error) throw error;
 
