@@ -1494,6 +1494,32 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }
 
         cargarDatosDesdeNube();
+        
+        window.agregarFilaInsumoManual = function() {
+            const contenedor = document.getElementById('contenedor-insumos-manuales');
+            const htmlFila = `
+                <div class="insumo-row form-row" style="align-items: flex-end; margin-bottom: 10px; gap: 10px;">
+                    <div class="form-group" style="flex: 0 0 70px; margin-bottom: 0;">
+                        <input type="number" class="form-input manual-cant" min="1" required placeholder="#">
+                    </div>
+                    <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                        <input type="text" class="form-input manual-nombre" required placeholder="Ej: Nombre de insumo...">
+                    </div>
+                    <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                        <select class="form-select manual-cat" required>
+                            <option value="medicina">💊 Medicina</option>
+                            <option value="alimentos">🥫 Alimentos</option>
+                            <option value="higiene">🧼 Limpieza</option>
+                            <option value="general">🛠️ General</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                        <button type="button" class="btn btn-delete" style="padding: 0.6rem; height: 100%; font-weight: bold;" onclick="this.parentElement.parentElement.remove()" title="Eliminar fila">✖</button>
+                    </div>
+                </div>
+            `;
+            contenedor.insertAdjacentHTML('beforeend', htmlFila);
+        };
 
         document.getElementById('etiquetaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1501,24 +1527,75 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const btn = this.querySelector('button[type="submit"]');
             btn.innerText = "Guardando..."; btn.disabled = true;
             
-            const payload = {
-                punto_usb: document.getElementById('etiqueta_centro').value,
-                categoria_insumo: document.getElementById('etiqueta_categoria').value,
-                requerimiento: document.getElementById('etiqueta_requerimiento').value.trim(),
-                estado: "Pendiente",
-                encargado: "Sin Asignar"
-            };
+            const centro = document.getElementById('etiqueta_centro').value;
+            const beneficiarioTxt = document.getElementById('etiqueta_beneficiario').value.trim();
+            const nombreDestino = beneficiarioTxt ? `Para: ${beneficiarioTxt}` : 'Sin Asignar';
+            const filas = document.querySelectorAll('.insumo-row');
             
-            const { error } = await supabaseClient.from('etiquetas_logistica').insert([payload]);
+            let agrupados = { medicina: [], alimentos: [], higiene: [], general: [] };
+            
+            filas.forEach(fila => {
+                let cant = fila.querySelector('.manual-cant').value;
+                let nom = fila.querySelector('.manual-nombre').value.trim();
+                let cat = fila.querySelector('.manual-cat').value;
+                if (cant && nom) {
+                    agrupados[cat].push(`${cant} x ${nom}`);
+                }
+            });
+            
+            let nuevosTickets = [];
+            for (let cat in agrupados) {
+                if (agrupados[cat].length > 0) {
+                    nuevosTickets.push({
+                        punto_usb: centro,
+                        categoria_insumo: cat,
+                        requerimiento: agrupados[cat].join(', '),
+                        estado: "Pendiente",
+                        encargado: nombreDestino
+                    });
+                }
+            }
+            
+            if (nuevosTickets.length === 0) {
+                alert("Debes agregar al menos un insumo válido.");
+                btn.innerText = "CREAR PEDIDO EN EL SISTEMA"; btn.disabled = false;
+                return;
+            }
+            
+            const { error } = await supabaseClient.from('etiquetas_logistica').insert(nuevosTickets);
             
             if(error) { 
-                alert("Error: " + error.message); 
+                alert("Error de guardado: " + error.message); 
             } else {
-                mostrarNotificacion("¡Ticket logístico añadido al almacén!");
-                this.reset();
+                mostrarNotificacion("¡Pedido logístico separado y añadido al almacén!");
+                
+                document.getElementById('contenedor-insumos-manuales').innerHTML = `
+                    <div class="insumo-row form-row" style="align-items: flex-end; margin-bottom: 10px; gap: 10px;">
+                        <div class="form-group" style="flex: 0 0 70px; margin-bottom: 0;">
+                            <label class="form-label" style="font-size: 0.75rem;">Cant.</label>
+                            <input type="number" class="form-input manual-cant" min="1" required placeholder="#">
+                        </div>
+                        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                            <label class="form-label" style="font-size: 0.75rem;">Nombre del Insumo</label>
+                            <input type="text" class="form-input manual-nombre" required placeholder="Ej: Harina PAN">
+                        </div>
+                        <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                            <label class="form-label" style="font-size: 0.75rem;">Categoría</label>
+                            <select class="form-select manual-cat" required>
+                                <option value="medicina">💊 Medicina</option>
+                                <option value="alimentos">🥫 Alimentos</option>
+                                <option value="higiene">🧼 Limpieza</option>
+                                <option value="general">🛠️ General</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                            <button type="button" class="btn btn-delete" style="padding: 0.6rem; height: 100%; font-weight: bold;" onclick="this.parentElement.parentElement.remove()" title="Eliminar fila">✖</button>
+                        </div>
+                    </div>
+                `;
                 cargarTablaLogisticaFuerza();
             }
-            btn.innerText = "AÑADIR AL SISTEMA"; btn.disabled = false;
+            btn.innerText = "CREAR PEDIDO EN EL SISTEMA"; btn.disabled = false;
         });
 
         window.cargarTablaLogisticaFuerza = async function() {

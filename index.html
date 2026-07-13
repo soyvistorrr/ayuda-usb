@@ -922,20 +922,41 @@
                                             <option value="La Guaira - Macuto">La Guaira - Macuto</option>
                                         </select>
                                     </div>
+
                                     <div class="form-group">
-                                        <label class="form-label">Categoría del Insumo *</label>
-                                        <select id="etiqueta_categoria" class="form-select" required>
-                                            <option value="medicina">💊 Medicina e Insumos Médicos</option>
-                                            <option value="alimentos">🥫 Alimentos y Bebidas</option>
-                                            <option value="higiene">🧼 Limpieza e Higiene</option>
-                                            <option value="general">🛠️ General (Ropa, Colchones, etc.)</option>
-                                        </select>
+                                        <label class="form-label">Beneficiario del Pedido (Opcional)</label>
+                                        <input type="text" id="etiqueta_beneficiario" class="form-input" placeholder="Ej: Juan Pérez (C.I: 12345) o 'Reposición de Almacén'">
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Requerimiento Detallado *</label>
-                                        <textarea id="etiqueta_requerimiento" class="form-textarea" placeholder="Ej: 2 Bultos de Harina, 1 Paquete de Pañales..." required></textarea>
+                                    
+                                    <label class="form-label">Insumos del Pedido *</label>
+                                    <div id="contenedor-insumos-manuales">
+                                        <div class="insumo-row form-row" style="align-items: flex-end; margin-bottom: 10px; gap: 10px;">
+                                            <div class="form-group" style="flex: 0 0 70px; margin-bottom: 0;">
+                                                <label class="form-label" style="font-size: 0.75rem;">Cant.</label>
+                                                <input type="number" class="form-input manual-cant" min="1" required placeholder="#">
+                                            </div>
+                                            <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                                                <label class="form-label" style="font-size: 0.75rem;">Nombre del Insumo</label>
+                                                <input type="text" class="form-input manual-nombre" required placeholder="Ej: Harina PAN">
+                                            </div>
+                                            <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                                                <label class="form-label" style="font-size: 0.75rem;">Categoría</label>
+                                                <select class="form-select manual-cat" required>
+                                                    <option value="medicina">💊 Medicina</option>
+                                                    <option value="alimentos">🥫 Alimentos</option>
+                                                    <option value="higiene">🧼 Limpieza</option>
+                                                    <option value="general">🛠️ General</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                                                <button type="button" class="btn btn-delete" style="padding: 0.6rem; height: 100%; font-weight: bold;" onclick="this.parentElement.parentElement.remove()" title="Eliminar fila">✖</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button type="submit" class="btn btn-success btn-block">AÑADIR AL SISTEMA</button>
+                                    
+                                    <button type="button" class="btn" style="background:#e2e8f0; color:#333; margin-bottom: 15px; width: 100%; border: 1px dashed #cbd5e1;" onclick="agregarFilaInsumoManual()">➕ Añadir otro insumo a este pedido</button>
+                                    
+                                    <button type="submit" class="btn btn-success btn-block" style="padding: 0.8rem; font-weight: 700; font-size: 0.95rem;">CREAR PEDIDO EN EL SISTEMA</button>
                                 </form>
                             </div>
                         </div>
