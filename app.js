@@ -304,16 +304,17 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                     document.body.style.overflow = "auto";
 
-                    const botonesAcceso = document.querySelectorAll('button');
-                    botonesAcceso.forEach(btn => {
-                        if (btn.innerText.toUpperCase().includes('ACCESO') || btn.innerText.toUpperCase().includes('INGRESA') || btn.innerText.toUpperCase().includes('OFICIAL')) {
-                            btn.innerHTML = '🚪 Cerrar Sesión';
-                            btn.classList.add('btn-danger');
-                            btn.onclick = function() {
+                    const btnAdminFooter = document.getElementById('btn-toggle-role');
+                    if (btnAdminFooter) {
+                        btnAdminFooter.innerHTML = '🚪 Cerrar Sesión';
+                        btnAdminFooter.style.color = '#dc2626';
+                        btnAdminFooter.style.fontWeight = 'bold';
+                        btnAdminFooter.onclick = function() {
+                            if(confirm("¿Seguro que deseas cerrar sesión?")) {
                                 location.reload();
-                            };
-                        }
-                    });
+                            }
+                        };
+                    }
 
                     const panelAyuda = document.getElementById('panel-tabla-solicitudes');
                     const panelForm = document.getElementById('panel-formulario-afectado');
@@ -325,9 +326,17 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const dropAyuda = document.getElementById('dropZoneAyuda');
                     const dropLogistica = document.getElementById('dropZoneLogistica');
                     const filtroCen = document.getElementById('filtroCentro');
+                    
+                    const btnExpAyuda = document.getElementById('btnExportarAyuda');
+                    const btnExpBusqueda = document.getElementById('btnExportar');
+                    const btnExpColab = document.getElementById('btnExportarColab');
+
                     if(dropAyuda) dropAyuda.style.display = "none";
                     if(dropLogistica) dropLogistica.style.display = "none";
                     if(filtroCen) filtroCen.style.display = "none";
+                    if(btnExpAyuda) btnExpAyuda.style.display = "none";
+                    if(btnExpBusqueda) btnExpBusqueda.style.display = "none";
+                    if(btnExpColab) btnExpColab.style.display = "none";
 
                     try {
                         if(typeof navegarA === 'function') navegarA('view-home');
@@ -335,7 +344,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         const elementosAyuda = document.querySelectorAll('[onclick*="view-necesito-ayuda"]');
                         const elementosLogistica = document.querySelectorAll('[onclick*="view-etiquetas-logistica"]');
                         const elementosBusqueda = document.querySelectorAll('[onclick*="view-buscar"]');
-                        const elementosColaborar = document.querySelectorAll('[onclick*="view-colaborar"]'); // Agregamos Colaborar
+                        const elementosColaborar = document.querySelectorAll('[onclick*="view-colaborar"]');
 
                         const mostrarElementos = (nodos, mostrar) => {
                             nodos.forEach(nodo => { nodo.style.display = mostrar ? "" : "none"; });
@@ -350,12 +359,19 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
                             if(filtroCen) filtroCen.style.display = "inline-block";
+                            
+                            if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
+                            if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
+                            if(btnExpColab) btnExpColab.style.display = "inline-block";
 
                         } else if (rol === 'admin_busqueda') {
                             mostrarElementos(elementosAyuda, false);
                             mostrarElementos(elementosLogistica, false);
                             mostrarElementos(elementosBusqueda, true);
                             mostrarElementos(elementosColaborar, true);
+                            
+                            if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
+                            if(btnExpColab) btnExpColab.style.display = "inline-block";
 
                         } else if (rol === 'admin_centro') {
                             mostrarElementos(elementosAyuda, true);
@@ -365,13 +381,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
+                            
+                            if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
 
                         } else if (rol === 'especialista_cva') {
                             mostrarElementos(elementosAyuda, false);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, false);
                             mostrarElementos(elementosColaborar, false);
-                            
                         } else {
                             console.warn("Rol no reconocido:", rol);
                             alert("Atención: Tu usuario no tiene un rol válido asignado.");
@@ -1762,9 +1779,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if (p.estado === 'Pendiente') {
                         btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
                     } else if (p.estado === 'Empacando') {
-                        btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="imprimirYDespachar('${p.id}')">🖨️ Despachar</button>`;
+                        btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="finalizarDespacho('${p.id}')">📦 Finalizar y Despachar</button>`;
                     } else {
-                        btnAccion = `<button class="btn" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%; cursor:not-allowed;" disabled>✅ Finalizado</button>`;
+                        btnAccion = `<div style="display:flex; gap:5px; width:100%;">
+                            <span class="badge" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem; flex:1; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">✅ Listo</span>
+                            <button class="btn" style="background-color:#10b981; color:white; padding:0.4rem; font-size:0.8rem; flex:1;" onclick="generarNotaEntrega('${p.id}')" title="Generar Nota de Entrega con Firmas">📄 Acta</button>
+                        </div>`;
                     }
                 }
 
@@ -1804,29 +1824,38 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
         };
 
-        window.imprimirYDespachar = async function(idRegistro) {
+        window.finalizarDespacho = async function(idRegistro) {
             const pedido = pedidosLogistica.find(p => p.id === idRegistro);
             if(!pedido) return;
 
-            if(!confirm(`¿Finalizar el empaque y generar guía para ${pedido.punto_usb}?`)) return;
-
-            const ventanita = window.open('', '_blank');
-            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes (pop-ups) en tu navegador para imprimir."); return; }
+            if(!confirm(`¿Marcar este pedido como DESPACHADO para el centro: ${pedido.punto_usb}?`)) return;
 
             const { error } = await supabaseClient.from('etiquetas_logistica')
                 .update({ estado: 'Despachado' })
                 .eq('id', idRegistro);
 
-            if(error) { ventanita.close(); alert("Error: " + error.message); return; }
+            if(error) { alert("Error: " + error.message); return; }
+            
             cargarTablaLogisticaFuerza();
 
+            setTimeout(() => {
+                if(confirm("✅ Pedido cerrado exitosamente en el sistema.\n\n¿Deseas imprimir la ETIQUETA PEQUEÑA para pegarla en la caja?")) {
+                    imprimirTicketEmpaque(pedido);
+                }
+            }, 300);
+        };
+
+        window.imprimirTicketEmpaque = function(pedido) {
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
+
             const fecha = new Date().toLocaleString('es-VE');
-            const idCorto = idRegistro.split('-')[0].toUpperCase();
+            const idCorto = pedido.id.split('-')[0].toUpperCase();
 
             ventanita.document.write(`
                 <html>
                 <head>
-                    <title>Guía Logística - ${pedido.punto_usb}</title>
+                    <title>Etiqueta Caja - ${pedido.punto_usb}</title>
                     <style>
                         body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
                         .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
@@ -1837,22 +1866,102 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 </head>
                 <body>
                     <div class="ticket">
-                        <h1>TICKET DE DESPACHO</h1>
+                        <h1>ETIQUETA DE DESPACHO</h1>
                         <hr style="border: 1px solid #000; margin-bottom: 15px;">
                         <div class="info-header">
                             <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.punto_usb || '-'}</span><br>
                             <strong>CATEGORÍA:</strong> ${String(pedido.categoria_insumo).toUpperCase()}<br>
-                            <strong>PREPARADO POR:</strong> ${pedido.encargado}<br>
-                            <strong>FECHA:</strong> ${fecha}<br>
                             <strong>CÓDIGO:</strong> #${idCorto}
                         </div>
-                        <hr style="border: 1px solid #000; margin-bottom: 15px;">
-                        <h3 style="margin-bottom: 5px;">REQUERIMIENTOS SOLICITADOS:</h3>
-                        <p style="font-size: 20px; border: 1px solid #000; padding: 15px;">${pedido.requerimiento}</p>
+                        <p style="font-size: 16px; border: 1px solid #000; padding: 10px;">${pedido.requerimiento}</p>
                     </div>
-                    <script>
-                        window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }
-                    </script>
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        };
+
+        window.generarNotaEntrega = function(idRegistro) {
+            const pedido = pedidosLogistica.find(p => p.id === idRegistro);
+            if(!pedido) return;
+
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
+
+            const fecha = new Date().toLocaleString('es-VE');
+            const idCorto = pedido.id.split('-')[0].toUpperCase();
+
+            let personaVinculada = "Carga Manual / Reposición de Inventario";
+            if(pedido.solicitud_id) {
+                const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
+                if(reg) personaVinculada = `${reg.nombre} (C.I: ${reg.cedula})`;
+            }
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Nota de Entrega - #${idCorto}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #000; max-width: 800px; margin: 0 auto; line-height: 1.4; }
+                        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #111; }
+                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 14px; }
+                        .order-info { text-align: right; }
+                        .order-info h2 { margin: 0; font-size: 20px; }
+                        .info-box { border: 1px solid #ccc; padding: 20px; margin-bottom: 30px; border-radius: 8px; background-color: #f9f9f9; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px; }
+                        .req-box { border: 1px solid #000; padding: 20px; margin-bottom: 50px; min-height: 200px; font-size: 16px; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 80px; gap: 40px; }
+                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 10px; text-align: left; font-size: 14px; }
+                        @media print { @page { margin: 0; } body { margin: 1cm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div>
+                            <h1>ACTA DE ENTREGA DE DONATIVO</h1>
+                            <h3>Universidad Simón Bolívar - Logística de Contingencia</h3>
+                        </div>
+                        <div class="order-info">
+                            <h2>Folio: #${idCorto}</h2>
+                            <p style="margin:5px 0 0 0; font-size:14px;">${fecha}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-grid">
+                            <div><strong>SEDE DE ORIGEN:</strong><br> Almacén CVA - Las Mercedes</div>
+                            <div><strong>SEDE DESTINO / ACOPIO:</strong><br> ${pedido.punto_usb || 'N/A'}</div>
+                            <div><strong>PREPARADOR (ALMACÉN):</strong><br> ${pedido.encargado || 'N/A'}</div>
+                            <div><strong>BENEFICIARIO VINCULADO:</strong><br> ${personaVinculada}</div>
+                            <div style="grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                                <strong>CATEGORÍA DE LOS INSUMOS:</strong> ${String(pedido.categoria_insumo).toUpperCase()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 10px;">DETALLE EXACTO DE INSUMOS A ENTREGAR:</h3>
+                    <div class="req-box">
+                        <div style="white-space: pre-wrap;">${pedido.requerimiento}</div>
+                    </div>
+
+                    <div class="signatures">
+                        <div class="sig-line">
+                            <strong>ENTREGADO POR (ALMACÉN / CHOFER)</strong><br><br>
+                            Nombre: _______________________________<br><br>
+                            C.I: ___________________________________<br><br>
+                            Firma: _________________________________
+                        </div>
+                        <div class="sig-line">
+                            <strong>RECIBIDO CONFORME (DESTINO)</strong><br><br>
+                            Nombre: _______________________________<br><br>
+                            C.I: ___________________________________<br><br>
+                            Firma: _________________________________
+                        </div>
+                    </div>
+
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
                 </body>
                 </html>
             `);
@@ -1965,7 +2074,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             }
                         }
                     } else {
-                        // MODO EXCEL LOGÍSTICO BÁSICO 
                         let iReq = cabecera.findIndex(c => c.includes('requerimiento') || c.includes('insumo'));
                         if (iReq === -1) { alert("Error: El Excel debe tener una columna 'Requerimiento'."); return; }
                         for (let row of rawData) {
