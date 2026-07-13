@@ -382,3 +382,45 @@
             gap: 1.5rem !important;
         }
     }
+
+    #pagina-noticia-contenido p {
+        margin-bottom: 1.25rem;
+        line-height: 1.8;
+    }
+
+    #pagina-noticia-contenido h3,
+    #pagina-noticia-contenido h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    #pagina-noticia-contenido ul {
+        list-style-type: disc;
+        margin-left: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    #pagina-noticia-contenido ol {
+        list-style-type: decimal;
+        margin-left: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    #pagina-noticia-contenido li {
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+        line-height: 1.6;
+    }
+
+    #pagina-noticia-contenido a {
+        color: #0284c7;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #pagina-noticia-contenido a:hover {
+        color: #0369a1;
+    }
