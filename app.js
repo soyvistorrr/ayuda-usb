@@ -276,16 +276,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const btn = document.getElementById('btn-login');
             btn.innerText = "Verificando..."; btn.disabled = true;
 
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPass').value;
+            const u = document.getElementById('adminUser').value.trim();
+            const p = document.getElementById('adminPass').value.trim();
 
             try {
-                const { data, error } = await supabaseClient.from('perfiles_admin').select('*').eq('correo', u).eq('clave', p);
+                const { data, error } = await supabaseClient
+                    .from('perfiles_admin')
+                    .select('*')
+                    .eq('usuario', u)
+                    .eq('clave', p);
                 
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    const usuarioBD = data[0];
+                    const usuarioBD = data[0]; 
                     esAdministrador = true;
                     perfilUsuarioActual = usuarioBD; 
 
@@ -313,31 +317,26 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "block";
                         if(filtroCen) filtroCen.style.display = "inline-block";
-                        
                     } else if (rol === 'auditor') {
                         navegarA('view-home');
                         if(filtroCen) filtroCen.style.display = "inline-block";
-                        
                     } else if (rol === 'admin_busqueda') {
                         navegarA('view-busqueda');
-                        
                     } else if (rol === 'admin_centro') {
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "block";
-                        
                         navegarA('view-ayuda'); 
-                        
                     } else if (rol === 'especialista_cva') {
                         navegarA('view-logistica');
                     }
 
-                    cargarDatosDesdeNube();
+                    await cargarDatosDesdeNube();
 
                 } else {
-                    alert("Credenciales incorrectas.");
+                    alert("Usuario o contraseña incorrectos.");
                 }
             } catch (err) {
-                console.error("Error login:", err);
+                console.error("Error login:", err.message);
                 alert("Error de conexión al verificar credenciales.");
             }
             btn.innerText = "Ingresar"; btn.disabled = false;
