@@ -296,21 +296,32 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const formLogin = document.getElementById('loginForm');
                     if (formLogin) {
                         const modalPadre = formLogin.closest('.modal') || formLogin.closest('[class*="modal"]') || formLogin.closest('[id*="modal"]');
-                        
-                        if (modalPadre) {
-                            modalPadre.style.display = 'none';
-                        } else {
+                        if (modalPadre) modalPadre.style.display = 'none';
+                        else {
                             formLogin.parentElement.style.display = 'none';
-                            if(formLogin.parentElement.parentElement) {
-                                formLogin.parentElement.parentElement.style.display = 'none';
-                            }
+                            if(formLogin.parentElement.parentElement) formLogin.parentElement.parentElement.style.display = 'none';
                         }
                     }
-                    
                     document.body.style.overflow = "auto";
-                    
-                    const rol = perfilUsuarioActual.rol;
 
+                    const botonesAcceso = document.querySelectorAll('button');
+                    botonesAcceso.forEach(btn => {
+                        if (btn.innerText.toUpperCase().includes('ACCESO') || btn.innerText.toUpperCase().includes('INGRESA') || btn.innerText.toUpperCase().includes('OFICIAL')) {
+                            btn.innerHTML = '🚪 Cerrar Sesión';
+                            btn.classList.add('btn-danger');
+                            btn.onclick = function() {
+                                location.reload();
+                            };
+                        }
+                    });
+
+                    const panelAyuda = document.getElementById('panel-tabla-solicitudes');
+                    const panelForm = document.getElementById('panel-formulario-afectado');
+                    if(panelAyuda) panelAyuda.style.display = "block";
+                    if(panelForm) panelForm.style.display = "block";
+
+                    const rol = perfilUsuarioActual.rol;
+                    
                     const dropAyuda = document.getElementById('dropZoneAyuda');
                     const dropLogistica = document.getElementById('dropZoneLogistica');
                     const filtroCen = document.getElementById('filtroCentro');
@@ -347,7 +358,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             mostrarElementos(elementosAyuda, true);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, false);
-                            
                             if(dropAyuda) dropAyuda.style.display = "block";
                             if(dropLogistica) dropLogistica.style.display = "block";
 
@@ -355,10 +365,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             mostrarElementos(elementosAyuda, false);
                             mostrarElementos(elementosLogistica, true);
                             mostrarElementos(elementosBusqueda, false);
+                        } else {
+                            console.warn("Rol no reconocido:", rol);
+                            alert("Atención: Tu usuario no tiene un rol válido asignado.");
                         }
 
                     } catch(navErr) {
-                        console.log("Aviso visual en la navegación:", navErr);
+                        console.log("Aviso en la navegación:", navErr);
                     }
 
                     await cargarDatosDesdeNube();
