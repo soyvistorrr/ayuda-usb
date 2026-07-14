@@ -2035,7 +2035,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const data = new Uint8Array(evt.target.result);
                     const libro = XLSX.read(data, { type: 'array' });
 
-                    // ¡CORRECCIÓN AQUÍ! Todas las variables declaradas correctamente
                     let ticketsNuevos = 0; let ticketsOmitidos = 0; let ticketsActualizados = 0;
                     let personasNuevas = 0; let personasOmitidas = 0; let personasActualizadas = 0;
 
@@ -2106,7 +2105,35 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
 
                                 if (personaExistente || repetidoIntra) {
-                                    personasOmitidas++;
+                                    // --- LÓGICA DE ACTUALIZACIÓN (PARA RESPALDOS) ---
+                                    if (personaExistente) {
+                                        let updateData = {};
+                                        let hayCambios = false;
+                                        
+                                        let excelPuntoUsb = iPun !== -1 && row[iPun] ? String(row[iPun]).trim() : 'Sin Asignar';
+
+                                        // Actualiza la sede si la BD la tiene vacía y el Excel la tiene llena
+                                        if (excelPuntoUsb !== 'Sin Asignar' && (!personaExistente.punto_usb || personaExistente.punto_usb === 'Sin Asignar')) {
+                                            updateData.punto_usb = excelPuntoUsb;
+                                            hayCambios = true;
+                                        }
+                                        
+                                        // Actualiza la cédula si la BD la tiene vacía y el Excel la tiene llena
+                                        if (cedVal !== '-' && cedVal !== '' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
+                                            updateData.cedula = cedVal;
+                                            hayCambios = true;
+                                        }
+
+                                        if (hayCambios) {
+                                            const { error } = await supabaseClient.from('solicitudes_ayuda').update(updateData).eq('id', personaExistente.id);
+                                            if (!error) personasActualizadas++;
+                                        } else {
+                                            personasOmitidas++;
+                                        }
+                                    } else {
+                                        personasOmitidas++;
+                                    }
+
                                     if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
                                     nombresEnEsteExcel.add(nomVal.toLowerCase());
                                     continue; 
@@ -2180,7 +2207,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
 
                                 if (personaExistente || repetidoIntra) {
-                                    // --- LÓGICA DE ACTUALIZACIÓN INTELIGENTE ---
+                                    // --- LÓGICA DE ACTUALIZACIÓN (PARA PLANTILLAS NUEVAS) ---
                                     if (personaExistente) {
                                         let updateData = {};
                                         let hayCambios = false;
@@ -2189,7 +2216,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                             updateData.punto_usb = sedeArchivo;
                                             hayCambios = true;
                                         }
-                                        if (cedVal !== '-' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
+                                        if (cedVal !== '-' && cedVal !== '' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
                                             updateData.cedula = cedVal;
                                             hayCambios = true;
                                         }
