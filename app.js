@@ -1753,11 +1753,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const cuerpo = document.getElementById('tablaLogisticaCuerpo');
             if(!cuerpo) return;
 
-            // Inyectamos la cabecera dinámica para añadir el Beneficiario sin tocar el HTML
+            const filtroCentro = document.getElementById('filtroCentroLogistica') ? document.getElementById('filtroCentroLogistica').value : 'Todos';
+
             const thead = cuerpo.parentElement.querySelector('thead');
             if(thead) {
                 thead.innerHTML = `
                     <tr>
+                        <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAllLogistica(this)" title="Seleccionar todos"></th>
                         <th>ESTADO</th>
                         <th>DESTINO</th>
                         <th>BENEFICIARIO</th>
@@ -1769,26 +1771,28 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 `;
             }
 
-            cuerpo.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; font-weight: bold; color: var(--primary);">Cargando inventario y pedidos...</td></tr>';
+            cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; font-weight: bold; color: var(--primary);">⏳ Cargando inventario y pedidos...</td></tr>';
 
             const { data, error } = await supabaseClient
                 .from('etiquetas_logistica')
-                .select('id, created_at, solicitud_id, punto_usb, categoria_insumo, requerimiento, estado, encargado')
+                .select('id, created_at, solicitud_id, punto_usb, categoria_insumo, requerimiento, estado, encargado, fecha_despacho')
                 .order('created_at', { ascending: false });
 
-            if(error) {
-                cuerpo.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 1rem; color: red;">Error: ${error.message}</td></tr>`;
-                return;
-            }
-
-            if(!data || data.length === 0) {
-                cuerpo.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay tickets registrados en el almacén.</td></tr>';
-                return;
-            }
+            if(error) { cuerpo.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 1rem; color: red;">Error: ${error.message}</td></tr>`; return; }
+            if(!data || data.length === 0) { cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay tickets registrados en el almacén.</td></tr>'; return; }
 
             pedidosLogistica = data;
 
-            cuerpo.innerHTML = data.map(p => {
+            let pedidosFiltrados = data;
+            if (filtroCentro !== 'Todos') {
+                pedidosFiltrados = pedidosFiltrados.filter(p => p.punto_usb === filtroCentro);
+            }
+
+            if(pedidosFiltrados.length === 0) {
+                cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay tickets para este centro de acopio.</td></tr>'; return;
+            }
+
+            cuerpo.innerHTML = pedidosFiltrados.map(p => {
                 let badgeColor = 'badge-gray';
                 if (p.estado === 'Pendiente') badgeColor = 'badge-danger';
                 if (p.estado === 'Empacando') badgeColor = 'badge-warning';
@@ -1800,23 +1804,24 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 if(p.categoria_insumo === 'otras') icono = '🛠️';
                 
                 let btnAccion = '';
+                let checkboxHtml = `<input type="checkbox" class="cb-logistica" value="${p.id}" style="width:18px; height:18px;">`;
                 
                 if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda')) {
                     btnAccion = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Vista</span>`;
                 } else {
                     if (p.estado === 'Pendiente') {
-                        btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
+                        btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.5rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
                     } else if (p.estado === 'Empacando') {
-                        btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="finalizarDespacho('${p.id}')">📦 Finalizar y Despachar</button>`;
+                        btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.5rem; font-size:0.8rem; width:100%;" onclick="finalizarDespacho('${p.id}')">📦 Finalizar y Despachar</button>`;
                     } else {
-                        btnAccion = `<div style="display:flex; gap:5px; width:100%;">
-                            <span class="badge" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem; flex:1; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">✅ Listo</span>
-                            <button class="btn" style="background-color:#10b981; color:white; padding:0.4rem; font-size:0.8rem; flex:1;" onclick="generarNotaEntrega('${p.id}')" title="Generar Nota de Entrega con Firmas">📄 Acta</button>
+                        btnAccion = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">
+                            <span class="badge" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem; flex:1; min-width: 50px; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">✅ Listo</span>
+                            <button class="btn" style="background-color:#0284c7; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="imprimirTicketEmpaqueId('${p.id}')" title="Imprimir Ticket">🖨️ Ticket</button>
+                            <button class="btn" style="background-color:#10b981; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="generarNotaEntrega('${p.id}')" title="Generar Nota de Entrega Individual">📄 Acta</button>
                         </div>`;
                     }
                 }
 
-                // Cruzamos datos para sacar el nombre y cédula del beneficiario
                 let persona = ayudaNube.find(a => a.id === p.solicitud_id);
                 let nombreBen = persona ? persona.nombre : 'Carga Manual / Reposición';
                 let cedulaBen = persona && persona.cedula !== '-' ? `C.I: ${persona.cedula}` : '';
@@ -1827,6 +1832,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                 return `
                     <tr>
+                        <td data-label="Sel." style="text-align: center;">${checkboxHtml}</td>
                         <td data-label="Estado"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
                         <td data-label="Destino"><strong>${p.punto_usb || 'Sin Asignar'}</strong></td>
                         <td data-label="Beneficiario">${htmlBeneficiario}</td>
@@ -1839,24 +1845,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }).join('');
         };
 
-        window.tomarPedidoLogistica = async function(id) {
-            const nombreGuardia = document.getElementById('nombreGuardiaLogistica').value.trim();
-            if(!nombreGuardia) {
-                alert("⚠️ Por favor, ingresa tu nombre de guardia en la barra superior antes de tomar un pedido.");
-                document.getElementById('nombreGuardiaLogistica').focus();
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const filtroLog = document.getElementById('filtroCentroLogistica');
+            if (filtroLog) filtroLog.addEventListener('change', cargarTablaLogisticaFuerza);
+        });
 
-            const { error } = await supabaseClient.from('etiquetas_logistica')
-                .update({ estado: 'Empacando', encargado: nombreGuardia })
-                .eq('id', id);
-
-            if(error) {
-                alert("Error: " + error.message);
-            } else {
-                mostrarNotificacion(`Pedido asignado a ${nombreGuardia}`);
-                cargarTablaLogisticaFuerza();
-            }
+        window.imprimirTicketEmpaqueId = function(id) {
+            const pedido = pedidosLogistica.find(p => p.id === id);
+            if (pedido) imprimirTicketEmpaque(pedido);
         };
 
         window.finalizarDespacho = async function(idRegistro) {
@@ -1865,8 +1861,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             if(!confirm(`¿Marcar este pedido como DESPACHADO para el centro: ${pedido.punto_usb}?`)) return;
 
+            const fechaActualISO = new Date().toISOString();
+
             const { error } = await supabaseClient.from('etiquetas_logistica')
-                .update({ estado: 'Despachado' })
+                .update({ estado: 'Despachado', fecha_despacho: fechaActualISO })
                 .eq('id', idRegistro);
 
             if(error) { alert("Error: " + error.message); return; }
@@ -1874,10 +1872,120 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             cargarTablaLogisticaFuerza();
 
             setTimeout(() => {
-                if(confirm("✅ Pedido cerrado exitosamente en el sistema.\n\n¿Deseas imprimir la ETIQUETA PEQUEÑA para pegarla en la caja?")) {
+                if(confirm("✅ Pedido cerrado y fecha registrada.\n\n¿Deseas imprimir la ETIQUETA PEQUEÑA para pegarla en la caja ahora?")) {
                     imprimirTicketEmpaque(pedido);
                 }
             }, 300);
+        };
+
+        window.toggleSelectAllLogistica = function(source) {
+            const checkboxes = document.querySelectorAll('.cb-logistica');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        };
+
+        window.generarNotaEntregaMasiva = function() {
+            const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+            if (seleccionados.length === 0) {
+                alert("Debes seleccionar al menos un ticket marcando las casillas de la izquierda.");
+                return;
+            }
+
+            const pedidosSeleccionados = pedidosLogistica.filter(p => seleccionados.includes(p.id));
+            
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
+
+            const fecha = new Date().toLocaleString('es-VE');
+            
+            let filasInsumos = '';
+            pedidosSeleccionados.forEach(pedido => {
+                let personaVinculada = "Carga Manual / Reposición";
+                if(pedido.solicitud_id) {
+                    const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
+                    if(reg) personaVinculada = `${reg.nombre} <br><span style="font-size:12px; color:#555;">(C.I: ${reg.cedula})</span>`;
+                }
+                const idCorto = pedido.id.split('-')[0].toUpperCase();
+                
+                filasInsumos += `
+                    <tr style="border-bottom: 1px solid #ccc;">
+                        <td style="padding: 12px 10px;">#${idCorto}</td>
+                        <td style="padding: 12px 10px;"><strong>${pedido.punto_usb || 'N/A'}</strong></td>
+                        <td style="padding: 12px 10px;">${personaVinculada}</td>
+                        <td style="padding: 12px 10px;">${String(pedido.categoria_insumo).toUpperCase()}</td>
+                        <td style="padding: 12px 10px;">${pedido.requerimiento}</td>
+                    </tr>
+                `;
+            });
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Acta de Entrega Masiva</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #000; max-width: 950px; margin: 0 auto; line-height: 1.4; }
+                        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #111; }
+                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 14px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px; }
+                        th { background-color: #f0f0f0; padding: 12px 10px; border-bottom: 2px solid #000; text-align: left; text-transform: uppercase; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 60px; gap: 40px; }
+                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 10px; text-align: left; font-size: 14px; }
+                        @media print { @page { margin: 0; } body { margin: 1cm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div>
+                            <h1>ACTA DE ENTREGA DE DONATIVOS (MASIVA)</h1>
+                            <h3>Universidad Simón Bolívar - Logística de Contingencia</h3>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin:0; font-size:14px; font-weight:bold;">Fecha de Emisión:</p>
+                            <p style="margin:5px 0 0 0; font-size:14px;">${fecha}</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px; background-color: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 6px;">
+                        <p style="margin: 0; font-size: 16px;"><strong>Total de Tickets a Despachar en esta Acta:</strong> <span style="font-size: 18px; color: #d32f2f;">${pedidosSeleccionados.length}</span></p>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>CENTRO DESTINO</th>
+                                <th>BENEFICIARIO</th>
+                                <th>CATEGORÍA</th>
+                                <th>DETALLE DEL INSUMO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasInsumos}
+                        </tbody>
+                    </table>
+
+                    <div class="signatures">
+                        <div class="sig-line">
+                            <strong>ENTREGADO POR (ALMACÉN CENTRAL)</strong><br><br>
+                            Nombre: _______________________________<br><br>
+                            Firma: _________________________________
+                        </div>
+                        <div class="sig-line">
+                            <strong>CHOFER / TRANSPORTISTA</strong><br><br>
+                            Nombre: _______________________________<br><br>
+                            Firma: _________________________________
+                        </div>
+                        <div class="sig-line">
+                            <strong>RECIBIDO CONFORME (DESTINOS)</strong><br><br>
+                            Nombre: _______________________________<br><br>
+                            Firma: _________________________________
+                        </div>
+                    </div>
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
         };
 
         window.imprimirTicketEmpaque = function(pedido) {
@@ -2003,9 +2111,28 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             ventanita.document.close();
         };
 
+        window.tomarPedidoLogistica = async function(id) {
+            const nombreGuardia = document.getElementById('nombreGuardiaLogistica').value.trim();
+            if(!nombreGuardia) {
+                alert("⚠️ Por favor, ingresa tu nombre de guardia en la barra superior antes de tomar un pedido.");
+                document.getElementById('nombreGuardiaLogistica').focus();
+                return;
+            }
+
+            const { error } = await supabaseClient.from('etiquetas_logistica')
+                .update({ estado: 'Empacando', encargado: nombreGuardia })
+                .eq('id', id);
+
+            if(error) {
+                alert("Error: " + error.message);
+            } else {
+                mostrarNotificacion(`Pedido asignado a ${nombreGuardia}`);
+                cargarTablaLogisticaFuerza();
+            }
+        };
+
         window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
             
-            // 1. TRADUCTOR DE SEDES
             let nombreRaw = String(file.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             let sedeArchivo = 'Sin Asignar';
             
@@ -2064,9 +2191,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         let esPlantillaCenso = cabecera.some(c => c.includes('damnificado')) && !esExcelAyudaExportado;
                         let esPlantillaPedidos = cabecera.some(c => c.includes('fecha')) && (cabecera.some(c => c.includes('medicina')) || cabecera.some(c => c.includes('alimento'))) && !esPlantillaCenso && !esExcelAyudaExportado;
 
-                        // ==========================================
-                        // RECUPERACIÓN PERFECTA DEL RESPALDO (EXCEL DESCARGADO)
-                        // ==========================================
                         if (esExcelAyudaExportado) {
                             let iPun = cabecera.findIndex(c => c.includes('punto acopio'));
                             let iNom = cabecera.findIndex(c => c.includes('afectado'));
@@ -2105,20 +2229,17 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
 
                                 if (personaExistente || repetidoIntra) {
-                                    // --- LÓGICA DE ACTUALIZACIÓN (PARA RESPALDOS) ---
                                     if (personaExistente) {
                                         let updateData = {};
                                         let hayCambios = false;
                                         
                                         let excelPuntoUsb = iPun !== -1 && row[iPun] ? String(row[iPun]).trim() : 'Sin Asignar';
 
-                                        // Actualiza la sede si la BD la tiene vacía y el Excel la tiene llena
                                         if (excelPuntoUsb !== 'Sin Asignar' && (!personaExistente.punto_usb || personaExistente.punto_usb === 'Sin Asignar')) {
                                             updateData.punto_usb = excelPuntoUsb;
                                             hayCambios = true;
                                         }
                                         
-                                        // Actualiza la cédula si la BD la tiene vacía y el Excel la tiene llena
                                         if (cedVal !== '-' && cedVal !== '' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
                                             updateData.cedula = cedVal;
                                             hayCambios = true;
@@ -2170,9 +2291,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 personasNuevas++;
                             }
                         }
-                        // ==========================================
-                        // PROCESANDO HOJA 1: CENSO (PLANTILLAS NUEVAS)
-                        // ==========================================
+
                         else if (esPlantillaCenso) {
                             let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
@@ -2207,7 +2326,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
 
                                 if (personaExistente || repetidoIntra) {
-                                    // --- LÓGICA DE ACTUALIZACIÓN (PARA PLANTILLAS NUEVAS) ---
                                     if (personaExistente) {
                                         let updateData = {};
                                         let hayCambios = false;
@@ -2267,9 +2385,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 personasNuevas++;
                             }
                         } 
-                        // ==========================================
-                        // PROCESANDO HOJA: ACTUALIZACIÓN DE LOGÍSTICA
-                        // ==========================================
+
                         else if (esExcelLogisticaExportado) {
                             let iId = cabecera.findIndex(c => c.includes('id ticket'));
                             let iEst = cabecera.findIndex(c => c.includes('estado logistico') || c.includes('estado logístico'));
@@ -2293,9 +2409,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
                             }
                         }
-                        // ==========================================
-                        // PROCESANDO HOJA 2: PEDIDOS MASIVOS (LOGÍSTICA)
-                        // ==========================================
+
                         else if (esPlantillaPedidos) {
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
                             let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
