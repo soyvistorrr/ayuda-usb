@@ -857,8 +857,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 else radioNo.checked = true;
             }
 
-            document.getElementById('atencionMedica').value = reg.requiere_atencion_medica ? "Paciente reportó necesitar atención. Revise las observaciones." : "";
-            
+            document.getElementById('atencionMedica').value = (reg.requiere_atencion_medica === true || reg.requiere_atencion_medica === 'true') ? "Sí requiere (Revisar obs.)" : (reg.requiere_atencion_medica || '');            
             document.getElementById('personasHogar').value = reg.personas_hogar || 1;
             document.getElementById('ninosHogar').value = reg.ninos_hogar || 0;
             document.getElementById('adultosMayores').value = reg.adultos_mayores_hogar || 0;
@@ -929,7 +928,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 grupo: grupoSeleccionado,
                 comunidad: 'Universidad Simón Bolívar',
                 es_damnificado: esDamnificadoForm, 
-                requiere_atencion_medica: requiereMedicaBool,
+                requiere_atencion_medica: atencionTxt, 
                 personas_hogar: parseInt(document.getElementById('personasHogar').value) || 1,
                 ninos_hogar: parseInt(document.getElementById('ninosHogar').value) || 0,
                 adultos_mayores_hogar: parseInt(document.getElementById('adultosMayores').value) || 0,
@@ -1987,6 +1986,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 const textoOriginal = pElement.innerHTML;
                 
                 try {
+                    if (!ayudaNube || ayudaNube.length === 0) {
+                        await cargarDatosDesdeNube();
+                    }
+
                     pElement.innerHTML = "<strong>⏳ Procesando archivo. Cruzando hojas y datos...</strong>";
 
                     const data = new Uint8Array(evt.target.result);
@@ -2015,7 +2018,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         let esExcelLogisticaExportado = cabecera.some(c => c.includes('id ticket'));
                         let esExcelAyudaExportado = cabecera.some(c => c.includes('id solicitud'));
                         let esPlantillaCenso = cabecera.some(c => c.includes('damnificado')) && !esExcelAyudaExportado;
-                        let esPlantillaPedidos = cabecera.some(c => c.includes('fecha') && (c.includes('medicina') || c.includes('alimento'))) && !esPlantillaCenso;
+                        
+                        let esPlantillaPedidos = cabecera.some(c => c.includes('fecha')) && 
+                                                 (cabecera.some(c => c.includes('medicina')) || cabecera.some(c => c.includes('alimento'))) && 
+                                                 !esPlantillaCenso;
 
                         if (esExcelLogisticaExportado) {
                             let iId = cabecera.findIndex(c => c.includes('id ticket'));
@@ -2179,7 +2185,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     alert(`✅ Procesamiento Completado:\n\n👤 Personas Nuevas: ${personasNuevas}\n🔄 Personas Actualizadas: ${personasActualizadas}\n📦 Tickets Logísticos Creados: ${ticketsNuevos}\n✅ Tickets Actualizados: ${ticketsActualizados}`);
                     
                 } catch (err) { 
-                    alert('ERROR CRÍTICO: ' + err.message + '\n\nRevisa los permisos de Supabase o que no falten datos obligatorios.'); 
+                    alert('ERROR CRÍTICO: ' + err.message); 
                     console.error(err); 
                 } finally {
                     if (pElement) pElement.innerHTML = textoOriginal;
