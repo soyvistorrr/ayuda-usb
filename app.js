@@ -1368,14 +1368,21 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const fDesp = document.getElementById('filtroDespacho').value;
             const fCen = document.getElementById('filtroCentro').value;
 
+            let cedulas = ayudaNube.map(a => a.cedula).filter(c => c && c !== '-');
+            let nombres = ayudaNube.map(a => a.nombre.toLowerCase());
+
             let filtrados = ayudaNube.filter(a => {
-                
-                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
-                    if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
-                }
-                
-                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'auditor')) {
-                    if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
+                if (fCen === 'Duplicados') {
+                    let dupCedula = a.cedula !== '-' && cedulas.filter(c => c === a.cedula).length > 1;
+                    let dupNombre = nombres.filter(n => n === a.nombre.toLowerCase()).length > 1;
+                    if (!dupCedula && !dupNombre) return false;
+                } else {
+                    if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
+                        if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
+                    }
+                    if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'auditor')) {
+                        if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
+                    }
                 }
 
                 const cumpleTexto = (a.nombre || '').toLowerCase().includes(texto) || (a.cedula || '').toLowerCase().includes(texto);
@@ -1429,7 +1436,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
                 let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
                 
-                let alertaMedica = a.requiere_atencion_medica ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Req. Atención Médica</div>` : '';
+                let tieneMedicina = a.req_medicina && a.req_medicina !== '-' && a.req_medicina.trim() !== '';
+                let alertaMedica = tieneMedicina ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Solicita Medicina</div>` : '';
 
                 let colorDespacho = '#64748b'; 
                 let estDespacho = a.estado_despacho_calculado || 'Sin Pedido';
@@ -1780,7 +1788,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 
                 let btnAccion = '';
                 
-                if (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda') {
+                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda')) {
                     btnAccion = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Vista</span>`;
                 } 
                 else {
@@ -1803,7 +1811,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     <tr>
                         <td data-label="Estado"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
                         <td data-label="Destino"><strong>${p.punto_usb || 'Sin Asignar'}</strong></td>
-                        <td data-label="Categoría" style="text-transform: capitalize;">${iconoCategoria} ${p.categoria_insumo || '-'}</td>
+                        <td data-label="Categoría" style="text-transform: capitalize;">${icono} ${p.categoria_insumo || '-'}</td>
                         <td data-label="Requerimiento"><div class="text-truncate-clamp">${reqTexto}</div></td>
                         <td data-label="Encargado" style="color: #3b82f6; font-weight: bold;">${p.encargado || 'Sin Asignar'}</td>
                         <td data-label="Acción" class="actions-cell">${btnAccion}</td>
@@ -1977,7 +1985,18 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         };
 
         window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
-            let sedeArchivo = file.name.replace(/\.[^/.]+$/, "").trim();
+            
+            let nombreArchivoOriginal = file.name.replace(/\.[^/.]+$/, "").trim().toLowerCase();
+            let sedeArchivo = 'Sin Asignar';
+            if (nombreArchivoOriginal.includes('catia')) sedeArchivo = 'Catia la Mar Centro';
+            else if (nombreArchivoOriginal.includes('tunitas') || nombreArchivoOriginal.includes('mamo')) sedeArchivo = 'Las Tunitas - Mamo';
+            else if (nombreArchivoOriginal.includes('caraballeda')) sedeArchivo = 'Caraballeda';
+            else if (nombreArchivoOriginal.includes('naiguata') || nombreArchivoOriginal.includes('naiguatá')) sedeArchivo = 'Naiguatá';
+            else if (nombreArchivoOriginal.includes('camuri') || nombreArchivoOriginal.includes('camurí')) sedeArchivo = 'Camurí Grande';
+            else if (nombreArchivoOriginal.includes('maiquetia') || nombreArchivoOriginal.includes('maiquetía')) sedeArchivo = 'Maiquetía';
+            else if (nombreArchivoOriginal.includes('macuto') || nombreArchivoOriginal.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
+            else if (nombreArchivoOriginal.includes('cva') || nombreArchivoOriginal.includes('mercedes')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
+            else sedeArchivo = file.name.replace(/\.[^/.]+$/, "").trim(); // Respaldo si no reconoce nada
 
             const lector = new FileReader();
             lector.onload = async function(evt) {
