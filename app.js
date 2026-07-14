@@ -528,7 +528,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
                             .order('created_at', { ascending: false }).limit(500),
                         supabaseClient.from('solicitudes_ayuda')
-                            .select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
+                            .select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
                             .order('created_at', { ascending: false }).limit(500),
                         supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false }),
                         supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb').order('created_at', { ascending: false })
@@ -849,7 +849,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             document.getElementById('carnetAfectado').value = reg.carnet_estudiante === 'N/A' ? '' : (reg.carnet_estudiante || '');
             document.getElementById('grupoAfectado').value = reg.grupo || '';
             
-            let esDamEdit = reg.es_damnificado === true || String(reg.damnificado).trim().toLowerCase() === 'sí' || String(reg.damnificado).trim().toLowerCase() === 'si';
+            let esDamEdit = reg.es_damnificado === true;
             let radioSi = document.querySelector('input[name="damnificadoAfectado"][value="si"]');
             let radioNo = document.querySelector('input[name="damnificadoAfectado"][value="no"]');
             if(radioSi && radioNo) {
@@ -857,7 +857,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 else radioNo.checked = true;
             }
 
-            document.getElementById('atencionMedica').value = (reg.requiere_atencion_medica === true || reg.requiere_atencion_medica === 'true') ? "Sí requiere (Revisar obs.)" : (reg.requiere_atencion_medica || '');            
+            document.getElementById('atencionMedica').value = (reg.requiere_atencion_medica === true || reg.requiere_atencion_medica === 'true') ? "Sí requiere (Revisar obs.)" : (reg.requiere_atencion_medica || '');
             document.getElementById('personasHogar').value = reg.personas_hogar || 1;
             document.getElementById('ninosHogar').value = reg.ninos_hogar || 0;
             document.getElementById('adultosMayores').value = reg.adultos_mayores_hogar || 0;
