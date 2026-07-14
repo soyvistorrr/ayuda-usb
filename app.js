@@ -2005,7 +2005,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
             
-            // 1. TRADUCTOR DE SEDES (Solo se usa para archivos nuevos, no para el Respaldo)
+            // 1. TRADUCTOR DE SEDES
             let nombreRaw = String(file.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             let sedeArchivo = 'Sin Asignar';
             
@@ -2017,7 +2017,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             else if (nombreRaw.includes('maiquetia')) sedeArchivo = 'Maiquetía';
             else if (nombreRaw.includes('macuto') || nombreRaw.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
             else if (nombreRaw.includes('cva') || nombreRaw.includes('mercedes') || nombreRaw.includes('caracas')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
-            else sedeArchivo = 'Maiquetía'; // Respaldo seguro
+            else sedeArchivo = 'Maiquetía'; 
 
             const lector = new FileReader();
             lector.onload = async function(evt) {
@@ -2035,8 +2035,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const data = new Uint8Array(evt.target.result);
                     const libro = XLSX.read(data, { type: 'array' });
 
-                    let ticketsNuevos = 0; let ticketsOmitidos = 0; 
-                    let personasNuevas = 0; let personasOmitidas = 0;
+                    // ¡CORRECCIÓN AQUÍ! Todas las variables declaradas correctamente
+                    let ticketsNuevos = 0; let ticketsOmitidos = 0; let ticketsActualizados = 0;
+                    let personasNuevas = 0; let personasOmitidas = 0; let personasActualizadas = 0;
 
                     let cedulasEnEsteExcel = new Set();
                     let nombresEnEsteExcel = new Set();
@@ -2092,7 +2093,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 if (!nomVal) continue;
                                 let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
                                 
-                                // LOGICA SIMPLE: Si tiene cédula compara cédula. Si no, compara nombre.
                                 let personaExistente = ayudaNube.find(p => {
                                     if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
                                     else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
@@ -2143,7 +2143,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 personasNuevas++;
                             }
                         }
-
+                        // ==========================================
+                        // PROCESANDO HOJA 1: CENSO (PLANTILLAS NUEVAS)
+                        // ==========================================
                         else if (esPlantillaCenso) {
                             let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
@@ -2183,12 +2185,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                         let updateData = {};
                                         let hayCambios = false;
 
-                                        // Si no tenía sede (o era Sin Asignar) y el Excel sí tiene, la actualizamos
                                         if ((!personaExistente.punto_usb || personaExistente.punto_usb === 'Sin Asignar') && sedeArchivo !== 'Sin Asignar') {
                                             updateData.punto_usb = sedeArchivo;
                                             hayCambios = true;
                                         }
-                                        // Si no tenía cédula y el Excel sí tiene, la actualizamos
                                         if (cedVal !== '-' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
                                             updateData.cedula = cedVal;
                                             hayCambios = true;
@@ -2239,9 +2239,35 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 if (data && data.length > 0) ayudaNube.push(data[0]); 
                                 personasNuevas++;
                             }
+                        } 
+                        // ==========================================
+                        // PROCESANDO HOJA: ACTUALIZACIÓN DE LOGÍSTICA
+                        // ==========================================
+                        else if (esExcelLogisticaExportado) {
+                            let iId = cabecera.findIndex(c => c.includes('id ticket'));
+                            let iEst = cabecera.findIndex(c => c.includes('estado logistico') || c.includes('estado logístico'));
+                            let iEnc = cabecera.findIndex(c => c.includes('voluntario encargado') || c.includes('encargado'));
+
+                            for (let row of rawData) {
+                                let idVal = iId !== -1 ? String(row[iId] || '').trim() : '';
+                                if (!idVal || idVal === '-') continue;
+                                
+                                let updateData = {};
+                                let estVal = iEst !== -1 ? String(row[iEst] || '').trim() : null;
+                                let encVal = iEnc !== -1 ? String(row[iEnc] || '').trim() : null;
+
+                                if (estVal && estVal !== '-') updateData.estado = estVal;
+                                if (encVal && encVal !== '-') updateData.encargado = encVal;
+
+                                if (Object.keys(updateData).length > 0) {
+                                    const { error } = await supabaseClient.from('etiquetas_logistica').update(updateData).eq('id', idVal);
+                                    if (error) throw new Error("Logística Update - " + error.message);
+                                    ticketsActualizados++;
+                                }
+                            }
                         }
                         // ==========================================
-                        // PROCESANDO HOJA 2: PEDIDOS (LOGÍSTICA)
+                        // PROCESANDO HOJA 2: PEDIDOS MASIVOS (LOGÍSTICA)
                         // ==========================================
                         else if (esPlantillaPedidos) {
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
@@ -2309,7 +2335,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         }
                     } 
 
-                    alert(`✅ Base de datos verificada y actualizada.\n\n👤 Afectados Guardados: ${personasNuevas}\n📦 Pedidos Creados: ${ticketsNuevos}\n\n🛡️ DUPLICADOS OMITIDOS:\n🚫 ${personasOmitidas} personas repetidas.\n🚫 ${ticketsOmitidos} tickets repetidos.`);
+                    alert(`✅ Base de datos verificada y actualizada.\n\n👤 Afectados Nuevos: ${personasNuevas}\n👤 Afectados Actualizados: ${personasActualizadas}\n\n📦 Pedidos Nuevos: ${ticketsNuevos}\n📦 Tickets Actualizados: ${ticketsActualizados}\n\n🛡️ OMITIDOS (DUPLICADOS):\n🚫 ${personasOmitidas} personas repetidas.\n🚫 ${ticketsOmitidos} pedidos repetidos.`);
                     
                 } catch (err) { 
                     alert('ERROR: ' + err.message); 
