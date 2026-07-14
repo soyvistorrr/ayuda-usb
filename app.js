@@ -2046,29 +2046,29 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 <head>
                     <title>Nota de Entrega - #${idCorto}</title>
                     <style>
-                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #000; max-width: 800px; margin: 0 auto; line-height: 1.4; }
-                        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #111; }
-                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 14px; }
+                        body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; max-width: 800px; margin: 0 auto; line-height: 1.3; }
+                        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+                        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; color: #111; }
+                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 13px; }
                         .order-info { text-align: right; }
-                        .order-info h2 { margin: 0; font-size: 20px; }
-                        .info-box { border: 1px solid #ccc; padding: 20px; margin-bottom: 30px; border-radius: 8px; background-color: #f9f9f9; }
-                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px; }
-                        .req-box { border: 1px solid #000; padding: 20px; margin-bottom: 50px; min-height: 200px; font-size: 16px; }
-                        .signatures { display: flex; justify-content: space-between; margin-top: 80px; gap: 40px; }
-                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 10px; text-align: left; font-size: 14px; }
-                        @media print { @page { margin: 0; } body { margin: 1cm; } }
+                        .order-info h2 { margin: 0; font-size: 18px; }
+                        .info-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; background-color: #f9f9f9; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
+                        .req-box { border: 1px solid #000; padding: 15px; margin-bottom: 25px; min-height: 80px; font-size: 14px; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
+                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 5px; text-align: center; font-size: 12px; }
+                        @media print { @page { margin: 0.5cm; } body { margin: 0; } }
                     </style>
                 </head>
                 <body>
                     <div class="header">
                         <div>
                             <h1>ACTA DE ENTREGA DE DONATIVO</h1>
-                            <h3>Universidad Simón Bolívar - Logística de Contingencia</h3>
+                            <h3>Universidad Simón Bolívar - Logística</h3>
                         </div>
                         <div class="order-info">
                             <h2>Folio: #${idCorto}</h2>
-                            <p style="margin:5px 0 0 0; font-size:14px;">${fecha}</p>
+                            <p style="margin:5px 0 0 0; font-size:12px;">${fecha}</p>
                         </div>
                     </div>
 
@@ -2078,32 +2078,94 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             <div><strong>SEDE DESTINO / ACOPIO:</strong><br> ${pedido.punto_usb || 'N/A'}</div>
                             <div><strong>PREPARADOR (ALMACÉN):</strong><br> ${pedido.encargado || 'N/A'}</div>
                             <div><strong>BENEFICIARIO VINCULADO:</strong><br> ${personaVinculada}</div>
-                            <div style="grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                            <div style="grid-column: 1 / -1; margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
                                 <strong>CATEGORÍA DE LOS INSUMOS:</strong> ${String(pedido.categoria_insumo).toUpperCase()}
                             </div>
                         </div>
                     </div>
 
-                    <h3 style="margin-bottom: 10px;">DETALLE EXACTO DE INSUMOS A ENTREGAR:</h3>
+                    <h3 style="margin-bottom: 8px; font-size: 14px;">DETALLE EXACTO DE INSUMOS A ENTREGAR:</h3>
                     <div class="req-box">
                         <div style="white-space: pre-wrap;">${pedido.requerimiento}</div>
                     </div>
 
                     <div class="signatures">
                         <div class="sig-line">
-                            <strong>ENTREGADO POR (ALMACÉN / CHOFER)</strong><br><br>
-                            Nombre: _______________________________<br><br>
-                            C.I: ___________________________________<br><br>
-                            Firma: _________________________________
+                            <strong>ENTREGADO POR (ALMACÉN)</strong><br><br><br>
+                            Nombre / Firma
                         </div>
                         <div class="sig-line">
-                            <strong>RECIBIDO CONFORME (DESTINO)</strong><br><br>
-                            Nombre: _______________________________<br><br>
-                            C.I: ___________________________________<br><br>
-                            Firma: _________________________________
+                            <strong>CHOFER / TRANSPORTE</strong><br><br><br>
+                            Nombre / Firma
+                        </div>
+                        <div class="sig-line">
+                            <strong>RECIBIDO CONFORME (DESTINO)</strong><br><br><br>
+                            Nombre / Firma
                         </div>
                     </div>
 
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        };
+
+        window.imprimirTicketEmpaqueMasivo = function() {
+            const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+            if (seleccionados.length === 0) {
+                alert("Debes seleccionar al menos un ticket marcando las casillas de la izquierda.");
+                return;
+            }
+
+            const pedidosSeleccionados = pedidosLogistica.filter(p => seleccionados.includes(p.id));
+            
+            const destinos = [...new Set(pedidosSeleccionados.map(p => p.punto_usb))];
+            const destinoFinal = destinos.length === 1 ? destinos[0] : "⚠️ ATENCIÓN: MÚLTIPLES DESTINOS";
+            
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
+
+            const fecha = new Date().toLocaleString('es-VE');
+            const idsCortos = pedidosSeleccionados.map(p => "#" + p.id.split('-')[0].toUpperCase()).join(", ");
+            
+            let requerimientosHtml = "";
+            pedidosSeleccionados.forEach(p => {
+                requerimientosHtml += `
+                    <li style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #ccc;">
+                        <strong>[${String(p.categoria_insumo).toUpperCase()}]</strong> ${p.requerimiento}
+                    </li>`;
+            });
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Etiqueta Caja Múltiple</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 15px; color: #000; }
+                        .ticket { border: 2px dashed #000; padding: 15px; max-width: 550px; margin: 0 auto; }
+                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 22px; }
+                        .info-header { margin-bottom: 15px; font-size: 16px; line-height: 1.5; }
+                        ul { margin: 0; padding-left: 20px; font-size: 14px; list-style-type: square; }
+                        @media print { @page { margin: 0; } body { margin: 0.5cm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="ticket">
+                        <h1>ETIQUETA DE DESPACHO GRUPAL</h1>
+                        <hr style="border: 1px solid #000; margin-bottom: 10px;">
+                        <div class="info-header">
+                            <strong>DESTINO:</strong> <span style="font-size: 20px; text-transform: uppercase;">${destinoFinal}</span><br>
+                            <strong>TICKETS INCLUIDOS:</strong> ${idsCortos}<br>
+                            <span style="font-size: 12px; color: #555;">Agrupado el: ${fecha}</span>
+                        </div>
+                        <div style="border: 1px solid #000; padding: 10px; background-color: #fafafa;">
+                            <strong style="font-size: 16px;">CONTENIDO DE LA CAJA:</strong>
+                            <ul style="margin-top: 10px;">
+                                ${requerimientosHtml}
+                            </ul>
+                        </div>
+                    </div>
                     <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
                 </body>
                 </html>
