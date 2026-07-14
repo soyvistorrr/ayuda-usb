@@ -1368,13 +1368,17 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const fDesp = document.getElementById('filtroDespacho').value;
             const fCen = document.getElementById('filtroCentro').value;
 
-            let cedulas = ayudaNube.map(a => a.cedula).filter(c => c && c !== '-');
-            let nombres = ayudaNube.map(a => a.nombre.toLowerCase());
+            let cedulasValidas = ayudaNube.map(a => String(a.cedula || '').trim()).filter(c => c !== '' && c !== '-');
+            let nombresValidos = ayudaNube.map(a => String(a.nombre || '').trim().toLowerCase()).filter(n => n !== '');
 
             let filtrados = ayudaNube.filter(a => {
                 if (fCen === 'Duplicados') {
-                    let dupCedula = a.cedula !== '-' && cedulas.filter(c => c === a.cedula).length > 1;
-                    let dupNombre = nombres.filter(n => n === a.nombre.toLowerCase()).length > 1;
+                    let miCedula = String(a.cedula || '').trim();
+                    let miNombre = String(a.nombre || '').trim().toLowerCase();
+                    
+                    let dupCedula = miCedula !== '-' && miCedula !== '' && cedulasValidas.filter(c => c === miCedula).length > 1;
+                    let dupNombre = miNombre !== '' && nombresValidos.filter(n => n === miNombre).length > 1;
+                    
                     if (!dupCedula && !dupNombre) return false;
                 } else {
                     if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
@@ -1385,7 +1389,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                 }
 
-                const cumpleTexto = (a.nombre || '').toLowerCase().includes(texto) || (a.cedula || '').toLowerCase().includes(texto);
+                const cumpleTexto = String(a.nombre || '').toLowerCase().includes(texto) || String(a.cedula || '').toLowerCase().includes(texto);
                 
                 let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
                 const cumpleDam = (fDam === 'Todos') || (isDamStr === fDam);
@@ -1436,7 +1440,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
                 let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
                 
-                let tieneMedicina = a.req_medicina && a.req_medicina !== '-' && a.req_medicina.trim() !== '';
+                let tieneMedicina = a.req_medicina && a.req_medicina !== '-' && String(a.req_medicina).trim() !== '';
                 let alertaMedica = tieneMedicina ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Solicita Medicina</div>` : '';
 
                 let colorDespacho = '#64748b'; 
