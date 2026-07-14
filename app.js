@@ -2009,7 +2009,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             rawData.shift();
                         }
 
-                        if(cabecera.length === 0) continue;
+                        if(cabecera.length === 0) continue; 
                         rawData.shift(); 
 
                         let esExcelLogisticaExportado = cabecera.some(c => c.includes('id ticket'));
@@ -2075,6 +2075,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             let iNin = cabecera.findIndex(c => c.includes('niños') || c.includes('ninos'));
                             let iAdu = cabecera.findIndex(c => c.includes('adultos'));
                             let iObs = cabecera.findIndex(c => c.includes('observaciones'));
+                            let iMed = cabecera.findIndex(c => c.includes('medicina'));
+                            let iAli = cabecera.findIndex(c => c.includes('alimento') || c.includes('agua'));
 
                             for (let row of rawData) {
                                 let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
@@ -2084,21 +2086,23 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 let payloadPersona = {
                                     nombre: nomVal, 
                                     cedula: cedVal,
-                                    es_damnificado: iDam !== -1 ? String(row[iDam] || '').toLowerCase().includes('si') : false,
+                                    es_damnificado: iDam !== -1 ? (String(row[iDam]).toLowerCase().includes('si') || String(row[iDam]).toLowerCase().includes('sí')) : false,
                                     punto_usb: sedeArchivo,
                                     estado: 'Con vida',
                                     telefono: iTel !== -1 && row[iTel] ? String(row[iTel]).trim() : '-',
                                     ubicacion: iUbi !== -1 && row[iUbi] ? String(row[iUbi]).trim() : '-',
                                     descripcion_ayuda: iObs !== -1 && row[iObs] ? String(row[iObs]).trim() : '',
                                     estado_despacho: 'Sin Pedido',
-                                    comunidad: 'Universidad Simón Bolívar',
+                                    comunidad: 'Universidad Simón Bolívar', 
                                     grupo: iGrp !== -1 && row[iGrp] ? String(row[iGrp]).trim() : 'Estudiante',
                                     correo: iCor !== -1 && row[iCor] ? String(row[iCor]).trim() : '',
                                     carnet_estudiante: iCar !== -1 && row[iCar] ? String(row[iCar]).trim() : 'N/A',
                                     personas_hogar: iPer !== -1 && row[iPer] ? (parseInt(row[iPer]) || 1) : 1,
                                     ninos_hogar: iNin !== -1 && row[iNin] ? (parseInt(row[iNin]) || 0) : 0,
                                     adultos_mayores_hogar: iAdu !== -1 && row[iAdu] ? (parseInt(row[iAdu]) || 0) : 0,
-                                    requiere_atencion_medica: false
+                                    requiere_atencion_medica: iMed !== -1 && row[iMed] ? String(row[iMed]).trim() : '', 
+                                    req_alimentos: iAli !== -1 && row[iAli] ? String(row[iAli]).trim() : '',
+                                    req_general: ''
                                 };
 
                                 let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (p.nombre.toLowerCase() === nomVal.toLowerCase()));
@@ -2110,7 +2114,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 } else {
                                     const { data, error } = await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]).select();
                                     if (error) throw new Error("Ayuda Insert - " + error.message);
-                                    if (data && data.length > 0) ayudaNube.push(data[0]);
+                                    if (data && data.length > 0) ayudaNube.push(data[0]); 
                                     personasNuevas++;
                                 }
                             }
