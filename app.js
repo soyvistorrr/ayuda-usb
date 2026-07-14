@@ -1415,7 +1415,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             thead.innerHTML = `
                 <tr>
-                    <th>ESTADO VITAL</th>
                     <th>PUNTO ACOPIO</th>
                     <th>AFECTADO</th>
                     <th>CONTACTO</th>
@@ -1427,16 +1426,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             tbody.innerHTML = '';
             if(filtrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">No hay registros que coincidan con la búsqueda.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay registros que coincidan con la búsqueda.</td></tr>';
                 return;
             }
 
             filtrados.forEach(a => {
-                let colorEstado = 'var(--gray-500)';
-                if(a.estado === 'Con vida') colorEstado = 'var(--success)';
-                if(a.estado === 'Atrapado') colorEstado = 'var(--danger)';
-                if(a.estado === 'Desaparecido') colorEstado = 'var(--dark)';
-
                 let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
                 let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
                 
@@ -1459,7 +1453,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                 tbody.innerHTML += `
                     <tr>
-                        <td data-label="Estado Vital"><span style="color:${colorEstado}; font-weight:bold;">●</span> ${a.estado || 'Desconocido'}</td>
                         <td data-label="Punto Acopio"><strong>${a.punto_usb || 'Sin Asignar'}</strong></td>
                         <td data-label="Afectado">
                             <div style="font-weight:bold;">${a.nombre || '-'}</div>
@@ -1760,7 +1753,23 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const cuerpo = document.getElementById('tablaLogisticaCuerpo');
             if(!cuerpo) return;
 
-            cuerpo.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; font-weight: bold; color: var(--primary);">Cargando inventario y pedidos...</td></tr>';
+            // Inyectamos la cabecera dinámica para añadir el Beneficiario sin tocar el HTML
+            const thead = cuerpo.parentElement.querySelector('thead');
+            if(thead) {
+                thead.innerHTML = `
+                    <tr>
+                        <th>ESTADO</th>
+                        <th>DESTINO</th>
+                        <th>BENEFICIARIO</th>
+                        <th>CATEGORÍA</th>
+                        <th>REQUERIMIENTO</th>
+                        <th>ENCARGADO</th>
+                        <th>ACCIÓN LOGÍSTICA</th>
+                    </tr>
+                `;
+            }
+
+            cuerpo.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; font-weight: bold; color: var(--primary);">Cargando inventario y pedidos...</td></tr>';
 
             const { data, error } = await supabaseClient
                 .from('etiquetas_logistica')
@@ -1768,12 +1777,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 .order('created_at', { ascending: false });
 
             if(error) {
-                cuerpo.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 1rem; color: red;">Error: ${error.message}</td></tr>`;
+                cuerpo.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 1rem; color: red;">Error: ${error.message}</td></tr>`;
                 return;
             }
 
             if(!data || data.length === 0) {
-                cuerpo.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No hay tickets registrados en el almacén.</td></tr>';
+                cuerpo.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay tickets registrados en el almacén.</td></tr>';
                 return;
             }
 
@@ -1794,8 +1803,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 
                 if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda')) {
                     btnAccion = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Vista</span>`;
-                } 
-                else {
+                } else {
                     if (p.estado === 'Pendiente') {
                         btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.4rem 0.8rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
                     } else if (p.estado === 'Empacando') {
@@ -1808,6 +1816,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                 }
 
+                // Cruzamos datos para sacar el nombre y cédula del beneficiario
+                let persona = ayudaNube.find(a => a.id === p.solicitud_id);
+                let nombreBen = persona ? persona.nombre : 'Carga Manual / Reposición';
+                let cedulaBen = persona && persona.cedula !== '-' ? `C.I: ${persona.cedula}` : '';
+                let htmlBeneficiario = `<div style="font-weight:bold; color:var(--primary);">${nombreBen}</div><div style="font-size:0.8rem; color:#64748b;">${cedulaBen}</div>`;
+
                 let reqTexto = p.requerimiento || '-';
                 if(reqTexto.length > 80) reqTexto = reqTexto.substring(0, 80) + '...';
 
@@ -1815,6 +1829,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     <tr>
                         <td data-label="Estado"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
                         <td data-label="Destino"><strong>${p.punto_usb || 'Sin Asignar'}</strong></td>
+                        <td data-label="Beneficiario">${htmlBeneficiario}</td>
                         <td data-label="Categoría" style="text-transform: capitalize;">${icono} ${p.categoria_insumo || '-'}</td>
                         <td data-label="Requerimiento"><div class="text-truncate-clamp">${reqTexto}</div></td>
                         <td data-label="Encargado" style="color: #3b82f6; font-weight: bold;">${p.encargado || 'Sin Asignar'}</td>
@@ -1990,6 +2005,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
             
+            // 1. TRADUCTOR DE SEDES (Solo se usa para archivos nuevos, no para el Respaldo)
             let nombreRaw = String(file.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             let sedeArchivo = 'Sin Asignar';
             
@@ -2001,6 +2017,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             else if (nombreRaw.includes('maiquetia')) sedeArchivo = 'Maiquetía';
             else if (nombreRaw.includes('macuto') || nombreRaw.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
             else if (nombreRaw.includes('cva') || nombreRaw.includes('mercedes') || nombreRaw.includes('caracas')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
+            else sedeArchivo = 'Maiquetía'; // Respaldo seguro
 
             const lector = new FileReader();
             lector.onload = async function(evt) {
@@ -2013,7 +2030,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         await cargarDatosDesdeNube();
                     }
 
-                    pElement.innerHTML = "<strong>⏳ Aplicando Doble Verificación Anti-Duplicados...</strong>";
+                    pElement.innerHTML = "<strong>⏳ Analizando archivo y verificando registros...</strong>";
 
                     const data = new Uint8Array(evt.target.result);
                     const libro = XLSX.read(data, { type: 'array' });
@@ -2042,10 +2059,92 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if(cabecera.length === 0) continue; 
                         rawData.shift(); 
 
-                        let esPlantillaCenso = cabecera.some(c => c.includes('damnificado'));
-                        let esPlantillaPedidos = cabecera.some(c => c.includes('fecha')) && (cabecera.some(c => c.includes('medicina')) || cabecera.some(c => c.includes('alimento'))) && !esPlantillaCenso;
+                        let esExcelLogisticaExportado = cabecera.some(c => c.includes('id ticket'));
+                        let esExcelAyudaExportado = cabecera.some(c => c.includes('id solicitud'));
+                        let esPlantillaCenso = cabecera.some(c => c.includes('damnificado')) && !esExcelAyudaExportado;
+                        let esPlantillaPedidos = cabecera.some(c => c.includes('fecha')) && (cabecera.some(c => c.includes('medicina')) || cabecera.some(c => c.includes('alimento'))) && !esPlantillaCenso && !esExcelAyudaExportado;
 
-                        if (esPlantillaCenso) {
+                        // ==========================================
+                        // RECUPERACIÓN PERFECTA DEL RESPALDO (EXCEL DESCARGADO)
+                        // ==========================================
+                        if (esExcelAyudaExportado) {
+                            let iPun = cabecera.findIndex(c => c.includes('punto acopio'));
+                            let iNom = cabecera.findIndex(c => c.includes('afectado'));
+                            let iCed = cabecera.findIndex(c => c.includes('cédula') || c.includes('cedula'));
+                            let iTel = cabecera.findIndex(c => c.includes('teléfono') || c.includes('telefono'));
+                            let iCor = cabecera.findIndex(c => c.includes('correo'));
+                            let iCom = cabecera.findIndex(c => c.includes('comunidad'));
+                            let iGrp = cabecera.findIndex(c => c.includes('relación usb') || c.includes('grupo'));
+                            let iEst = cabecera.findIndex(c => c.includes('estado vital'));
+                            let iUbi = cabecera.findIndex(c => c.includes('ubicación') || c.includes('ubicacion'));
+                            let iDam = cabecera.findIndex(c => c.includes('es damnificado') || c.includes('damnificado'));
+                            let iMed = cabecera.findIndex(c => c.includes('atención médica'));
+                            let iPer = cabecera.findIndex(c => c.includes('total personas'));
+                            let iNin = cabecera.findIndex(c => c.includes('niños'));
+                            let iAdu = cabecera.findIndex(c => c.includes('adultos mayores'));
+                            let iReqM = cabecera.findIndex(c => c.includes('req. medicina'));
+                            let iReqA = cabecera.findIndex(c => c.includes('req. alimentos'));
+                            let iReqO = cabecera.findIndex(c => c.includes('otras solicitudes'));
+                            let iObs = cabecera.findIndex(c => c.includes('observaciones'));
+
+                            for (let row of rawData) {
+                                let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
+                                if (!nomVal) continue;
+                                let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
+                                
+                                // LOGICA SIMPLE: Si tiene cédula compara cédula. Si no, compara nombre.
+                                let personaExistente = ayudaNube.find(p => {
+                                    if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
+                                    else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                });
+
+                                let repetidoIntra = false;
+                                if (cedVal !== '-' && cedVal !== '') {
+                                    if (cedulasEnEsteExcel.has(cedVal)) repetidoIntra = true;
+                                } else {
+                                    if (nombresEnEsteExcel.has(nomVal.toLowerCase())) repetidoIntra = true;
+                                }
+
+                                if (personaExistente || repetidoIntra) {
+                                    personasOmitidas++;
+                                    if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
+                                    nombresEnEsteExcel.add(nomVal.toLowerCase());
+                                    continue; 
+                                }
+
+                                if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
+                                nombresEnEsteExcel.add(nomVal.toLowerCase());
+
+                                let payloadPersona = {
+                                    nombre: nomVal,
+                                    cedula: cedVal,
+                                    punto_usb: iPun !== -1 && row[iPun] ? String(row[iPun]).trim() : 'Sin Asignar',
+                                    telefono: iTel !== -1 && row[iTel] ? String(row[iTel]).trim() : '-',
+                                    correo: iCor !== -1 && row[iCor] ? String(row[iCor]).trim() : '',
+                                    comunidad: iCom !== -1 && row[iCom] ? String(row[iCom]).trim() : 'Universidad Simón Bolívar',
+                                    grupo: iGrp !== -1 && row[iGrp] ? String(row[iGrp]).trim() : 'Estudiante',
+                                    estado: iEst !== -1 && row[iEst] ? String(row[iEst]).trim() : 'Con vida',
+                                    ubicacion: iUbi !== -1 && row[iUbi] ? String(row[iUbi]).trim() : '-',
+                                    es_damnificado: iDam !== -1 ? (String(row[iDam]).toUpperCase().includes('SÍ') || String(row[iDam]).toUpperCase().includes('SI')) : false,
+                                    requiere_atencion_medica: iMed !== -1 ? String(row[iMed]).trim() : '',
+                                    personas_hogar: iPer !== -1 && row[iPer] ? (parseInt(row[iPer]) || 1) : 1,
+                                    ninos_hogar: iNin !== -1 && row[iNin] ? (parseInt(row[iNin]) || 0) : 0,
+                                    adultos_mayores_hogar: iAdu !== -1 && row[iAdu] ? (parseInt(row[iAdu]) || 0) : 0,
+                                    req_medicina: iReqM !== -1 && row[iReqM] ? String(row[iReqM]).trim() : '',
+                                    req_alimentos: iReqA !== -1 && row[iReqA] ? String(row[iReqA]).trim() : '',
+                                    req_general: iReqO !== -1 && row[iReqO] ? String(row[iReqO]).trim() : '',
+                                    descripcion_ayuda: iObs !== -1 && row[iObs] ? String(row[iObs]).trim() : '',
+                                    estado_despacho: 'Sin Pedido'
+                                };
+
+                                const { data, error } = await supabaseClient.from('solicitudes_ayuda').insert([payloadPersona]).select();
+                                if (error) throw new Error("Ayuda Insert - " + error.message);
+                                if (data && data.length > 0) ayudaNube.push(data[0]); 
+                                personasNuevas++;
+                            }
+                        }
+
+                        else if (esPlantillaCenso) {
                             let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
                             let iDam = cabecera.findIndex(c => c.includes('damnificado'));
@@ -2066,26 +2165,52 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 if (!nomVal) continue;
                                 let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
 
-                                if ((cedVal !== '-' && cedulasEnEsteExcel.has(cedVal)) || 
-                                    (nomVal && nombresEnEsteExcel.has(nomVal.toLowerCase()))) {
-                                    personasOmitidas++;
+                                let personaExistente = ayudaNube.find(p => {
+                                    if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
+                                    else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                });
+
+                                let repetidoIntra = false;
+                                if (cedVal !== '-' && cedVal !== '') {
+                                    if (cedulasEnEsteExcel.has(cedVal)) repetidoIntra = true;
+                                } else {
+                                    if (nombresEnEsteExcel.has(nomVal.toLowerCase())) repetidoIntra = true;
+                                }
+
+                                if (personaExistente || repetidoIntra) {
+                                    // --- LÓGICA DE ACTUALIZACIÓN INTELIGENTE ---
+                                    if (personaExistente) {
+                                        let updateData = {};
+                                        let hayCambios = false;
+
+                                        // Si no tenía sede (o era Sin Asignar) y el Excel sí tiene, la actualizamos
+                                        if ((!personaExistente.punto_usb || personaExistente.punto_usb === 'Sin Asignar') && sedeArchivo !== 'Sin Asignar') {
+                                            updateData.punto_usb = sedeArchivo;
+                                            hayCambios = true;
+                                        }
+                                        // Si no tenía cédula y el Excel sí tiene, la actualizamos
+                                        if (cedVal !== '-' && (!personaExistente.cedula || personaExistente.cedula === '-')) {
+                                            updateData.cedula = cedVal;
+                                            hayCambios = true;
+                                        }
+
+                                        if (hayCambios) {
+                                            const { error } = await supabaseClient.from('solicitudes_ayuda').update(updateData).eq('id', personaExistente.id);
+                                            if (!error) personasActualizadas++;
+                                        } else {
+                                            personasOmitidas++;
+                                        }
+                                    } else {
+                                        personasOmitidas++;
+                                    }
+                                    
+                                    if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
+                                    nombresEnEsteExcel.add(nomVal.toLowerCase());
                                     continue; 
                                 }
 
-                                let personaExistente = ayudaNube.find(p => 
-                                    (cedVal !== '-' && String(p.cedula).trim() === cedVal) || 
-                                    (String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase())
-                                );
-
-                                if (personaExistente) {
-                                    personasOmitidas++;
-                                    if (cedVal !== '-') cedulasEnEsteExcel.add(cedVal);
-                                    if (nomVal) nombresEnEsteExcel.add(nomVal.toLowerCase());
-                                    continue; 
-                                }
-
-                                if (cedVal !== '-') cedulasEnEsteExcel.add(cedVal);
-                                if (nomVal) nombresEnEsteExcel.add(nomVal.toLowerCase());
+                                if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
+                                nombresEnEsteExcel.add(nomVal.toLowerCase());
 
                                 let payloadPersona = {
                                     nombre: nomVal, 
@@ -2114,8 +2239,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 if (data && data.length > 0) ayudaNube.push(data[0]); 
                                 personasNuevas++;
                             }
-                        } 
-
+                        }
+                        // ==========================================
+                        // PROCESANDO HOJA 2: PEDIDOS (LOGÍSTICA)
+                        // ==========================================
                         else if (esPlantillaPedidos) {
                             let iCed = cabecera.findIndex(c => c.includes('cedula') || c.includes('cédula'));
                             let iNom = cabecera.findIndex(c => c.includes('nombre') || c.includes('afectado'));
@@ -2130,7 +2257,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
                                 if (!nomVal && cedVal === '-') continue;
 
-                                let personaExistente = ayudaNube.find(p => (cedVal !== '-' && p.cedula === cedVal) || (nomVal && p.nombre.toLowerCase() === nomVal.toLowerCase()));
+                                let personaExistente = ayudaNube.find(p => {
+                                    if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
+                                    else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                });
                                 let idAsignado = personaExistente ? personaExistente.id : null;
 
                                 let reqsObj = [
@@ -2173,13 +2303,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             if (ticketsAInsertar.length > 0) {
                                 const { data, error } = await supabaseClient.from('etiquetas_logistica').insert(ticketsAInsertar).select();
                                 if (error) throw new Error("Logística Insert Masivo - " + error.message);
-                                if (data && data.length > 0) pedidosLogistica = pedidosLogistica.concat(data); // Actualizar memoria
+                                if (data && data.length > 0) pedidosLogistica = pedidosLogistica.concat(data);
                                 ticketsNuevos += ticketsAInsertar.length;
                             }
                         }
                     } 
 
-                    alert(`✅ Doble Verificación Completada.\n\n👤 Afectados Guardados: ${personasNuevas}\n📦 Pedidos Guardados: ${ticketsNuevos}\n\n🛡️ FILTROS ANTI-DUPLICADOS BLOQUEARON:\n🚫 ${personasOmitidas} personas repetidas.\n🚫 ${ticketsOmitidos} tickets repetidos.`);
+                    alert(`✅ Base de datos verificada y actualizada.\n\n👤 Afectados Guardados: ${personasNuevas}\n📦 Pedidos Creados: ${ticketsNuevos}\n\n🛡️ DUPLICADOS OMITIDOS:\n🚫 ${personasOmitidas} personas repetidas.\n🚫 ${ticketsOmitidos} tickets repetidos.`);
                     
                 } catch (err) { 
                     alert('ERROR: ' + err.message); 
