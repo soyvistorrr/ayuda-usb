@@ -22,7 +22,6 @@
                     <h1>Universidad Simón Bolívar</h1>
                 </div>
             </div>
-            
             <img src="Logo-AEUSB-fondo-blanco.png" alt="Logo AEUSB" class="logo-aeusb">
         </div>
     </div>
@@ -44,6 +43,9 @@
     <main class="main-layout">
         <div class="container">
             
+            <!-- ============================================== -->
+            <!-- VISTA: HOME (MENÚ PRINCIPAL) -->
+            <!-- ============================================== -->
             <section class="app-view active" id="view-home">
                 <div class="home-hero">
                     <h2>Plataforma de Contingencia USB</h2>
@@ -72,7 +74,7 @@
                         <div class="news-section-header" style="margin-bottom: 0;">
                             <h3>Puntos USB y Centros de Acopio</h3>
                         </div>
-                        <a class="btn-ver-todas" onclick="navegarA('view-puntos-usb')">Ver detalles y necesidades ➔</a>
+                        <a class="btn-ver-todas" onclick="navegarA('view-puntos-usb')">Ver detalles y ubicaciones ➔</a>
                     </div>
                     
                     <div class="acopio-banner-card" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
@@ -101,6 +103,7 @@
                     </div>
                 </div>
                 
+                <!-- BOTONES DE ACCIÓN DEL HOME -->
                 <div class="home-grid-buttons">
                     <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
                         <div>
@@ -151,17 +154,20 @@
                     </div>
                 </div>
             </section>
-            
+
+            <!-- ============================================== -->
+            <!-- VISTA: PUNTOS USB (TARJETAS CON WHATSAPP) -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-puntos-usb">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
                 
                 <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 3rem 2rem; margin-bottom: 2.5rem; text-align: center;">
                     <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Red de Distribución USB</h2>
-                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Conoce a detalle los puntos estratégicos donde estaremos canalizando la ayuda humanitaria recolectada en el CVA. Cada centro tiene necesidades logísticas específicas según su ubicación.</p>
+                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Conoce a detalle los puntos estratégicos donde estaremos canalizando la ayuda humanitaria recolectada en el CVA.</p>
                 </div>
 
                 <div style="background-color: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; margin-bottom: 2.5rem; border-left: 5px solid var(--success); line-height: 1.6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <strong>AVISO IMPORTANTE:</strong> Estos puntos de distribución están destinados <strong>exclusivamente</strong> a brindar apoyo a miembros de la comunidad USB (Estudiantes, profesores, personal administrativo/obrero, egresados y familiares directos). Te pedimos contactar primero a tu encargado local para el censo de necesidades.
+                    <strong>AVISO IMPORTANTE:</strong> Estos puntos de distribución están destinados <strong>exclusivamente</strong> a brindar apoyo a miembros de la comunidad USB (Estudiantes, profesores, personal administrativo/obrero, egresados y familiares directos).
                 </div>
 
                 <div style="margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
@@ -264,173 +270,10 @@
 
                 </div>
             </section>
-                
-                <div class="home-grid-buttons">
-                    <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
-                        <div>
-                            <h3>Necesito Ayuda</h3>
-                            <p>Registra directamente tus requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate).</p>
-                        </div>
-                        <button class="btn btn-warning btn-block">Registrar Solicitud</button>
-                    </div>
 
-                    <div class="action-card" onclick="navegarA('view-colaborar')">
-                        <div>
-                            <h3>Quiero ser Colaborador</h3>
-                            <p>Súmate a los listados de brigadas activas para remoción de escombros, clasificación de insumos y primeros auxilios.</p>
-                        </div>
-                        <button class="btn btn-success btn-block">Ver Voluntarios / Inscribirme</button>
-                    </div>
-
-                    <div class="action-card" onclick="navegarA('view-buscar')">
-                        <div>
-                            <h3>Busco a Alguien</h3>
-                            <p>Consulta el registro general en tiempo real para rastrear la localización y condiciones de compañeros uesebistas.</p>
-                        </div>
-                        <button class="btn btn-primary btn-block">Ver Registro General</button>
-                    </div>
-
-                    <div class="action-card" onclick="navegarA('view-enlaces')">
-                        <div>
-                            <h3>Enlaces y Listas Oficiales</h3>
-                            <p>Accede a las listas oficiales de personas hospitalizadas, censos vecinales y el directorio de profesionales solidarios.</p>
-                        </div>
-                        <button class="btn btn-primary btn-block" style="background-color: #0284c7; color: white;">Ver Enlaces</button>
-                    </div>
-
-                    <!-- ESTA ES LA ÚNICA TARJETA DE DONAR QUE DEBE EXISTIR AQUÍ -->
-                    <div class="action-card donate-pulse" onclick="navegarA('view-donar')">
-                        <div>
-                            <h3>Quiero Donar</h3>
-                            <p>Apoya económicamente la adquisición masiva de insumos médicos y logística para los brigadistas en las zonas afectadas.</p>
-                        </div>
-                        <button class="btn btn-success btn-block" style="background-color: var(--success);">Aportar Fondos</button>
-                    </div>
-
-                    <div class="action-card admin-action-header" id="btn-acceso-logistica" style="display: none; border-top: 4px solid #f59e0b;">
-                        <div style="text-align: center; margin-bottom: 1.5rem; flex: 1;">
-                            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--slate-800); text-transform: uppercase;">Logística y Envíos</h3>
-                            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Panel de control para registrar pedidos y generar las facturas de despacho.</p>
-                        </div>
-                        <button class="btn btn-block" style="background-color: #f59e0b; color: white; border: none; font-weight: bold;" onclick="navegarA('view-etiquetas-logistica'); cargarTablaLogisticaFuerza();">GESTIONAR DESPACHOS</button>    
-                    </div>
-                </div>
-            </section>
-
-            <section class="app-view" id="view-puntos-usb">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
-                
-                <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 3rem 2rem; margin-bottom: 2.5rem; text-align: center;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Red de Distribución USB</h2>
-                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Conoce a detalle los puntos estratégicos donde estaremos canalizando la ayuda humanitaria recolectada en el CVA. Cada centro tiene necesidades logísticas específicas según su ubicación.</p>
-                </div>
-
-                <div style="background-color: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; margin-bottom: 2.5rem; border-left: 5px solid var(--success); line-height: 1.6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <strong>AVISO IMPORTANTE:</strong> Estos puntos de distribución están destinados <strong>exclusivamente</strong> a brindar apoyo a miembros de la comunidad USB (Estudiantes, profesores, personal administrativo/obrero, egresados y familiares directos). Te pedimos contactar primero a tu encargado local para el censo de necesidades.
-                </div>
-
-                <div style="margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
-                    <div style="background-color: var(--slate-800); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; text-transform: uppercase; color: var(--accent);">🗺️ Ubicación de los Puntos</h3>
-                        <a href="https://www.google.com/maps/d/u/0/edit?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4&usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: var(--accent); color: var(--primary); text-decoration: none; font-weight: bold;">📍 Abrir en Google Maps</a>
-                    </div>
-                    <iframe src="https://www.google.com/maps/d/embed?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4" width="100%" height="450" style="border:0; display: block;" allowfullscreen="" loading="lazy" title="Mapa de Puntos USB"></iframe>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-                    
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Catia la Mar Centro</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Aitana Mora</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0412-4176735</p>
-                            <a href="https://wa.me/584124176735" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Las Tunitas - Mamo</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Prof. Alba Peraza</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0424-1622863</p>
-                            <a href="https://wa.me/584241622863" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Caraballeda</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Illeny Aponte</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0414-3725800</p>
-                            <a href="https://wa.me/584143725800" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Naiguatá</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Prof. Elvin Barreto</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0412-3701226</p>
-                            <a href="https://wa.me/584123701226" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Camurí Grande</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Prof. Elvin Barreto</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0412-3701226</p>
-                            <a href="https://wa.me/584123701226" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 CVA Las Mercedes (Caracas)</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Equipo AEUSB</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0412-9267897</p>
-                            <a href="https://wa.me/584129267897" target="_blank" class="btn btn-success btn-block" style="margin-top: auto;">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Maiquetía</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Luis de Quintal</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0414-2518760</p>
-                            <a href="https://wa.me/584142518760" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                    <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
-                        <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 La Guaira-Macuto</div>
-                        </div>
-                        <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
-                            <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Maleixis Echandia</p>
-                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;"><strong>Teléfono:</strong> 0412-2982783</p>
-                            <a href="https://wa.me/584122982783" target="_blank" class="btn btn-success btn-block">Hablar por WhatsApp</a>
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-
+            <!-- ============================================== -->
+            <!-- VISTA: NECESITO AYUDA -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-necesito-ayuda">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
@@ -613,6 +456,9 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: QUIERO SER COLABORADOR -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-colaborar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 <div class="grid-system" id="mallaColaboradores">
@@ -695,6 +541,9 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: BUSCAR A ALGUIEN -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-buscar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 <div class="dashboard-hero">
@@ -822,10 +671,12 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: DONACIONES -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-donar">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 
-                <!-- HÉROE CON BARRA DE PROGRESO -->
                 <div class="donation-hero-banner" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
                     <h2 style="font-size: 2.2rem; color: #fbc02d;">Fondo de Emergencia USB</h2>
                     <p style="font-size: 1.15rem; margin-bottom: 2rem;">Tu aporte se transforma en soluciones inmediatas. Estamos recaudando fondos para centralizar la compra de insumos médicos, alimentación, agua y la dotación vital del Cuerpo de Bomberos de la USB.</p>
@@ -846,7 +697,6 @@
                     </div>
                 </div>
 
-                <!-- TARJETAS DE IMPACTO (QUÉ COMPRA TU DONACIÓN) -->
                 <div style="text-align: center; margin-bottom: 3.5rem;">
                     <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.6rem; color: var(--primary); text-transform: uppercase; font-weight: 900;">¿Cuál es el impacto de tu donación?</h3>
                     <p style="color: var(--gray-700); font-size: 1.05rem; max-width: 600px; margin: 0 auto;">Cualquier monto salva vidas. Aquí tienes un estimado de lo que los brigadistas pueden adquirir gracias a tu aporte:</p>
@@ -908,6 +758,9 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: ENLACES -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-enlaces">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
                 <div style="margin-bottom: 2rem;">
@@ -977,6 +830,9 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: DETALLE DE NOTICIA -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-noticia-detalle">
                 <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
                 <div class="panel-card" style="max-width: 850px; margin: 0 auto; border-top: 4px solid var(--primary);" id="pagina-noticia-borde">
@@ -994,6 +850,9 @@
                 </div>
             </section>
 
+            <!-- ============================================== -->
+            <!-- VISTA: TODAS LAS NOTICIAS -->
+            <!-- ============================================== -->
             <section class="app-view" id="view-todas-noticias">
                 <div class="container">
                     
@@ -1011,8 +870,10 @@
                     
                 </div>
             </section>
-        </div>
-
+        
+        <!-- ============================================== -->
+        <!-- VISTA: LOGÍSTICA (OCULTA HASTA INICIO SESIÓN) -->
+        <!-- ============================================== -->
         <section class="app-view" id="view-etiquetas-logistica">
             <div class="container">
                 
@@ -1145,8 +1006,10 @@
                     <table>
                         <thead>
                             <tr>
+                                <th style="width: 40px; text-align: center;"><input type="checkbox" onclick="toggleSelectAllLogistica(this)" title="Seleccionar todos"></th>
                                 <th>ESTADO</th>
                                 <th>DESTINO</th>
+                                <th>BENEFICIARIO</th>
                                 <th>CATEGORÍA</th>
                                 <th>REQUERIMIENTO</th>
                                 <th>ENCARGADO</th>
@@ -1159,6 +1022,9 @@
                 </div>
             </div>
         </section>
+
+        <!-- SE CIERRAN LOS CONTENEDORES PRINCIPALES -->
+        </div>
     </main>
 
     <footer class="site-footer" style="position: relative;">
@@ -1183,6 +1049,7 @@
         </div>
     </div>
 
+    <!-- MODALES DE LA APLICACIÓN -->
     <div id="modal-novedad" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
         <div class="panel-card" style="width: 90%; max-width: 550px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--accent);">
             <div class="panel-header">
@@ -1251,8 +1118,6 @@
         🔔 Novedades (<span id="contador-novedades">0</span>)
     </button>
 
-    <script src="app.js" defer></script>
-
     <div id="floating-donation-widget" class="floating-donation">
         <button class="close-btn" onclick="document.getElementById('floating-donation-widget').style.display='none'">&times;</button>
         <h4>¡La Simón nos necesita! 💛</h4>
@@ -1284,17 +1149,19 @@
         </div>
     </div>
 
-    <div id="modal-info-ayuda" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
-        <div class="panel-card" style="width: 95%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--accent);">
+    <div id="modal-detalles-ayuda" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div class="panel-card" style="width: 95%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid #0284c7;">
             <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="panel-title">Ficha Detallada del Afectado</div>
-                <button type="button" class="btn btn-delete" style="padding: 5px 10px;" onclick="document.getElementById('modal-info-ayuda').style.display='none'">✖</button>
+                <div class="panel-title">Resumen del Afectado</div>
+                <button onclick="document.getElementById('modal-detalles-ayuda').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-muted);">&times;</button>
             </div>
-            <div class="panel-body" style="overflow-y: auto; flex: 1;" id="contenido-info-ayuda">
-
+            <div class="panel-body" style="overflow-y: auto; flex: 1;" id="contenido-detalles-ayuda">
+                <!-- Se llena con JS -->
             </div>
         </div>
     </div>
+
+    <script src="app.js" defer></script>
 
 </body>
 </html>
