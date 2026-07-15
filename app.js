@@ -902,46 +902,62 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }
 
         window.verDetallesAyuda = function(id) {
-            const persona = ayudaNube.find(a => a.id === id);
-            if (!persona) return;
-
-            const tickets = pedidosLogistica.filter(p => p.solicitud_id === id);
-            let despachados = tickets.filter(t => t.estado === 'Despachado');
-            let pendientes = tickets.filter(t => t.estado !== 'Despachado');
-
-            let htmlTickets = 'No hay pedidos logísticos registrados.';
-            if (tickets.length > 0) {
-                htmlTickets = `<ul style="margin-left: 20px; font-size: 0.85rem; color: #444;">` + 
-                    tickets.map(t => {
-                        let color = t.estado === 'Despachado' ? 'color: #16a34a;' : (t.estado === 'Empacando' ? 'color: #ca8a04;' : 'color: #dc2626;');
-                        return `<li style="margin-bottom: 5px;"><strong>[${t.categoria_insumo.toUpperCase()}]</strong> ${t.requerimiento} - <span style="${color} font-weight:bold;">${t.estado}</span></li>`;
-                    }).join('') + `</ul>`;
+            const persona = ayudaNube.find(a => String(a.id) === String(id));
+            
+            if (!persona) {
+                console.error("Error: No se encontró la persona con ID", id);
+                return; 
             }
 
-            let badgeDam = persona.es_damnificado ? '<span class="badge badge-danger">Sí (Damnificado)</span>' : '<span class="badge badge-gray">No</span>';
+            const ticketsPersona = pedidosLogistica.filter(p => String(p.solicitud_id) === String(id));
+            
+            let historialTickets = '';
+            if(ticketsPersona.length === 0) {
+                historialTickets = '<p style="color:var(--text-muted); font-size:0.9rem;">No tiene pedidos logísticos generados en el sistema.</p>';
+            } else {
+                historialTickets = '<table style="width:100%; border-collapse:collapse; font-size:0.85rem; border-radius:6px; overflow:hidden;"><thead><tr style="background:#f1f5f9;"><th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">Insumo</th><th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">Detalle</th><th style="padding:8px; border:1px solid #e2e8f0; text-align:left;">Estado</th></tr></thead><tbody>';
+                ticketsPersona.forEach(t => {
+                    let colEst = t.estado === 'Despachado' ? '#16a34a' : (t.estado === 'Empacando' ? '#ca8a04' : '#dc2626');
+                    historialTickets += `<tr><td style="padding:8px; border:1px solid #e2e8f0; text-transform:capitalize;">${t.categoria_insumo}</td><td style="padding:8px; border:1px solid #e2e8f0;">${t.requerimiento}</td><td style="padding:8px; border:1px solid #e2e8f0; color:${colEst}; font-weight:bold;">${t.estado}</td></tr>`;
+                });
+                historialTickets += '</tbody></table>';
+            }
 
-            document.getElementById('contenido-info-ayuda').innerHTML = `
-                <div style="margin-bottom: 15px;">
-                    <h3 style="color: var(--primary); font-size: 1.2rem; margin-bottom: 5px;">${persona.nombre}</h3>
-                    <p style="font-size: 0.9rem; color: #555;"><strong>C.I:</strong> ${persona.cedula || '-'} | <strong>Tel:</strong> ${persona.telefono || '-'}</p>
-                    <p style="font-size: 0.9rem; color: #555;"><strong>Ubicación:</strong> ${persona.ubicacion || '-'}</p>
+            const isDam = (persona.es_damnificado === true || String(persona.damnificado).trim().toLowerCase() === 'sí' || String(persona.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+            const reqMed = persona.requiere_atencion_medica ? `<div style="background:#fef2f2; color:#dc2626; padding:10px; border-radius:6px; margin-top:10px; font-weight:bold;">🚨 Requiere Atención Médica: ${persona.requiere_atencion_medica}</div>` : '';
+
+            document.getElementById('contenido-detalles-ayuda').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:1.5rem;">
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Nombre Completo</strong><div style="font-size:1.1rem; font-weight:bold; color:var(--primary);">${persona.nombre}</div></div>
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Cédula</strong><div style="font-size:0.95rem;">${persona.cedula || '-'}</div></div>
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Teléfono</strong><div style="font-size:0.95rem;">${persona.telefono || '-'}</div></div>
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Ubicación Actual</strong><div style="font-size:0.95rem;">${persona.ubicacion || '-'}</div></div>
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Vínculo USB</strong><div style="font-size:0.95rem;">${persona.grupo || '-'}</div></div>
+                    <div><strong style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">Damnificado</strong><div style="font-size:0.95rem;">${isDam}</div></div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 0.85rem;">
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Vínculo USB:</strong> ${persona.grupo}</div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Centro Acopio:</strong> ${persona.punto_usb}</div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Familia:</strong> ${persona.personas_hogar} pers. (${persona.ninos_hogar} niños, ${persona.adultos_mayores_hogar} adultos may.)</div>
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Perdió Vivienda:</strong> ${badgeDam}</div>
+                
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem;">
+                    <h4 style="margin:0 0 10px 0; color:var(--primary); font-size:0.95rem;">👨‍👩‍👧‍👦 Composición Familiar</h4>
+                    <div style="display:flex; gap:20px; font-size:0.9rem;">
+                        <div><strong>Total:</strong> ${persona.personas_hogar || 1}</div>
+                        <div><strong>Niños:</strong> ${persona.ninos_hogar || 0}</div>
+                        <div><strong>Adultos Mayores:</strong> ${persona.adultos_mayores_hogar || 0}</div>
+                    </div>
+                    ${reqMed}
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 5px; border-bottom: 2px solid var(--gray-200); padding-bottom: 5px;">Observaciones Médicas / Generales</h4>
-                    <p style="font-size: 0.85rem; color: #333; white-space: pre-wrap; background: #fffbeb; padding: 10px; border-radius: 6px; border-left: 4px solid var(--warning);">${persona.descripcion_ayuda || 'Ninguna observación adicional.'}</p>
+
+                <div style="margin-bottom:1.5rem;">
+                    <h4 style="margin:0 0 10px 0; color:var(--primary); font-size:0.95rem;">📦 Historial Logístico</h4>
+                    ${historialTickets}
                 </div>
+                
                 <div>
-                    <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 5px; border-bottom: 2px solid var(--gray-200); padding-bottom: 5px;">Historial de Insumos</h4>
-                    ${htmlTickets}
+                    <h4 style="margin:0 0 5px 0; color:var(--primary); font-size:0.95rem;">📝 Observaciones del Caso</h4>
+                    <p style="font-size:0.9rem; color:var(--gray-700); background:#f1f5f9; padding:10px; border-radius:6px; margin:0;">${persona.descripcion_ayuda || 'Sin observaciones adicionales.'}</p>
                 </div>
             `;
-            document.getElementById('modal-info-ayuda').style.display = 'flex';
+            
+            document.getElementById('modal-detalles-ayuda').style.display = 'flex';
         };
 
         document.getElementById('formSolicitudAyuda').addEventListener('submit', async function(e) {
@@ -1500,7 +1516,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}</div>`;
                 } else {
                     let btnEditar = `<button class="btn btn-warning" style="padding:0.4rem; font-size:0.8rem; flex:1;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar</button>`;
-                    btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}${btnEditar}</div>`;
+                    
+                    let btnEliminar = '';
+                    if (perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin') {
+                        btnEliminar = `<button class="btn btn-delete" style="padding:0.4rem; font-size:0.8rem; flex:1; background-color:#fef2f2; color:#dc2626; border:1px solid #fecaca;" onclick="eliminarAyuda('${a.id}', this)">🗑️ Borrar</button>`;
+                    }
+                    
+                    btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">${btnVerInfo}${btnEditar}${btnEliminar}</div>`;
                 }
 
                 tbody.innerHTML += `
@@ -1531,22 +1553,38 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if (!ayudaNube || ayudaNube.length === 0) { alert("No hay datos para exportar."); return; }
 
             let datosAExportar = ayudaNube;
-            if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') {
-                datosAExportar = ayudaNube.filter(a => a.punto_usb === perfilUsuarioActual.centro_acopio);
-            } else {
-                const fCen = document.getElementById('filtroCentro').value;
-                if (fCen !== 'Todos') datosAExportar = ayudaNube.filter(a => a.punto_usb === fCen);
+            const fCen = document.getElementById('filtroCentro').value;
+            const fDam = document.getElementById('filtroDamnificado').value;
+            const fDesp = document.getElementById('filtroDespacho').value;
+            const texto = document.getElementById('buscarAyudaInput').value.toLowerCase();
+
+            if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
+                datosAExportar = datosAExportar.filter(a => a.punto_usb === perfilUsuarioActual.centro_acopio);
+            } else if (fCen !== 'Todos' && fCen !== 'Duplicados') {
+                datosAExportar = datosAExportar.filter(a => a.punto_usb === fCen);
             }
 
-            if(datosAExportar.length === 0) { alert("No hay datos en este centro para exportar."); return; }
+            datosAExportar = datosAExportar.filter(a => {
+                const cumpleTexto = String(a.nombre || '').toLowerCase().includes(texto) || String(a.cedula || '').toLowerCase().includes(texto);
+                let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+                const cumpleDam = (fDam === 'Todos') || (isDamStr === fDam);
+                const cumpleDesp = (fDesp === 'Todos') || (a.estado_despacho_calculado === fDesp);
+                return cumpleTexto && cumpleDam && cumpleDesp;
+            });
 
-            let matriz = [[
-                "ID Solicitud", "Fecha Reporte", "Punto Acopio", "Estado Despacho", 
-                "Afectado", "Cédula", "Teléfono", "Correo", "Comunidad", "Relación USB", 
-                "Estado Vital", "Ubicación", "Es Damnificado", 
-                "Atención Médica", "Total Personas", "Niños", "Adultos Mayores", 
-                "Req. Medicina", "Req. Alimentos/Agua/Limpieza", "Otras Solicitudes", "Observaciones"
-            ]];
+            if(datosAExportar.length === 0) { alert("No hay datos en pantalla para exportar."); return; }
+
+            let matriz = [
+                ["REPORTE OFICIAL DE SOLICITUDES DE AYUDA - ASOCIACIÓN DE EGRESADOS USB"],
+                [],
+                [
+                "ID SOLICITUD", "FECHA REPORTE", "PUNTO ACOPIO", "ESTADO DESPACHO", 
+                "AFECTADO", "CÉDULA", "TELÉFONO", "CORREO", "COMUNIDAD", "RELACIÓN USB", 
+                "ESTADO VITAL", "UBICACIÓN", "ES DAMNIFICADO", 
+                "ATENCIÓN MÉDICA", "TOTAL PERSONAS", "NIÑOS", "ADULTOS MAYORES", 
+                "REQ. MEDICINA", "REQ. ALIMENTOS/AGUA/LIMPIEZA", "OTRAS SOLICITUDES", "OBSERVACIONES"
+                ]
+            ];
 
             datosAExportar.forEach(a => {
                 let fecha = a.created_at ? new Date(a.created_at).toLocaleString('es-VE') : '';
@@ -1561,9 +1599,23 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 ]);
             });
 
-            let nombreArchivo = "Reporte_Ayuda_USB";
-            if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin') nombreArchivo += "_" + perfilUsuarioActual.centro_acopio;
-            descargarMatrizComoExcel(matriz, nombreArchivo);
+            const wb = XLSX.utils.book_new(); 
+            const ws = XLSX.utils.aoa_to_sheet(matriz);
+
+            ws['!merges'] = [ { s: {r:0, c:0}, e: {r:0, c:20} } ];
+
+            ws['!cols'] = [
+                {wch: 10}, {wch: 20}, {wch: 22}, {wch: 18}, {wch: 25}, {wch: 12}, 
+                {wch: 15}, {wch: 25}, {wch: 25}, {wch: 15}, {wch: 15}, {wch: 35}, 
+                {wch: 15}, {wch: 15}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 30}, 
+                {wch: 30}, {wch: 30}, {wch: 40}
+            ];
+
+            let nombreCentro = perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' ? perfilUsuarioActual.centro_acopio.substring(0,8) : fCen.substring(0,8);
+            if (nombreCentro === 'Todos') nombreCentro = 'General';
+
+            XLSX.utils.book_append_sheet(wb, ws, "Censo_Ayuda");
+            XLSX.writeFile(wb, `Reporte_Ayuda_${nombreCentro}_${new Date().toISOString().split('T')[0]}.xlsx`);
         });
 
         function descargarMatrizComoExcel(matriz, nombreArchivo) {
@@ -1610,13 +1662,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         window.eliminarAyuda = async function(id, boton) {
             if (!boton) return;
             let texto = boton.innerText.trim();
-            if (texto === "Eliminar") {
+            if (texto.includes("Borrar") || texto.includes("Eliminar")) {
                 boton.innerText = "¿Seguro?";
                 boton.style.backgroundColor = "#dc2626";
                 boton.style.color = "#ffffff";
                 boton.style.borderColor = "#dc2626";
                 boton.timeoutId = setTimeout(() => {
-                    boton.innerText = "Eliminar";
+                    boton.innerText = "🗑️ Borrar";
                     boton.style.backgroundColor = "#fef2f2";
                     boton.style.color = "var(--danger)";
                     boton.style.borderColor = "#fecaca";
@@ -1626,18 +1678,27 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 boton.innerText = "Borrando...";
                 boton.disabled = true;
                 
-                const { data, error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id).select();
-                
-                if (error) {
-                    alert("Error interno: " + error.message);
-                    boton.innerText = "Eliminar";
+                try {
+                    await supabaseClient.from('etiquetas_logistica').delete().eq('solicitud_id', id);
+
+                    const { data, error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id).select();
+                    
+                    if (error) {
+                        alert("Error interno: " + error.message);
+                        boton.innerText = "🗑️ Borrar";
+                        boton.disabled = false;
+                    } else if (!data || data.length === 0) {
+                        alert("⚠️ Supabase bloqueó el borrado. Verifica las políticas RLS.");
+                        boton.innerText = "🗑️ Borrar";
+                        boton.disabled = false;
+                    } else {
+                        mostrarNotificacion("Registro y pedidos asociados eliminados.");
+                        await cargarDatosDesdeNube();
+                    }
+                } catch(e) {
+                    alert("Error crítico en borrado: " + e.message);
+                    boton.innerText = "🗑️ Borrar";
                     boton.disabled = false;
-                } else if (!data || data.length === 0) {
-                    alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de la tabla 'solicitudes_ayuda'.");
-                    boton.innerText = "Eliminar";
-                    boton.disabled = false;
-                } else {
-                    await cargarDatosDesdeNube();
                 }
             }
         };
