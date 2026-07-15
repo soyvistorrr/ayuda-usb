@@ -385,12 +385,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                         } else if (rol === 'admin_centro') {
                             mostrarElementos(elementosAyuda, true);
-                            mostrarElementos(elementosLogistica, true);
+                            mostrarElementos(elementosLogistica, false);
                             mostrarElementos(elementosBusqueda, false);
                             mostrarElementos(elementosColaborar, false);
                             
                             if(dropAyuda) dropAyuda.style.display = "block";
-                            if(dropLogistica) dropLogistica.style.display = "block";
+                            if(dropLogistica) dropLogistica.style.display = "none";
                             
                             if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
 
@@ -1851,6 +1851,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay tickets que coincidan con estos filtros.</td></tr>'; return;
             }
 
+            if(document.getElementById('log-pendientes')) {
+                document.getElementById('log-pendientes').innerText = pedidosFiltrados.filter(p => p.estado === 'Pendiente').length;
+                document.getElementById('log-proceso').innerText = pedidosFiltrados.filter(p => p.estado === 'Empacando').length;
+                document.getElementById('log-despachados').innerText = pedidosFiltrados.filter(p => p.estado === 'Despachado').length;
+            }
+
             cuerpo.innerHTML = pedidosFiltrados.map(p => {
                 let badgeColor = 'badge-gray';
                 if (p.estado === 'Pendiente') badgeColor = 'badge-danger';
@@ -2672,40 +2678,89 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 return;
             }
             
-            let matriz = [[
-                "ID Ticket Logístico", "Fecha de Creación", "Estado Logístico", "Voluntario Encargado", 
-                "Centro de Acopio", "Categoría Insumo", "Requerimiento Solicitado",
-                "ID Solicitud", "Nombre del Beneficiario", "Cédula", "Teléfono", "Ubicación / Sector"
-            ]];
+            // 1. LEER LOS FILTROS ACTUALES DEL MENÚ DESPLEGABLE
+            let filtroCentro = document.getElementById('filtroCentroLogistica') ? document.getElementById('filtroCentroLogistica').value : 'Todos';
+            let filtroCat = document.getElementById('filtroCategoriaLog') ? document.getElementById('filtroCategoriaLog').value : 'Todos';
+            let filtroEst = document.getElementById('filtroEstadoLog') ? document.getElementById('filtroEstadoLog').value : 'Todos';
+
+            // 2. 🔒 CANDADO DE SEGURIDAD POR ROLES (NUEVO)
+            // Si es un admin de centro que por alguna razón logró entrar, lo forzamos a su centro
+            if (perfilUsuarioActual && perfilUsuarioActual.rol === 'admin_centro') {
+                filtroCentro = perfilUsuarioActual.centro_acopio;
+            }
+            // Si tienes un rol específico de especialista (ej. 'especialista_cva'), puedes forzarlo aquí:
+            // if (perfilUsuarioActual && perfilUsuarioActual.rol === 'especialista_cva') {
+            //    filtroCentro = 'CVA Las Mercedes (Caracas)'; 
+            // }
+
+            // 3. RECORTAR LA DATA SEGÚN LOS FILTROS
+            let pedidosFiltrados = pedidosLogistica.filter(p => {
+                let c1 = (filtroCentro === 'Todos') || (p.punto_usb === filtroCentro);
+                let c2 = (filtroCat === 'Todos') || (p.categoria_insumo === filtroCat);
+                let c3 = (filtroEst === 'Todos') || (p.estado === filtroEst);
+                return c1 && c2 && c3;
+            });
+
+            if(pedidosFiltrados.length === 0) {
+                alert("No hay datos para exportar con los filtros actuales."); return;
+            }
+
+            // 4. ESTRUCTURACIÓN LIMPIA DEL EXCEL
+            let matriz = [
+                ["REPORTE OFICIAL DE LOGÍSTICA - ASOCIACIÓN DE EGRESADOS USB"], // Fila de Título Principal
+                [], // Fila de Separación
+                [
+                "ID TICKET", "FECHA CREACIÓN", "FECHA DESPACHO", "ESTADO", "ENCARGADO", 
+                "CENTRO DESTINO", "CATEGORÍA", "REQUERIMIENTO SOLICITADO",
+                "BENEFICIARIO", "CÉDULA", "TELÉFONO", "UBICACIÓN"
+                ]
+            ];
             
-            pedidosLogistica.forEach(p => {
-                let fecha = p.created_at ? new Date(p.created_at).toLocaleString('es-VE') : '';
+            pedidosFiltrados.forEach(p => {
+                let fechaCrea = p.created_at ? new Date(p.created_at).toLocaleString('es-VE') : '';
+                let fechaDesp = p.fecha_despacho ? new Date(p.fecha_despacho).toLocaleString('es-VE') : 'Pendiente';
                 
-                let persona = null;
-                if (p.solicitud_id) {
-                    persona = ayudaNube.find(a => a.id == p.solicitud_id);
-                }
-                
-                let nombrePersona = persona ? persona.nombre : 'No Registrado / Carga Manual';
-                let cedulaPersona = persona ? (persona.cedula || '-') : '-';
-                let telPersona = persona ? (persona.telefono || '-') : '-';
-                let ubiPersona = persona ? (persona.ubicacion || '-') : '-';
+                let persona = p.solicitud_id ? ayudaNube.find(a => a.id == p.solicitud_id) : null;
+                let idCorto = p.id ? p.id.split('-')[0].toUpperCase() : '-';
                 
                 matriz.push([ 
-                    p.id, 
-                    fecha, 
+                    idCorto, 
+                    fechaCrea,
+                    fechaDesp, 
                     p.estado || 'Pendiente', 
                     p.encargado || 'Sin Asignar',
                     p.punto_usb || '-', 
-                    p.categoria_insumo || '-', 
+                    String(p.categoria_insumo).toUpperCase() || '-', 
                     p.requerimiento || '-',
-                    p.solicitud_id || 'N/A', 
-                    nombrePersona,
-                    cedulaPersona, 
-                    telPersona, 
-                    ubiPersona
+                    persona ? persona.nombre : 'Carga Manual',
+                    persona ? (persona.cedula || '-') : '-', 
+                    persona ? (persona.telefono || '-') : '-', 
+                    persona ? (persona.ubicacion || '-') : '-'
                 ]);
             });
             
-            descargarMatrizComoExcel(matriz, "Reporte_Auditoria_Despachos_y_Beneficiarios");
+            const wb = XLSX.utils.book_new(); 
+            const ws = XLSX.utils.aoa_to_sheet(matriz);
+
+            // Combinar las celdas del título para que se vea como un encabezado real
+            ws['!merges'] = [ { s: {r:0, c:0}, e: {r:0, c:11} } ];
+
+            // 5. MEJORA VISUAL: Ajustar el ancho de cada columna para que nada salga cortado
+            ws['!cols'] = [
+                {wch: 12}, // ID
+                {wch: 20}, // FECHA CREACION
+                {wch: 20}, // FECHA DESPACHO
+                {wch: 15}, // ESTADO
+                {wch: 22}, // ENCARGADO
+                {wch: 25}, // DESTINO
+                {wch: 18}, // CATEGORIA
+                {wch: 50}, // REQUERIMIENTO (Muy ancha)
+                {wch: 25}, // BENEFICIARIO
+                {wch: 15}, // CEDULA
+                {wch: 15}, // TELEFONO
+                {wch: 35}  // UBICACION
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, "Logistica");
+            XLSX.writeFile(wb, `Reporte_Logistica_${filtroCentro.substring(0,8)}_${new Date().toISOString().split('T')[0]}.xlsx`);
         };

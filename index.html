@@ -881,6 +881,17 @@
                     <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">⬅ VOLVER AL MENÚ PRINCIPAL</button>
                 </div>
 
+                <div class="dashboard-hero" style="background-color: #1e3a8a; color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: #fbc02d; margin-bottom: 0.5rem; text-transform: uppercase;">Métricas de Logística</h2>
+                    <p style="font-size: 0.95rem; color: #bfdbfe; margin-bottom: 1.5rem;">Resumen en tiempo real de la preparación y despacho de cajas.</p>
+                    
+                    <div class="stats-bar" style="margin-top: 0;">
+                        <div class="stat-card" style="border-left-color: var(--danger); background: rgba(255,255,255,0.1);"><span class="stat-value" id="log-pendientes">0</span><span class="stat-label" style="color:#f8fafc;">Pendientes</span></div>
+                        <div class="stat-card" style="border-left-color: var(--warning); background: rgba(255,255,255,0.1);"><span class="stat-value" id="log-proceso">0</span><span class="stat-label" style="color:#f8fafc;">Empacando</span></div>
+                        <div class="stat-card" style="border-left-color: var(--success); background: rgba(255,255,255,0.1);"><span class="stat-value" id="log-despachados">0</span><span class="stat-label" style="color:#f8fafc;">Despachados</span></div>
+                    </div>
+                </div>
+
                 <div class="panel-card" style="margin-bottom: 2rem; border-top: 4px solid #3b82f6;">
                     <div class="panel-body" style="padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; background-color: #eff6ff;">
                         <div>
@@ -996,10 +1007,11 @@
                         <option value="Despachado">Despachado</option>
                     </select>
 
-                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
-                        <button type="button" class="btn btn-primary" onclick="imprimirTicketsIndividualesMasivos()" style="background-color: #0284c7; color: white; flex: 1;">🖨️ Etiquetas Indiv.</button>
-                        <button type="button" class="btn btn-primary" onclick="imprimirTicketEmpaqueMasivo()" style="background-color: #0369a1; color: white; flex: 1;">🖨️ Ticket Agrupado</button>
-                        <button type="button" class="btn btn-warning" onclick="generarNotaEntregaMasiva()" style="background-color: #f59e0b; color: white; flex: 1;">📄 Acta Masiva</button>
+                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-primary" onclick="imprimirTicketsIndividualesMasivos()" style="background-color: #0284c7; color: white; flex: 1; min-width: 150px;">🖨️ Etiquetas Indiv.</button>
+                        <button type="button" class="btn btn-primary" onclick="imprimirTicketEmpaqueMasivo()" style="background-color: #0369a1; color: white; flex: 1; min-width: 150px;">🖨️ Ticket Agrupado</button>
+                        <button type="button" class="btn btn-warning" onclick="generarNotaEntregaMasiva()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 150px;">📄 Acta Masiva</button>
+                        <button type="button" class="btn btn-success" onclick="descargarExcelLogistica()" style="background-color: #16a34a; color: white; flex: 1; min-width: 150px;">⬇️ Exportar Excel</button>
                     </div>
                 </div>
                 <div class="table-container">
