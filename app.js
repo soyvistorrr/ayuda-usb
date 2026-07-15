@@ -28,7 +28,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             intervaloCarrusel = setInterval(() => {
                 const scrollMaximo = carrusel.scrollWidth - carrusel.clientWidth;
-                if (carrusel.scrollLeft >= scrollMaximo - 10) {
+                if (Math.ceil(carrusel.scrollLeft) >= scrollMaximo - 20) {
                     carrusel.scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
                     const tarjeta = carrusel.querySelector('.news-card');
@@ -54,9 +54,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 const avance = tarjeta ? tarjeta.offsetWidth + 24 : 320;
                 const scrollMaximo = carrusel.scrollWidth - carrusel.clientWidth;
 
-                if (direccion === 1 && carrusel.scrollLeft >= scrollMaximo - 10) {
+                if (direccion === 1 && Math.ceil(carrusel.scrollLeft) >= scrollMaximo - 20) {
                     carrusel.scrollTo({ left: 0, behavior: 'smooth' });
-                } else if (direccion === -1 && carrusel.scrollLeft <= 10) {
+                } else if (direccion === -1 && carrusel.scrollLeft <= 20) {
                     carrusel.scrollTo({ left: scrollMaximo, behavior: 'smooth' });
                 } else {
                     carrusel.scrollBy({ left: avance * direccion, behavior: 'smooth' });
@@ -441,7 +441,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             }
 
             try {
-                const [resAfectados, resNoticias] = await Promise.all([
+                const [resAfectados, resNoticias, resColabs] = await Promise.all([
                     supabaseClient
                         .from('registros_ciudadanos')
                         .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
@@ -451,7 +451,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         .from('noticias_oficiales')
                         .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
                         .order('fecha_publicacion', { ascending: false })
-                        .limit(15)
+                        .limit(15),
+                    supabaseClient
+                        .from('colaboradores')
+                        .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
+                        .order('created_at', { ascending: false })
+                        .limit(500)
                 ]);
 
                 let tempAfectados = resAfectados.data || [];
@@ -473,6 +478,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                 }
                 registrosNube = tempAfectados;
+                
+                colaboradoresNube = resColabs.data || [];
+                actualizarInterfazColaboradores(colaboradoresNube);
 
                 if (resNoticias && resNoticias.data) {
                     noticiasNube = resNoticias.data; 
@@ -493,14 +501,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             else if (eVal.includes('logro')||eVal.includes('buena')) { colBorde = "var(--success)"; colFondo = "var(--success)"; }
                             else if (eVal.includes('alerta')) { colBorde = "var(--warning)"; colFondo = "#ea580c"; }
 
+                            let etiquetaLimpia = (n.etiqueta && n.etiqueta.trim() !== '') ? n.etiqueta.trim() : 'AVISO';
+
                             let thumbHtml = '';
                             let urlMini = (n.imagen_miniatura && n.imagen_miniatura.trim() !== '') ? n.imagen_miniatura : n.imagen_url;
                             
                             if (urlMini && urlMini.trim() !== '') {
-                                thumbHtml = `<div class="news-thumbnail" style="background-image: url('${urlMini}'); display: block; background-size: contain; background-color: var(--gray-100); background-repeat: no-repeat;"></div>`;
+                                thumbHtml = `<div class="news-thumbnail" style="background-image: url('${urlMini}'); display: block; background-size: cover; background-color: var(--gray-100); background-position: center;"></div>`;
                             } else {
-                                thumbHtml = `
-                                <div class="news-thumbnail" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
+                                thumbHtml = `<div class="news-thumbnail" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; border-bottom: 3px solid ${colBorde};">
                                     <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
                                         <line x1="8" y1="7" x2="16" y2="7"></line>
@@ -509,7 +518,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                     </svg>
                                 </div>`;
                             }
-                            const tarjetaInterior = `${thumbHtml}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo};">${n.etiqueta || 'Aviso'}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
+                            
+                            const tarjetaInterior = `${thumbHtml}<div style="display:flex; justify-content:space-between; align-items:center;"><span class="news-badge" style="background-color:${colFondo}; color: #ffffff;">${etiquetaLimpia}</span><span class="news-date">${fString}</span></div><h4 class="news-title">${n.titulo}</h4><div class="news-body">${n.contenido}</div><div class="leer-mas-link">Leer completo ➔</div>`;
 
                             if (index < 8) htmlCarrusel += `<div class="news-card" style="border-left-color:${colBorde};" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
                             htmlPagina += `<div class="news-card" style="border-left-color:${colBorde}; height:auto!important; min-height:280px;" onclick="abrirNoticiaCompleta('${n.id}')">${tarjetaInterior}</div>`;
@@ -523,10 +533,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 filtrarYActualizarTablero();
 
                 if (esAdministrador) {
-                    const [resColabs, resAyudas, resNov, resLogistica] = await Promise.all([
-                        supabaseClient.from('colaboradores')
-                            .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
-                            .order('created_at', { ascending: false }).limit(500),
+                    const [resAyudas, resNov, resLogistica] = await Promise.all([
                         supabaseClient.from('solicitudes_ayuda')
                             .select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
                             .order('created_at', { ascending: false }).limit(500),
@@ -534,7 +541,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb').order('created_at', { ascending: false })
                     ]);
 
-                    colaboradoresNube = resColabs.data || [];
                     ayudaNube = resAyudas.data || [];
                     pedidosLogistica = resLogistica.data || [];
                     
@@ -894,6 +900,49 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const cancelBtn = document.getElementById('btn-cancelar-edicion-ayuda');
             if(cancelBtn) cancelBtn.style.display = 'none';
         }
+
+        window.verDetallesAyuda = function(id) {
+            const persona = ayudaNube.find(a => a.id === id);
+            if (!persona) return;
+
+            const tickets = pedidosLogistica.filter(p => p.solicitud_id === id);
+            let despachados = tickets.filter(t => t.estado === 'Despachado');
+            let pendientes = tickets.filter(t => t.estado !== 'Despachado');
+
+            let htmlTickets = 'No hay pedidos logísticos registrados.';
+            if (tickets.length > 0) {
+                htmlTickets = `<ul style="margin-left: 20px; font-size: 0.85rem; color: #444;">` + 
+                    tickets.map(t => {
+                        let color = t.estado === 'Despachado' ? 'color: #16a34a;' : (t.estado === 'Empacando' ? 'color: #ca8a04;' : 'color: #dc2626;');
+                        return `<li style="margin-bottom: 5px;"><strong>[${t.categoria_insumo.toUpperCase()}]</strong> ${t.requerimiento} - <span style="${color} font-weight:bold;">${t.estado}</span></li>`;
+                    }).join('') + `</ul>`;
+            }
+
+            let badgeDam = persona.es_damnificado ? '<span class="badge badge-danger">Sí (Damnificado)</span>' : '<span class="badge badge-gray">No</span>';
+
+            document.getElementById('contenido-info-ayuda').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: var(--primary); font-size: 1.2rem; margin-bottom: 5px;">${persona.nombre}</h3>
+                    <p style="font-size: 0.9rem; color: #555;"><strong>C.I:</strong> ${persona.cedula || '-'} | <strong>Tel:</strong> ${persona.telefono || '-'}</p>
+                    <p style="font-size: 0.9rem; color: #555;"><strong>Ubicación:</strong> ${persona.ubicacion || '-'}</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 0.85rem;">
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Vínculo USB:</strong> ${persona.grupo}</div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Centro Acopio:</strong> ${persona.punto_usb}</div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Familia:</strong> ${persona.personas_hogar} pers. (${persona.ninos_hogar} niños, ${persona.adultos_mayores_hogar} adultos may.)</div>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;"><strong>Perdió Vivienda:</strong> ${badgeDam}</div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 5px; border-bottom: 2px solid var(--gray-200); padding-bottom: 5px;">Observaciones Médicas / Generales</h4>
+                    <p style="font-size: 0.85rem; color: #333; white-space: pre-wrap; background: #fffbeb; padding: 10px; border-radius: 6px; border-left: 4px solid var(--warning);">${persona.descripcion_ayuda || 'Ninguna observación adicional.'}</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 5px; border-bottom: 2px solid var(--gray-200); padding-bottom: 5px;">Historial de Insumos</h4>
+                    ${htmlTickets}
+                </div>
+            `;
+            document.getElementById('modal-info-ayuda').style.display = 'flex';
+        };
 
         document.getElementById('formSolicitudAyuda').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1444,11 +1493,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 if(estDespacho === 'Despachado') colorDespacho = '#10b981';    
                 let badgeDespacho = `<span class="badge" style="background:${colorDespacho}; color:white; font-size: 0.8rem; padding: 4px 8px;">${estDespacho}</span>`;
 
-                let btnEditar = '';
+                let btnAccionesContainer = '';
+                let btnVerInfo = `<button class="btn btn-primary" style="padding:0.4rem; font-size:0.8rem; background-color:#0284c7; flex:1;" onclick="verDetallesAyuda('${a.id}')">👁️ Ver Info</button>`;
+
                 if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda' || perfilUsuarioActual.rol === 'especialista_cva')) {
-                    btnEditar = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Lectura</span>`;
+                    btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}</div>`;
                 } else {
-                    btnEditar = `<button class="btn btn-warning" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar / Ver</button>`;
+                    let btnEditar = `<button class="btn btn-warning" style="padding:0.4rem; font-size:0.8rem; flex:1;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar</button>`;
+                    btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}${btnEditar}</div>`;
                 }
 
                 tbody.innerHTML += `
@@ -1464,9 +1516,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         </td>
                         <td data-label="Damnificado">${badgeDam} ${alertaMedica}</td>
                         <td data-label="Despacho">${badgeDespacho}</td>
-                        <td data-label="Acciones" class="actions-cell">
-                            ${btnEditar}
-                        </td>
+                        <td data-label="Acciones" class="actions-cell">${btnAccionesContainer}</td>
                     </tr>
                 `;
             });
@@ -1753,7 +1803,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const cuerpo = document.getElementById('tablaLogisticaCuerpo');
             if(!cuerpo) return;
 
-            const filtroCentro = document.getElementById('filtroCentroLogistica') ? document.getElementById('filtroCentroLogistica').value : 'Todos';
+            let filtroCentro = document.getElementById('filtroCentroLogistica') ? document.getElementById('filtroCentroLogistica').value : 'Todos';
+            let filtroCat = document.getElementById('filtroCategoriaLog') ? document.getElementById('filtroCategoriaLog').value : 'Todos';
+            let filtroEst = document.getElementById('filtroEstadoLog') ? document.getElementById('filtroEstadoLog').value : 'Todos';
+
+            if (perfilUsuarioActual && perfilUsuarioActual.rol === 'admin_centro') {
+                filtroCentro = perfilUsuarioActual.centro_acopio;
+                if(document.getElementById('filtroCentroLogistica')) document.getElementById('filtroCentroLogistica').disabled = true;
+            }
 
             const thead = cuerpo.parentElement.querySelector('thead');
             if(thead) {
@@ -1783,13 +1840,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
             pedidosLogistica = data;
 
-            let pedidosFiltrados = data;
-            if (filtroCentro !== 'Todos') {
-                pedidosFiltrados = pedidosFiltrados.filter(p => p.punto_usb === filtroCentro);
-            }
+            let pedidosFiltrados = data.filter(p => {
+                let c1 = (filtroCentro === 'Todos') || (p.punto_usb === filtroCentro);
+                let c2 = (filtroCat === 'Todos') || (p.categoria_insumo === filtroCat);
+                let c3 = (filtroEst === 'Todos') || (p.estado === filtroEst);
+                return c1 && c2 && c3;
+            });
 
             if(pedidosFiltrados.length === 0) {
-                cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay tickets para este centro de acopio.</td></tr>'; return;
+                cuerpo.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No hay tickets que coincidan con estos filtros.</td></tr>'; return;
             }
 
             cuerpo.innerHTML = pedidosFiltrados.map(p => {
@@ -1816,14 +1875,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     } else {
                         btnAccion = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">
                             <span class="badge" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem; flex:1; min-width: 50px; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">✅ Listo</span>
-                            <button class="btn" style="background-color:#0284c7; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="imprimirTicketEmpaqueId('${p.id}')" title="Imprimir Ticket">🖨️ Ticket</button>
-                            <button class="btn" style="background-color:#10b981; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="generarNotaEntrega('${p.id}')" title="Generar Nota de Entrega Individual">📄 Acta</button>
+                            <button class="btn" style="background-color:#0284c7; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="imprimirTicketEmpaqueId('${p.id}')" title="Imprimir Etiqueta">🖨️ Ticket</button>
+                            <button class="btn" style="background-color:#10b981; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="generarNotaEntrega('${p.id}')" title="Generar Acta Individual">📄 Acta</button>
                         </div>`;
                     }
                 }
 
                 let persona = ayudaNube.find(a => a.id === p.solicitud_id);
-                let nombreBen = persona ? persona.nombre : 'Carga Manual / Reposición';
+                let nombreBen = persona ? persona.nombre : 'Carga Manual';
                 let cedulaBen = persona && persona.cedula !== '-' ? `C.I: ${persona.cedula}` : '';
                 let htmlBeneficiario = `<div style="font-weight:bold; color:var(--primary);">${nombreBen}</div><div style="font-size:0.8rem; color:#64748b;">${cedulaBen}</div>`;
 
@@ -1883,111 +1942,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             checkboxes.forEach(cb => cb.checked = source.checked);
         };
 
-        window.generarNotaEntregaMasiva = function() {
-            const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
-            if (seleccionados.length === 0) {
-                alert("Debes seleccionar al menos un ticket marcando las casillas de la izquierda.");
-                return;
-            }
-
-            const pedidosSeleccionados = pedidosLogistica.filter(p => seleccionados.includes(p.id));
-            
-            const ventanita = window.open('', '_blank');
-            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
-
-            const fecha = new Date().toLocaleString('es-VE');
-            
-            let filasInsumos = '';
-            pedidosSeleccionados.forEach(pedido => {
-                let personaVinculada = "Carga Manual / Reposición";
-                if(pedido.solicitud_id) {
-                    const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
-                    if(reg) personaVinculada = `${reg.nombre} <br><span style="font-size:12px; color:#555;">(C.I: ${reg.cedula})</span>`;
-                }
-                const idCorto = pedido.id.split('-')[0].toUpperCase();
-                
-                filasInsumos += `
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding: 12px 10px;">#${idCorto}</td>
-                        <td style="padding: 12px 10px;"><strong>${pedido.punto_usb || 'N/A'}</strong></td>
-                        <td style="padding: 12px 10px;">${personaVinculada}</td>
-                        <td style="padding: 12px 10px;">${String(pedido.categoria_insumo).toUpperCase()}</td>
-                        <td style="padding: 12px 10px;">${pedido.requerimiento}</td>
-                    </tr>
-                `;
-            });
-
-            ventanita.document.write(`
-                <html>
-                <head>
-                    <title>Acta de Entrega Masiva</title>
-                    <style>
-                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #000; max-width: 950px; margin: 0 auto; line-height: 1.4; }
-                        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #111; }
-                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 14px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px; }
-                        th { background-color: #f0f0f0; padding: 12px 10px; border-bottom: 2px solid #000; text-align: left; text-transform: uppercase; }
-                        .signatures { display: flex; justify-content: space-between; margin-top: 60px; gap: 40px; }
-                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 10px; text-align: left; font-size: 14px; }
-                        @media print { @page { margin: 0; } body { margin: 1cm; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div>
-                            <h1>ACTA DE ENTREGA DE DONATIVOS (MASIVA)</h1>
-                            <h3>Universidad Simón Bolívar - Logística de Contingencia</h3>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin:0; font-size:14px; font-weight:bold;">Fecha de Emisión:</p>
-                            <p style="margin:5px 0 0 0; font-size:14px;">${fecha}</p>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px; background-color: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 6px;">
-                        <p style="margin: 0; font-size: 16px;"><strong>Total de Tickets a Despachar en esta Acta:</strong> <span style="font-size: 18px; color: #d32f2f;">${pedidosSeleccionados.length}</span></p>
-                    </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CÓDIGO</th>
-                                <th>CENTRO DESTINO</th>
-                                <th>BENEFICIARIO</th>
-                                <th>CATEGORÍA</th>
-                                <th>DETALLE DEL INSUMO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filasInsumos}
-                        </tbody>
-                    </table>
-
-                    <div class="signatures">
-                        <div class="sig-line">
-                            <strong>ENTREGADO POR (ALMACÉN CENTRAL)</strong><br><br>
-                            Nombre: _______________________________<br><br>
-                            Firma: _________________________________
-                        </div>
-                        <div class="sig-line">
-                            <strong>CHOFER / TRANSPORTISTA</strong><br><br>
-                            Nombre: _______________________________<br><br>
-                            Firma: _________________________________
-                        </div>
-                        <div class="sig-line">
-                            <strong>RECIBIDO CONFORME (DESTINOS)</strong><br><br>
-                            Nombre: _______________________________<br><br>
-                            Firma: _________________________________
-                        </div>
-                    </div>
-                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
-                </body>
-                </html>
-            `);
-            ventanita.document.close();
-        };
-
         window.imprimirTicketEmpaque = function(pedido) {
             const ventanita = window.open('', '_blank');
             if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
@@ -1995,15 +1949,21 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const fecha = new Date().toLocaleString('es-VE');
             const idCorto = pedido.id.split('-')[0].toUpperCase();
 
+            let personaVinculada = "Carga Manual / Reposición";
+            if(pedido.solicitud_id) {
+                const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
+                if(reg) personaVinculada = `${reg.nombre} (C.I: ${reg.cedula || 'N/A'})`;
+            }
+
             ventanita.document.write(`
                 <html>
                 <head>
                     <title>Etiqueta Caja - ${pedido.punto_usb}</title>
                     <style>
                         body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; }
-                        .ticket { border: 2px dashed #000; padding: 20px; max-width: 600px; margin: 0 auto; }
-                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; }
-                        .info-header { margin-bottom: 20px; font-size: 18px; line-height: 1.5; }
+                        .ticket { border: 2px dashed #000; padding: 20px; max-width: 500px; margin: 0 auto; page-break-inside: avoid; }
+                        h1 { text-align: center; text-transform: uppercase; margin-bottom: 5px; font-size: 24px; }
+                        .info-header { margin-bottom: 15px; font-size: 16px; line-height: 1.5; }
                         @media print { @page { margin: 0; } body { margin: 1cm; } }
                     </style>
                 </head>
@@ -2012,7 +1972,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         <h1>ETIQUETA DE DESPACHO</h1>
                         <hr style="border: 1px solid #000; margin-bottom: 15px;">
                         <div class="info-header">
-                            <strong>DESTINO:</strong> <span style="font-size: 24px; text-transform: uppercase;">${pedido.punto_usb || '-'}</span><br>
+                            <strong>DESTINO:</strong> <span style="font-size: 20px; text-transform: uppercase;">${pedido.punto_usb || '-'}</span><br>
+                            <strong>BENEFICIARIO:</strong> ${personaVinculada}<br>
                             <strong>CATEGORÍA:</strong> ${String(pedido.categoria_insumo).toUpperCase()}<br>
                             <strong>CÓDIGO:</strong> #${idCorto}
                         </div>
@@ -2025,12 +1986,67 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             ventanita.document.close();
         };
 
+        window.imprimirTicketsIndividualesMasivos = function() {
+            const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+            if (seleccionados.length === 0) { alert("Selecciona tickets primero."); return; }
+
+            const pedidosSeleccionados = pedidosLogistica.filter(p => seleccionados.includes(p.id));
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes."); return; }
+
+            let ticketsHtml = '';
+            pedidosSeleccionados.forEach(pedido => {
+                const idCorto = pedido.id.split('-')[0].toUpperCase();
+                let personaVinculada = "Carga Manual";
+                if(pedido.solicitud_id) {
+                    const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
+                    if(reg) personaVinculada = `${reg.nombre} (C.I: ${reg.cedula || 'N/A'})`;
+                }
+
+                ticketsHtml += `
+                    <div class="ticket">
+                        <h1>ETIQUETA DESPACHO</h1>
+                        <hr style="border: 1px solid #000; margin-bottom: 10px;">
+                        <div class="info-header">
+                            <strong>DESTINO:</strong> <span style="font-size: 16px;">${pedido.punto_usb || '-'}</span><br>
+                            <strong>A NOMBRE DE:</strong> ${personaVinculada}<br>
+                            <strong>CAT:</strong> ${String(pedido.categoria_insumo).toUpperCase()}<br>
+                            <strong>CÓDIGO:</strong> #${idCorto}
+                        </div>
+                        <p style="font-size: 13px; border: 1px solid #000; padding: 8px;">${pedido.requerimiento}</p>
+                    </div>
+                `;
+            });
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Tickets Individuales (Grilla)</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 10px; color: #000; }
+                        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                        .ticket { border: 2px dashed #000; padding: 15px; page-break-inside: avoid; }
+                        h1 { text-align: center; margin: 0 0 5px 0; font-size: 18px; }
+                        .info-header { margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
+                        @media print { @page { margin: 1cm; } body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="grid-container">
+                        ${ticketsHtml}
+                    </div>
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        };
+
         window.generarNotaEntrega = function(idRegistro) {
             const pedido = pedidosLogistica.find(p => p.id === idRegistro);
             if(!pedido) return;
-
             const ventanita = window.open('', '_blank');
-            if(!ventanita) { alert("⚠️ Permite las ventanas emergentes para imprimir."); return; }
+            if(!ventanita) return;
 
             const fecha = new Date().toLocaleString('es-VE');
             const idCorto = pedido.id.split('-')[0].toUpperCase();
@@ -2044,7 +2060,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             ventanita.document.write(`
                 <html>
                 <head>
-                    <title>Nota de Entrega - #${idCorto}</title>
+                    <title>Acta - #${idCorto}</title>
                     <style>
                         body { font-family: 'Arial', sans-serif; padding: 20px; color: #000; max-width: 800px; margin: 0 auto; line-height: 1.3; }
                         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
@@ -2054,17 +2070,21 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         .order-info h2 { margin: 0; font-size: 18px; }
                         .info-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 6px; background-color: #f9f9f9; }
                         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
-                        .req-box { border: 1px solid #000; padding: 15px; margin-bottom: 25px; min-height: 80px; font-size: 14px; }
+                        .req-box { border: 1px solid #000; padding: 15px; margin-bottom: 20px; min-height: 80px; font-size: 14px; }
                         .signatures { display: flex; justify-content: space-between; margin-top: 30px; gap: 20px; }
                         .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 5px; text-align: center; font-size: 12px; }
+                        .logo { height: 60px; margin-right: 15px; }
                         @media print { @page { margin: 0.5cm; } body { margin: 0; } }
                     </style>
                 </head>
                 <body>
                     <div class="header">
-                        <div>
-                            <h1>ACTA DE ENTREGA DE DONATIVO</h1>
-                            <h3>Universidad Simón Bolívar - Logística</h3>
+                        <div style="display:flex; align-items:center;">
+                            <img src="Logo-AEUSB-fondo-blanco.png" class="logo" onerror="this.style.display='none'">
+                            <div>
+                                <h1>ACTA DE ENTREGA DE DONATIVO</h1>
+                                <h3>Asociación de Egresados de la Universidad Simón Bolívar</h3>
+                            </div>
                         </div>
                         <div class="order-info">
                             <h2>Folio: #${idCorto}</h2>
@@ -2075,35 +2095,121 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     <div class="info-box">
                         <div class="info-grid">
                             <div><strong>SEDE DE ORIGEN:</strong><br> Almacén CVA - Las Mercedes</div>
-                            <div><strong>SEDE DESTINO / ACOPIO:</strong><br> ${pedido.punto_usb || 'N/A'}</div>
-                            <div><strong>PREPARADOR (ALMACÉN):</strong><br> ${pedido.encargado || 'N/A'}</div>
-                            <div><strong>BENEFICIARIO VINCULADO:</strong><br> ${personaVinculada}</div>
+                            <div><strong>SEDE DESTINO:</strong><br> ${pedido.punto_usb || 'N/A'}</div>
+                            <div><strong>PREPARADOR:</strong><br> ${pedido.encargado || 'N/A'}</div>
+                            <div style="padding: 5px; border: 1px dashed #000;">
+                                <strong>BENEFICIARIO:</strong> ${personaVinculada}<br><br>
+                                <strong>Firma Beneficiario:</strong> ________________________
+                            </div>
                             <div style="grid-column: 1 / -1; margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
                                 <strong>CATEGORÍA DE LOS INSUMOS:</strong> ${String(pedido.categoria_insumo).toUpperCase()}
                             </div>
                         </div>
                     </div>
 
-                    <h3 style="margin-bottom: 8px; font-size: 14px;">DETALLE EXACTO DE INSUMOS A ENTREGAR:</h3>
+                    <h3 style="margin-bottom: 8px; font-size: 14px;">DETALLE DE INSUMOS A ENTREGAR:</h3>
                     <div class="req-box">
                         <div style="white-space: pre-wrap;">${pedido.requerimiento}</div>
                     </div>
 
                     <div class="signatures">
-                        <div class="sig-line">
-                            <strong>ENTREGADO POR (ALMACÉN)</strong><br><br><br>
-                            Nombre / Firma
+                        <div class="sig-line"><strong>ENTREGADO POR (ALMACÉN)</strong><br><br><br>Firma</div>
+                        <div class="sig-line"><strong>CHOFER / TRANSPORTE</strong><br><br><br>Firma</div>
+                        <div class="sig-line"><strong>RECIBIDO CONFORME (CENTRO ACOPIO)</strong><br><br><br>Firma</div>
+                    </div>
+                    <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
+                </body>
+                </html>
+            `);
+            ventanita.document.close();
+        };
+
+        window.generarNotaEntregaMasiva = function() {
+            const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+            if (seleccionados.length === 0) { alert("Selecciona tickets primero."); return; }
+
+            const pedidosSeleccionados = pedidosLogistica.filter(p => seleccionados.includes(p.id));
+            const ventanita = window.open('', '_blank');
+            if(!ventanita) return;
+
+            const fecha = new Date().toLocaleString('es-VE');
+            
+            let filasInsumos = '';
+            pedidosSeleccionados.forEach(pedido => {
+                let personaVinculada = "Carga Manual";
+                if(pedido.solicitud_id) {
+                    const reg = ayudaNube.find(a => a.id === pedido.solicitud_id);
+                    if(reg) personaVinculada = `<strong>${reg.nombre}</strong><br><span style="font-size:11px; color:#555;">C.I: ${reg.cedula}</span>`;
+                }
+                const idCorto = pedido.id.split('-')[0].toUpperCase();
+                
+                filasInsumos += `
+                    <tr style="border-bottom: 1px solid #ccc;">
+                        <td style="padding: 10px; font-size:12px;">#${idCorto}</td>
+                        <td style="padding: 10px; font-size:12px;">${personaVinculada}</td>
+                        <td style="padding: 10px; font-size:12px;">${String(pedido.categoria_insumo).toUpperCase()}</td>
+                        <td style="padding: 10px; font-size:12px;">${pedido.requerimiento}</td>
+                        <td style="padding: 10px; font-size:12px;">___________________</td>
+                    </tr>
+                `;
+            });
+
+            ventanita.document.write(`
+                <html>
+                <head>
+                    <title>Acta de Entrega Masiva</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 30px; color: #000; max-width: 950px; margin: 0 auto; line-height: 1.4; }
+                        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+                        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; color: #111; }
+                        .header h3 { margin: 5px 0 0 0; color: #555; font-size: 13px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        th { background-color: #f0f0f0; padding: 10px; border-bottom: 2px solid #000; text-align: left; font-size:13px; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 40px; gap: 30px; }
+                        .sig-line { flex: 1; border-top: 1px solid #000; padding-top: 10px; text-align: center; font-size: 12px; }
+                        .logo { height: 60px; margin-right: 15px; }
+                        @media print { @page { margin: 0; } body { margin: 1cm; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div style="display:flex; align-items:center;">
+                            <img src="Logo-AEUSB-fondo-blanco.png" class="logo" onerror="this.style.display='none'">
+                            <div>
+                                <h1>ACTA DE ENTREGA DE DONATIVOS (MASIVA)</h1>
+                                <h3>Asociación de Egresados de la Universidad Simón Bolívar</h3>
+                            </div>
                         </div>
-                        <div class="sig-line">
-                            <strong>CHOFER / TRANSPORTE</strong><br><br><br>
-                            Nombre / Firma
-                        </div>
-                        <div class="sig-line">
-                            <strong>RECIBIDO CONFORME (DESTINO)</strong><br><br><br>
-                            Nombre / Firma
+                        <div style="text-align: right;">
+                            <p style="margin:0; font-size:13px; font-weight:bold;">Fecha de Emisión:</p>
+                            <p style="margin:5px 0 0 0; font-size:13px;">${fecha}</p>
                         </div>
                     </div>
 
+                    <div style="margin-bottom: 15px; background-color: #f9f9f9; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                        <p style="margin: 0; font-size: 15px;"><strong>Total de Tickets a Despachar:</strong> <span style="font-size: 16px; color: #d32f2f;">${pedidosSeleccionados.length}</span></p>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>BENEFICIARIO</th>
+                                <th>CATEGORÍA</th>
+                                <th>DETALLE DEL INSUMO</th>
+                                <th>FIRMA BENEFICIARIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filasInsumos}
+                        </tbody>
+                    </table>
+
+                    <div class="signatures">
+                        <div class="sig-line"><strong>ENTREGADO POR (ALMACÉN)</strong><br><br><br>Firma</div>
+                        <div class="sig-line"><strong>CHOFER / TRANSPORTE</strong><br><br><br>Firma</div>
+                        <div class="sig-line"><strong>RECIBIDO CONFORME (CENTRO ACOPIO)</strong><br><br><br>Firma</div>
+                    </div>
                     <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); } }</script>
                 </body>
                 </html>
