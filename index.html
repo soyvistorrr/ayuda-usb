@@ -76,7 +76,6 @@
                     </div>
                     
                     <div class="acopio-banner-card" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
-                        
                         <div class="acopio-info-side">
                             <h4 style="color: #0284c7;">Punto USB para recepción y Entrega de Ayuda Humanitaria</h4>
                             <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1.25rem;">Recepción de Donaciones Punto USB CVA Las Mercedes. Dirección Av. Principal de Las Mercedes, Centro Venezolano Americano</p>
@@ -100,6 +99,77 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+                
+                <div class="home-grid-buttons">
+                    <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
+                        <div>
+                            <h3>Necesito Ayuda</h3>
+                            <p>Registra directamente tus requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate).</p>
+                        </div>
+                        <button class="btn btn-warning btn-block">Registrar Solicitud</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-colaborar')">
+                        <div>
+                            <h3>Quiero ser Colaborador</h3>
+                            <p>Súmate a los listados de brigadas activas para remoción de escombros, clasificación de insumos y primeros auxilios.</p>
+                        </div>
+                        <button class="btn btn-success btn-block">Ver Voluntarios / Inscribirme</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-buscar')">
+                        <div>
+                            <h3>Busco a Alguien</h3>
+                            <p>Consulta el registro general en tiempo real para rastrear la localización y condiciones de compañeros uesebistas.</p>
+                        </div>
+                        <button class="btn btn-primary btn-block">Ver Registro General</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-enlaces')">
+                        <div>
+                            <h3>Enlaces y Listas Oficiales</h3>
+                            <p>Accede a las listas oficiales de personas hospitalizadas, censos vecinales y el directorio de profesionales solidarios.</p>
+                        </div>
+                        <button class="btn btn-primary btn-block" style="background-color: #0284c7; color: white;">Ver Enlaces</button>
+                    </div>
+
+                    <div class="action-card donate-pulse" onclick="navegarA('view-donar')">
+                        <div>
+                            <h3>Quiero Donar</h3>
+                            <p>Apoya económicamente la adquisición masiva de insumos médicos y logística para los brigadistas en las zonas afectadas.</p>
+                        </div>
+                        <button class="btn btn-success btn-block" style="background-color: var(--success);">Aportar Fondos</button>
+                    </div>
+
+                    <div class="action-card admin-action-header" id="btn-acceso-logistica" style="display: none; border-top: 4px solid #f59e0b;">
+                        <div style="text-align: center; margin-bottom: 1.5rem; flex: 1;">
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--slate-800); text-transform: uppercase;">Logística y Envíos</h3>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Panel de control para registrar pedidos y generar las facturas de despacho.</p>
+                        </div>
+                        <button class="btn btn-block" style="background-color: #f59e0b; color: white; border: none; font-weight: bold;" onclick="navegarA('view-etiquetas-logistica'); cargarTablaLogisticaFuerza();">GESTIONAR DESPACHOS</button>    
+                    </div>
+                </div>
+            </section>
+
+            <section class="app-view" id="view-puntos-usb">
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
+                
+                <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 3rem 2rem; margin-bottom: 2.5rem; text-align: center;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Red de Distribución USB</h2>
+                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Conoce a detalle los puntos estratégicos donde estaremos canalizando la ayuda humanitaria recolectada en el CVA. Cada centro tiene necesidades logísticas específicas según su ubicación.</p>
+                </div>
+
+                <div style="background-color: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; margin-bottom: 2.5rem; border-left: 5px solid var(--success); line-height: 1.6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <strong>AVISO IMPORTANTE:</strong> Estos puntos de distribución están destinados <strong>exclusivamente</strong> a brindar apoyo a miembros de la comunidad USB (Estudiantes, profesores, personal administrativo/obrero, egresados y familiares directos). Te pedimos contactar primero a tu encargado local para el censo de necesidades.
+                </div>
+
+                <div style="margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
+                    <div style="background-color: var(--slate-800); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; text-transform: uppercase; color: var(--accent);">🗺️ Ubicación de los Puntos</h3>
+                        <a href="https://www.google.com/maps/d/u/0/edit?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4&usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: var(--accent); color: var(--primary); text-decoration: none; font-weight: bold;">📍 Abrir en Google Maps</a>
+                    </div>
+                    <iframe src="https://www.google.com/maps/d/embed?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4" width="100%" height="450" style="border:0; display: block;" allowfullscreen="" loading="lazy" title="Mapa de Puntos USB"></iframe>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
@@ -194,7 +264,6 @@
 
                 </div>
             </section>
-                </div>
                 
                 <div class="home-grid-buttons">
                     <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
