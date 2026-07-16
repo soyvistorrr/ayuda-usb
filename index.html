@@ -31,7 +31,7 @@
             <a class="nav-item active-nav" onclick="navegarA('view-home')">Inicio</a>
             <a class="nav-item" onclick="navegarA('view-todas-noticias')">Boletines</a>
             <a class="nav-item" onclick="navegarA('view-puntos-usb')">Puntos USB</a>
-            <a class="nav-item" onclick="navegarA('view-necesito-ayuda')">Ayuda</a>
+            <a class="nav-item admin-action-header" style="display: none; cursor: pointer;" onclick="navegarA('view-necesito-ayuda')">Censo Ayuda</a>
             <a class="nav-item" onclick="navegarA('view-colaborar')">Colaborar</a>
             <a class="nav-item" onclick="navegarA('view-buscar')">Buscar</a>
             <a class="nav-item" onclick="navegarA('view-enlaces')">Enlaces</a>
@@ -67,6 +67,12 @@
                         </div>
                         <button class="carousel-arrow right" onclick="moverCarrusel(1)">&#10095;</button>
                     </div>
+                </div>
+
+                <div class="seccion-destacada" style="background-color: #fffbeb; border-color: #fcd34d; padding: 2rem; margin-bottom: 2rem; text-align: center;">
+                    <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #b45309; margin-bottom: 0.5rem; text-transform: uppercase;">¿Necesitas ayuda médica, alimentos o insumos?</h3>
+                    <p style="color: #92400e; font-size: 1.05rem; max-width: 800px; margin: 0 auto 1.5rem auto;">Para evitar duplicidad en los registros y organizar mejor los despachos, el registro de necesidades ahora se realiza de forma directa a través de los coordinadores locales. Si necesitas asistencia, comunícate con el encargado del punto más cercano para que tome tus datos.</p>
+                    <button class="btn" style="font-weight: 700; font-size: 1rem; padding: 0.75rem 1.5rem; background-color: #f59e0b; color: white; border: none;" onclick="navegarA('view-puntos-usb')">📞 Contactar Encargado Local</button>
                 </div>
 
                 <div class="seccion-destacada" style="border-top: 4px solid var(--success);">
@@ -105,12 +111,12 @@
                 
                 <!-- BOTONES DE ACCIÓN DEL HOME -->
                 <div class="home-grid-buttons">
-                    <div class="action-card" onclick="navegarA('view-necesito-ayuda')">
+                    <div class="action-card admin-action-header" style="display: none;" onclick="navegarA('view-necesito-ayuda')">
                         <div>
-                            <h3>Necesito Ayuda</h3>
-                            <p>Registra directamente tus requerimientos de asistencia crítica (insumos médicos, alimentos, agua potable o rescate).</p>
+                            <h3>Censo de Afectados</h3>
+                            <p>Módulo exclusivo para administradores. Ingresa y gestiona los requerimientos de la comunidad en tu punto de acopio.</p>
                         </div>
-                        <button class="btn btn-warning btn-block">Registrar Solicitud</button>
+                        <button class="btn btn-warning btn-block">Gestionar Solicitudes</button>
                     </div>
 
                     <div class="action-card" onclick="navegarA('view-colaborar')">
@@ -168,6 +174,11 @@
 
                 <div style="background-color: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; margin-bottom: 2.5rem; border-left: 5px solid var(--success); line-height: 1.6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <strong>AVISO IMPORTANTE:</strong> Estos puntos de distribución están destinados <strong>exclusivamente</strong> a brindar apoyo a miembros de la comunidad USB (Estudiantes, profesores, personal administrativo/obrero, egresados y familiares directos).
+                </div>
+
+                <div style="background-color: #fffbeb; color: #92400e; padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; margin-bottom: 2.5rem; border-left: 5px solid var(--warning); line-height: 1.6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h4 style="margin: 0 0 0.5rem 0; color: #b45309; font-size: 1.1rem; text-transform: uppercase;">¿Necesitas solicitar insumos?</h4>
+                    Si tú o tu familia requieren asistencia (alimentos, agua, higiene, medicinas o refugio), <strong>ponte en contacto vía WhatsApp o llamada con la persona encargada del punto USB más cercano a tu zona</strong> detallado a continuación. Ellos se encargarán de ingresarte al censo oficial y manifestar tus necesidades.
                 </div>
 
                 <div style="margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
@@ -685,13 +696,13 @@
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
                             <div>
                                 <span style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: bold;">Meta de Recaudación (Fase 1)</span><br>
-                                <span style="font-size: 2.5rem; font-weight: 900; color: white; line-height: 1;">$6,850</span> <span style="color: var(--accent); font-weight: bold; font-size: 1.2rem;">/ $10,000</span>
+                                <span id="monto-recaudado" style="font-size: 2.5rem; font-weight: 900; color: white; line-height: 1;">$3,198</span> <span style="color: var(--accent); font-weight: bold; font-size: 1.2rem;">/ $10,000</span>
                             </div>
-                            <div style="font-weight: 900; color: var(--success); font-size: 1.5rem; background: rgba(22, 163, 74, 0.2); padding: 0.3rem 0.8rem; border-radius: 8px;">68% Alcanzado</div>
+                            <div id="porcentaje-recaudado" style="font-weight: 900; color: var(--success); font-size: 1.5rem; background: rgba(22, 163, 74, 0.2); padding: 0.3rem 0.8rem; border-radius: 8px;">31.98% Alcanzado</div>
                         </div>
                         
                         <div class="progress-container">
-                            <div class="progress-bar" style="width: 68%;"></div>
+                            <div id="barra-recaudado" class="progress-bar" style="width: 31.98%;"></div>
                         </div>
                         <p style="font-size: 0.75rem; color: #cbd5e1; margin-top: 0.8rem; text-align: center;">*Datos referenciales actualizados por la Asociación de Egresados (AEUSB).</p>
                     </div>
@@ -981,6 +992,10 @@
                 <div class="toolbar" style="margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                     <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--primary); min-width: 100%;">PANEL DE DESPACHO EN TIEMPO REAL</div>
                     
+                    <div class="search-box" style="flex: 1; min-width: 200px;">
+                        <input type="text" id="buscarLogisticaInput" placeholder="🔍 Buscar ticket, insumo o encargado..." oninput="cargarTablaLogisticaFuerza()">
+                    </div>
+                    
                     <select id="filtroCentroLogistica" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="cargarTablaLogisticaFuerza()">
                         <option value="Todos">Centro: Todos</option>
                         <option value="Catia la Mar Centro">Catia la Mar Centro</option>
@@ -1035,8 +1050,113 @@
             </div>
         </section>
 
-        <!-- SE CIERRAN LOS CONTENEDORES PRINCIPALES -->
         </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA: INVENTARIO GENERAL -->
+        <!-- ============================================== -->
+        <section class="app-view" id="view-inventario">
+            <div class="container">
+                <div class="toolbar" style="margin-top: 1.5rem; margin-bottom: 2rem; background: transparent; padding: 0;">
+                    <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">⬅ VOLVER AL MENÚ PRINCIPAL</button>
+                </div>
+                
+                <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 2.5rem 2rem; margin-bottom: 2.5rem; text-align: center; border-radius: 12px;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Control de Inventario</h2>
+                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Consulta la disponibilidad de recursos en los centros de acopio: Alimentos, Higiene, Salud y Refugio.</p>
+                </div>
+
+                <div class="grid-system" id="mallaInventario">
+                    <div class="left-column admin-action-header" id="panel-carga-inventario" style="display: none;">
+                        <div class="panel-card" style="border-top: 4px solid #10b981;">
+                            <div class="panel-header"><div class="panel-title">📥 Carga de Inventario (Excel)</div></div>
+                            <div class="panel-body">
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Sube el reporte. Columnas válidas: <strong>Medicamento o Ítem</strong>, <strong>Presentación</strong>, <strong>Cantidad</strong> y <strong>Caja</strong>.</p>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Asignar al Centro de Acopio:</label>
+                                    <select id="inventario_centro_carga" class="form-select">
+                                        <option value="Catia la Mar Centro">Catia la Mar Centro</option>
+                                        <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
+                                        <option value="Caraballeda">Caraballeda</option>
+                                        <option value="Naiguatá">Naiguatá</option>
+                                        <option value="Camurí Grande">Camurí Grande</option>
+                                        <option value="Maiquetía">Maiquetía</option>
+                                        <option value="La Guaira - Macuto">La Guaira - Macuto</option>
+                                        <option value="CVA Las Mercedes (Caracas)">CVA Las Mercedes (Caracas)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Categoría de los Ítems a subir:</label>
+                                    <select id="inventario_categoria_carga" class="form-select">
+                                        <option value="Salud">💊 Salud (Medicinas, 1eros auxilios, protector solar)</option>
+                                        <option value="Alimentos">🥫 Alimentos (Enlatados, agua, fórmulas)</option>
+                                        <option value="Higiene">🧼 Higiene (Shampoo, jabón, toallas)</option>
+                                        <option value="Refugio">⛺ Refugio (Linternas, carpas, sábanas)</option>
+                                    </select>
+                                </div>
+
+                                <div class="import-zone" id="dropZoneInventario" onclick="document.getElementById('excelFileInventario').click()" style="margin-bottom: 0;">
+                                    <p><strong>Haz clic aquí o arrastra tu Excel de Inventario</strong></p>
+                                    <input type="file" id="excelFileInventario" accept=".xlsx, .xls, .csv" style="display:none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="right-column" style="width: 100%;">
+                        <div class="toolbar" style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-200); gap: 10px; display: flex; flex-wrap: wrap;">
+                            <div class="search-box" style="flex: 1; min-width: 200px;">
+                                <input type="text" id="buscarInventarioInput" placeholder="🔍 Buscar insumo o medicamento...">
+                            </div>
+                            
+                            <select id="filtroCentroInventario" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="filtrarYActualizarInventario()">
+                                <option value="Todos">Todos los Centros</option>
+                                <option value="Catia la Mar Centro">Catia la Mar Centro</option>
+                                <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
+                                <option value="Caraballeda">Caraballeda</option>
+                                <option value="Naiguatá">Naiguatá</option>
+                                <option value="Camurí Grande">Camurí Grande</option>
+                                <option value="Maiquetía">Maiquetía</option>
+                                <option value="La Guaira - Macuto">La Guaira - Macuto</option>
+                                <option value="CVA Las Mercedes (Caracas)">CVA Las Mercedes (Caracas)</option>
+                            </select>
+
+                            <select id="filtroCategoriaInventario" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="filtrarYActualizarInventario()">
+                                <option value="Todas">Todas las Categorías</option>
+                                <option value="Salud">💊 Salud / Medicinas</option>
+                                <option value="Alimentos">🥫 Alimentos / Agua</option>
+                                <option value="Higiene">🧼 Higiene Personal</option>
+                                <option value="Refugio">⛺ Refugio / Herramientas</option>
+                            </select>
+                            
+                            <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Centro</button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>CENTRO</th>
+                                        <th>CATEGORÍA</th>
+                                        <th>ÍTEM / MEDICAMENTO</th>
+                                        <th>PRESENTACIÓN</th>
+                                        <th style="text-align: center;">CANTIDAD</th>
+                                        <th style="text-align: center;">CAJA</th>
+                                        <th class="admin-action-header" style="display: none; text-align: center;">ACCIÓN</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaInventarioCuerpo">
+                                    <tr><td colspan="7" style="text-align: center; padding: 2rem;">Cargando inventario...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer" style="position: relative;">
