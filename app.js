@@ -355,6 +355,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const elementosLogistica = document.querySelectorAll('[onclick*="view-etiquetas-logistica"]');
                     const elementosBusqueda = document.querySelectorAll('[onclick*="view-buscar"]');
                     const elementosColaborar = document.querySelectorAll('[onclick*="view-colaborar"]');
+                    const elementosInventario = document.querySelectorAll('[onclick*="view-inventario"]'); // <-- SE AÑADE INVENTARIO
 
                     const mostrarElementos = (nodos, mostrar) => {
                         nodos.forEach(nodo => { nodo.style.display = mostrar ? "" : "none"; });
@@ -365,6 +366,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         mostrarElementos(elementosLogistica, true);
                         mostrarElementos(elementosBusqueda, true);
                         mostrarElementos(elementosColaborar, true); 
+                        mostrarElementos(elementosInventario, true);
                         
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "block";
@@ -373,12 +375,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
                         if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
                         if(btnExpColab) btnExpColab.style.display = "inline-block";
+                        
+                        if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "block";
 
                     } else if (rol === 'admin_busqueda') {
                         mostrarElementos(elementosAyuda, false);
                         mostrarElementos(elementosLogistica, false);
                         mostrarElementos(elementosBusqueda, true);
                         mostrarElementos(elementosColaborar, true);
+                        mostrarElementos(elementosInventario, false);
                         
                         if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
                         if(btnExpColab) btnExpColab.style.display = "inline-block";
@@ -388,17 +393,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         mostrarElementos(elementosLogistica, false);
                         mostrarElementos(elementosBusqueda, false);
                         mostrarElementos(elementosColaborar, false);
+                        mostrarElementos(elementosInventario, true);
                         
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "none";
                         
                         if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
+                        if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "block";
 
                     } else if (rol === 'especialista_cva') {
                         mostrarElementos(elementosAyuda, false);
                         mostrarElementos(elementosLogistica, true);
                         mostrarElementos(elementosBusqueda, false);
                         mostrarElementos(elementosColaborar, false);
+                        mostrarElementos(elementosInventario, true);
                     } else {
                         console.warn("Rol no reconocido:", rol);
                         alert("Atención: Tu usuario no tiene un rol válido asignado.");
@@ -409,6 +417,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 }
 
                 await cargarDatosDesdeNube();
+                if (typeof cargarInventarioNube === 'function') await cargarInventarioNube();
 
             } else {
                 alert("Usuario o contraseña incorrectos.");
@@ -2828,9 +2837,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         XLSX.writeFile(wb, `Reporte_Logistica_${filtroCentro.substring(0,8)}_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // ==============================================
-    // MÓDULO: INVENTARIO GENERAL
-    // ==============================================
     let inventarioNube = [];
 
     window.cargarInventarioNube = async function() {
@@ -2865,7 +2871,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let cumpleTexto = String(i.item || '').toLowerCase().includes(texto) || String(i.ubicacion_caja || '').toLowerCase().includes(texto);
             let cumpleCen = (fCen === 'Todos') || (i.punto_usb === fCen);
             
-            // Si es un admin de centro, forzamos que solo vea su centro
             if (perfilUsuarioActual && perfilUsuarioActual.rol === 'admin_centro') {
                 cumpleCen = i.punto_usb === perfilUsuarioActual.centro_acopio;
             }
@@ -2904,7 +2909,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }).join('');
     };
 
-    // Procesador inteligente del archivo Excel de Inventario
     const fileInventario = document.getElementById('excelFileInventario');
     if(fileInventario) {
         fileInventario.addEventListener('change', function(e) {
@@ -2922,15 +2926,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     const data = new Uint8Array(evt.target.result);
                     const libro = XLSX.read(data, { type: 'array' });
                     const hoja = libro.Sheets[libro.SheetNames[0]];
-                    // Leemos forzando que la primera fila sea el encabezado real
                     const rawData = XLSX.utils.sheet_to_json(hoja, { defval: "" }); 
                     
                     let registrosAInsertar = [];
                     
                     for (let row of rawData) {
-                        // Busca inteligentemente el nombre de la columna sin importar si el usuario puso "Medicamento", "Ítem" o "Insumo"
                         let item = String(row['Medicamento'] || row['medicamento'] || row['Item'] || row['Ítem'] || row['Insumo'] || '').trim();
-                        if (!item) continue; // Si la fila está vacía, la salta
+                        if (!item) continue;
 
                         let presentacion = String(row['Presentación'] || row['Presentacion'] || row['Detalle'] || '').trim();
                         let cantidad = String(row['Cantidad'] || row['cantidad'] || '0').trim();
@@ -2968,7 +2970,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         });
     }
 
-    // Buscador en vivo
     const buscadorInv = document.getElementById('buscarInventarioInput');
     if (buscadorInv) buscadorInv.addEventListener('input', filtrarYActualizarInventario);
 
