@@ -624,11 +624,41 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         }
     }
 
+    // ==========================================
+    // LÓGICA DE BOTONES PARA DUPLICADOS
+    // ==========================================
+    let viendoDuplicadosAfectados = false;
+    let viendoDuplicadosAyuda = false;
+
+    window.toggleDuplicadosAfectados = function() {
+        viendoDuplicadosAfectados = !viendoDuplicadosAfectados;
+        const btn = document.getElementById('btnFiltroDupAfectados');
+        if(btn) {
+            btn.innerText = viendoDuplicadosAfectados ? "❌ Quitar Filtro" : "🚨 Filtrar Duplicados";
+            btn.style.backgroundColor = viendoDuplicadosAfectados ? "#dc2626" : "#f59e0b";
+            btn.style.color = "#ffffff";
+        }
+        filtrarYActualizarTablero();
+    };
+
+    window.toggleDuplicadosAyuda = function() {
+        viendoDuplicadosAyuda = !viendoDuplicadosAyuda;
+        const btn = document.getElementById('btnFiltroDupAyuda');
+        if(btn) {
+            btn.innerText = viendoDuplicadosAyuda ? "❌ Quitar Filtro" : "🚨 Filtrar Duplicados";
+            btn.style.backgroundColor = viendoDuplicadosAyuda ? "#dc2626" : "#f59e0b";
+            btn.style.color = "#ffffff";
+        }
+        filtrarYActualizarAyuda();
+    };
+
+    // ==========================================
+    // ACTUALIZACIÓN DE TABLA AFECTADOS (BÚSQUEDA)
+    // ==========================================
     function filtrarYActualizarTablero() {
-        const texto = document.getElementById('buscarInput').value.toLowerCase();
-        const filterEst = document.getElementById('filtroEstado').value;
-        const filterGrp = document.getElementById('filtroGrupo').value;
-        const filterDup = document.getElementById('filtroDuplicados').value;
+        const texto = document.getElementById('buscarInput') ? document.getElementById('buscarInput').value.toLowerCase() : '';
+        const filterEst = document.getElementById('filtroEstado') ? document.getElementById('filtroEstado').value : 'Todos';
+        const filterGrp = document.getElementById('filtroGrupo') ? document.getElementById('filtroGrupo').value : 'Todos';
 
         let registrosFiltrados = registrosNube.filter(r => {
             const cumpleTexto = String(r.nombre || '').toLowerCase().includes(texto);
@@ -649,7 +679,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             return cumpleTexto && cumpleEst && cumpleGrp;
         });
 
-        if (filterDup === 'Duplicados') {
+        // Aplicamos el filtro de duplicados desde el botón dedicado
+        if (viendoDuplicadosAfectados) {
             registrosFiltrados = registrosFiltrados.filter(r1 => {
                 return registrosNube.some(r2 => r1.id !== r2.id && sonNombresSimilares(r1.nombre, r2.nombre));
             });
@@ -665,6 +696,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         let htmlFinal = '';
         let datosOrdenados = ordenarColeccion(datosFiltrados, sortConfigAfectados);
         
+        // 🔒 CANDADO DE SEGURIDAD: Solo Super Admin puede borrar
+        const esSuperAdmin = perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin';
+
         datosOrdenados.forEach(reg => {
             let badgeClass = 'badge-info';
             let est = String(reg.estado || 'Sin Información').trim();
@@ -676,6 +710,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let comLimpia = mapaComunidad[String(reg.cedula).trim().toLowerCase()] || reg.cedula || '-';
             let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
             let damLimpio = reg.damnificado || 'No sé';
+
+            // Botones de acción (Solo editar para admins normales, borrar solo para Super Admin)
+            let botonesAccion = '';
+            if (esAdministrador) {
+                let btnEditar = `<button class="btn-edit-table" onclick="activarEdiciónEnPagina('${reg.id}')">Editar</button>`;
+                let btnBorrar = esSuperAdmin ? `<button class="btn-delete" onclick="eliminarFila('${reg.id}', this)">Eliminar</button>` : '';
+                botonesAccion = `<td class="actions-cell admin-action-header" data-label="Acciones">${btnEditar}${btnBorrar}</td>`;
+            }
 
             htmlFinal += `
                 <tr>
@@ -693,7 +735,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     <td data-label="Ubicación"><div class="text-truncate-clamp">${reg.ubicacion || '-'}</div></td>
                     <td data-label="Teléfono">${enmascararTelefono(reg.telefono)}</td>
                     <td data-label="Observación"><div class="text-truncate-clamp">${reg.observaciones || '-'}</div></td>
-                    ${esAdministrador ? `<td class="actions-cell admin-action-header" data-label="Acciones"><button class="btn-edit-table" onclick="activarEdiciónEnPagina('${reg.id}')">Editar</button><button class="btn-delete" onclick="eliminarFila('${reg.id}', this)">Eliminar</button></td>` : ''}
+                    ${botonesAccion}
                 </tr>
             `;
         });
@@ -714,6 +756,130 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const elDesReal = document.getElementById('stat-desaparecidos-real'); if (elDesReal) elDesReal.innerText = desaparecidosReal;
         const elFall = document.getElementById('stat-fallecidos'); if (elFall) elFall.innerText = fall;
     }
+
+    // ==========================================
+    // ACTUALIZACIÓN DE TABLA AYUDA (CENSO)
+    // ==========================================
+    window.filtrarYActualizarAyuda = function() {
+        if (!ayudaNube) return;
+        
+        const texto = document.getElementById('buscarAyudaInput') ? document.getElementById('buscarAyudaInput').value.toLowerCase() : '';
+        const fDam = document.getElementById('filtroDamnificado') ? document.getElementById('filtroDamnificado').value : 'Todos';
+        const fDesp = document.getElementById('filtroDespacho') ? document.getElementById('filtroDespacho').value : 'Todos';
+        const fCen = document.getElementById('filtroCentro') ? document.getElementById('filtroCentro').value : 'Todos';
+
+        let cedulasValidas = ayudaNube.map(a => String(a.cedula || '').trim()).filter(c => c !== '' && c !== '-');
+        let nombresValidos = ayudaNube.map(a => String(a.nombre || '').trim().toLowerCase()).filter(n => n !== '');
+
+        let filtrados = ayudaNube.filter(a => {
+            // Aplicamos el filtro de duplicados desde el botón
+            if (viendoDuplicadosAyuda) {
+                let miCedula = String(a.cedula || '').trim();
+                let miNombre = String(a.nombre || '').trim().toLowerCase();
+                
+                let dupCedula = miCedula !== '-' && miCedula !== '' && cedulasValidas.filter(c => c === miCedula).length > 1;
+                let dupNombre = miNombre !== '' && nombresValidos.filter(n => n === miNombre).length > 1;
+                
+                if (!dupCedula && !dupNombre) return false;
+            } else {
+                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
+                    if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
+                }
+                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'auditor')) {
+                    if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
+                }
+            }
+
+            const cumpleTexto = String(a.nombre || '').toLowerCase().includes(texto) || String(a.cedula || '').toLowerCase().includes(texto);
+            
+            let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+            const cumpleDam = (fDam === 'Todos') || (isDamStr === fDam);
+
+            let estadoCalculado = 'Sin Pedido';
+            let ticketsPersona = pedidosLogistica.filter(p => p.solicitud_id === a.id);
+            
+            if (ticketsPersona.length > 0) {
+                if (ticketsPersona.some(t => t.estado === 'Pendiente')) estadoCalculado = 'Pendiente';
+                else if (ticketsPersona.some(t => t.estado === 'Empacando')) estadoCalculado = 'En Proceso';
+                else estadoCalculado = 'Despachado';
+            }
+            a.estado_despacho_calculado = estadoCalculado; 
+            
+            const cumpleDesp = (fDesp === 'Todos') || (estadoCalculado === fDesp);
+
+            return cumpleTexto && cumpleDam && cumpleDesp;
+        });
+
+        const thead = document.getElementById('theadAyuda');
+        const tbody = document.getElementById('tablaAyudaCuerpo');
+        if(!thead || !tbody) return;
+
+        thead.innerHTML = `
+            <tr>
+                <th>PUNTO ACOPIO</th>
+                <th>AFECTADO</th>
+                <th>CONTACTO</th>
+                <th>DAMNIFICADO</th>
+                <th>ESTADO DESPACHO</th>
+                <th>ACCIONES</th>
+            </tr>
+        `;
+
+        tbody.innerHTML = '';
+        if(filtrados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay registros que coincidan con la búsqueda.</td></tr>';
+            return;
+        }
+
+        filtrados.forEach(a => {
+            let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
+            let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
+            
+            let tieneMedicina = a.req_medicina && a.req_medicina !== '-' && String(a.req_medicina).trim() !== '';
+            let alertaMedica = tieneMedicina ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Solicita Medicina</div>` : '';
+
+            let colorDespacho = '#64748b'; 
+            let estDespacho = a.estado_despacho_calculado || 'Sin Pedido';
+            if(estDespacho === 'Pendiente') colorDespacho = '#dc2626';     
+            if(estDespacho === 'En Proceso') colorDespacho = '#f59e0b';    
+            if(estDespacho === 'Despachado') colorDespacho = '#10b981';    
+            let badgeDespacho = `<span class="badge" style="background:${colorDespacho}; color:white; font-size: 0.8rem; padding: 4px 8px;">${estDespacho}</span>`;
+
+            let btnAccionesContainer = '';
+            let btnVerInfo = `<button class="btn btn-primary" style="padding:0.4rem; font-size:0.8rem; background-color:#0284c7; flex:1;" onclick="verDetallesAyuda('${a.id}')">👁️ Ver Info</button>`;
+
+            if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda' || perfilUsuarioActual.rol === 'especialista_cva')) {
+                btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}</div>`;
+            } else {
+                let btnEditar = `<button class="btn btn-warning" style="padding:0.4rem; font-size:0.8rem; flex:1;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar</button>`;
+                
+                let btnEliminar = '';
+                // 🔒 CANDADO SUPER ADMIN PARA LA TABLA DE AYUDA
+                if (perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin') {
+                    btnEliminar = `<button class="btn btn-delete" style="padding:0.4rem; font-size:0.8rem; flex:1; background-color:#fef2f2; color:#dc2626; border:1px solid #fecaca;" onclick="eliminarAyuda('${a.id}', this)">🗑️ Borrar</button>`;
+                }
+                
+                btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">${btnVerInfo}${btnEditar}${btnEliminar}</div>`;
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td data-label="Punto Acopio"><strong>${a.punto_usb || 'Sin Asignar'}</strong></td>
+                    <td data-label="Afectado">
+                        <div style="font-weight:bold;">${a.nombre || '-'}</div>
+                        <div style="font-size:0.8rem; color:#64748b;">C.I: ${a.cedula || '-'}</div>
+                    </td>
+                    <td data-label="Contacto">
+                        <div>${a.telefono || '-'}</div>
+                        <div style="font-size:0.8rem; color:#64748b;">${a.ubicacion || '-'}</div>
+                    </td>
+                    <td data-label="Damnificado">${badgeDam} ${alertaMedica}</td>
+                    <td data-label="Despacho">${badgeDespacho}</td>
+                    <td data-label="Acciones" class="actions-cell">${btnAccionesContainer}</td>
+                </tr>
+            `;
+        });
+    };
 
     function actualizarInterfazColaboradores(datos) {
         const thead = document.getElementById('theadColab');
@@ -1434,125 +1600,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         descargarMatrizComoExcel(matriz, "Data_Ofrecimientos_Colaboradores_USB");
     });
 
-    window.filtrarYActualizarAyuda = function() {
-        if (!ayudaNube) return;
-        
-        const texto = document.getElementById('buscarAyudaInput').value.toLowerCase();
-        const fDam = document.getElementById('filtroDamnificado').value;
-        const fDesp = document.getElementById('filtroDespacho').value;
-        const fCen = document.getElementById('filtroCentro').value;
-
-        let cedulasValidas = ayudaNube.map(a => String(a.cedula || '').trim()).filter(c => c !== '' && c !== '-');
-        let nombresValidos = ayudaNube.map(a => String(a.nombre || '').trim().toLowerCase()).filter(n => n !== '');
-
-        let filtrados = ayudaNube.filter(a => {
-            if (fCen === 'Duplicados') {
-                let miCedula = String(a.cedula || '').trim();
-                let miNombre = String(a.nombre || '').trim().toLowerCase();
-                
-                let dupCedula = miCedula !== '-' && miCedula !== '' && cedulasValidas.filter(c => c === miCedula).length > 1;
-                let dupNombre = miNombre !== '' && nombresValidos.filter(n => n === miNombre).length > 1;
-                
-                if (!dupCedula && !dupNombre) return false;
-            } else {
-                if (perfilUsuarioActual && perfilUsuarioActual.rol !== 'super_admin' && perfilUsuarioActual.rol !== 'auditor' && perfilUsuarioActual.rol !== 'admin_busqueda') {
-                    if (a.punto_usb !== perfilUsuarioActual.centro_acopio) return false;
-                }
-                if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'auditor')) {
-                    if (fCen !== 'Todos' && a.punto_usb !== fCen) return false;
-                }
-            }
-
-            const cumpleTexto = String(a.nombre || '').toLowerCase().includes(texto) || String(a.cedula || '').toLowerCase().includes(texto);
-            
-            let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
-            const cumpleDam = (fDam === 'Todos') || (isDamStr === fDam);
-
-            let estadoCalculado = 'Sin Pedido';
-            let ticketsPersona = pedidosLogistica.filter(p => p.solicitud_id === a.id);
-            
-            if (ticketsPersona.length > 0) {
-                if (ticketsPersona.some(t => t.estado === 'Pendiente')) estadoCalculado = 'Pendiente';
-                else if (ticketsPersona.some(t => t.estado === 'Empacando')) estadoCalculado = 'En Proceso';
-                else estadoCalculado = 'Despachado';
-            }
-            a.estado_despacho_calculado = estadoCalculado; 
-            
-            const cumpleDesp = (fDesp === 'Todos') || (estadoCalculado === fDesp);
-
-            return cumpleTexto && cumpleDam && cumpleDesp;
-        });
-
-        const thead = document.getElementById('theadAyuda');
-        const tbody = document.getElementById('tablaAyudaCuerpo');
-        if(!thead || !tbody) return;
-
-        thead.innerHTML = `
-            <tr>
-                <th>PUNTO ACOPIO</th>
-                <th>AFECTADO</th>
-                <th>CONTACTO</th>
-                <th>DAMNIFICADO</th>
-                <th>ESTADO DESPACHO</th>
-                <th>ACCIONES</th>
-            </tr>
-        `;
-
-        tbody.innerHTML = '';
-        if(filtrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay registros que coincidan con la búsqueda.</td></tr>';
-            return;
-        }
-
-        filtrados.forEach(a => {
-            let isDamStr = (a.es_damnificado === true || String(a.damnificado).trim().toLowerCase() === 'sí' || String(a.damnificado).trim().toLowerCase() === 'si') ? "SÍ" : "NO";
-            let badgeDam = isDamStr === "SÍ" ? `<span class="badge" style="background:#dc3545; color:white;">SÍ</span>` : `NO`;
-            
-            let tieneMedicina = a.req_medicina && a.req_medicina !== '-' && String(a.req_medicina).trim() !== '';
-            let alertaMedica = tieneMedicina ? `<div style="color:#dc2626; font-size:0.75rem; margin-top:4px; font-weight:bold;">🚨 Solicita Medicina</div>` : '';
-
-            let colorDespacho = '#64748b'; 
-            let estDespacho = a.estado_despacho_calculado || 'Sin Pedido';
-            if(estDespacho === 'Pendiente') colorDespacho = '#dc2626';     
-            if(estDespacho === 'En Proceso') colorDespacho = '#f59e0b';    
-            if(estDespacho === 'Despachado') colorDespacho = '#10b981';    
-            let badgeDespacho = `<span class="badge" style="background:${colorDespacho}; color:white; font-size: 0.8rem; padding: 4px 8px;">${estDespacho}</span>`;
-
-            let btnAccionesContainer = '';
-            let btnVerInfo = `<button class="btn btn-primary" style="padding:0.4rem; font-size:0.8rem; background-color:#0284c7; flex:1;" onclick="verDetallesAyuda('${a.id}')">👁️ Ver Info</button>`;
-
-            if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda' || perfilUsuarioActual.rol === 'especialista_cva')) {
-                btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%;">${btnVerInfo}</div>`;
-            } else {
-                let btnEditar = `<button class="btn btn-warning" style="padding:0.4rem; font-size:0.8rem; flex:1;" onclick="activarEdicionAyuda('${a.id}')">✏️ Editar</button>`;
-                
-                let btnEliminar = '';
-                if (perfilUsuarioActual && perfilUsuarioActual.rol === 'super_admin') {
-                    btnEliminar = `<button class="btn btn-delete" style="padding:0.4rem; font-size:0.8rem; flex:1; background-color:#fef2f2; color:#dc2626; border:1px solid #fecaca;" onclick="eliminarAyuda('${a.id}', this)">🗑️ Borrar</button>`;
-                }
-                
-                btnAccionesContainer = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">${btnVerInfo}${btnEditar}${btnEliminar}</div>`;
-            }
-
-            tbody.innerHTML += `
-                <tr>
-                    <td data-label="Punto Acopio"><strong>${a.punto_usb || 'Sin Asignar'}</strong></td>
-                    <td data-label="Afectado">
-                        <div style="font-weight:bold;">${a.nombre || '-'}</div>
-                        <div style="font-size:0.8rem; color:#64748b;">C.I: ${a.cedula || '-'}</div>
-                    </td>
-                    <td data-label="Contacto">
-                        <div>${a.telefono || '-'}</div>
-                        <div style="font-size:0.8rem; color:#64748b;">${a.ubicacion || '-'}</div>
-                    </td>
-                    <td data-label="Damnificado">${badgeDam} ${alertaMedica}</td>
-                    <td data-label="Despacho">${badgeDespacho}</td>
-                    <td data-label="Acciones" class="actions-cell">${btnAccionesContainer}</td>
-                </tr>
-            `;
-        });
-    };
-
     document.getElementById('buscarAyudaInput').addEventListener('input', filtrarYActualizarAyuda);
     document.getElementById('filtroDamnificado').addEventListener('change', filtrarYActualizarAyuda);
     document.getElementById('filtroDespacho').addEventListener('change', filtrarYActualizarAyuda);
@@ -1633,6 +1680,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
+    // ==========================================
+    // FUNCIONES DE BORRADO CORREGIDAS
+    // ==========================================
+
     window.eliminarFila = async function(id, boton) {
         if (!boton) return;
         let texto = boton.innerText.trim();
@@ -1652,17 +1703,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             boton.innerText = "Borrando...";
             boton.disabled = true;
             
-            const { data, error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id).select();
+            // Eliminamos el .select() problemático
+            const { error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
             
             if (error) {
                 alert("Error interno: " + error.message);
                 boton.innerText = "Eliminar";
                 boton.disabled = false;
-            } else if (!data || data.length === 0) {
-                alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de esta tabla.");
-                boton.innerText = "Eliminar";
-                boton.disabled = false;
             } else {
+                mostrarNotificacion("Registro eliminado exitosamente.");
                 await cargarDatosDesdeNube();
             }
         }
@@ -1688,16 +1737,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             boton.disabled = true;
             
             try {
+                // Borrado en cascada: limpiamos la logística asociada primero
                 await supabaseClient.from('etiquetas_logistica').delete().eq('solicitud_id', id);
-
-                const { data, error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id).select();
+                
+                // Borramos la solicitud principal sin el .select()
+                const { error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
                 
                 if (error) {
                     alert("Error interno: " + error.message);
-                    boton.innerText = "🗑️ Borrar";
-                    boton.disabled = false;
-                } else if (!data || data.length === 0) {
-                    alert("⚠️ Supabase bloqueó el borrado. Verifica las políticas RLS.");
                     boton.innerText = "🗑️ Borrar";
                     boton.disabled = false;
                 } else {
@@ -1731,17 +1778,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             boton.innerText = "Borrando...";
             boton.disabled = true;
             
-            const { data, error } = await supabaseClient.from('colaboradores').delete().eq('id', id).select();
+            const { error } = await supabaseClient.from('colaboradores').delete().eq('id', id);
             
             if (error) {
                 alert("Error interno: " + error.message);
                 boton.innerText = "Eliminar";
                 boton.disabled = false;
-            } else if (!data || data.length === 0) {
-                alert("⚠️ Supabase bloqueó el borrado. Debes ir a tu panel de Supabase y habilitar el permiso de ELIMINAR (DELETE) en las políticas RLS de la tabla 'colaboradores'.");
-                boton.innerText = "Eliminar";
-                boton.disabled = false;
             } else {
+                mostrarNotificacion("Colaborador eliminado.");
                 await cargarDatosDesdeNube();
             }
         }
