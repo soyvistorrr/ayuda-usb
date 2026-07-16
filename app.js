@@ -393,13 +393,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         mostrarElementos(elementosLogistica, false);
                         mostrarElementos(elementosBusqueda, false);
                         mostrarElementos(elementosColaborar, false);
-                        mostrarElementos(elementosInventario, true);
+                        mostrarElementos(elementosInventario, false);
                         
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "none";
                         
                         if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
-                        if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "block";
+                        if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "none";
 
                     } else if (rol === 'especialista_cva') {
                         mostrarElementos(elementosAyuda, false);
@@ -1922,7 +1922,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 let encStr = String(p.encargado || '').toLowerCase();
                 let idCortoStr = String(p.id || '').split('-')[0].toLowerCase();
                 
-                cTexto = reqStr.includes(textoBusqueda) || encStr.includes(textoBusqueda) || idCortoStr.includes(textoBusqueda);
+                let persona = ayudaNube.find(a => a.id === p.solicitud_id);
+                let nombreBen = persona ? String(persona.nombre).toLowerCase() : 'carga manual';
+                let cedulaBen = persona ? String(persona.cedula).toLowerCase() : '';
+                
+                cTexto = reqStr.includes(textoBusqueda) || 
+                         encStr.includes(textoBusqueda) || 
+                         idCortoStr.includes(textoBusqueda) ||
+                         nombreBen.includes(textoBusqueda) ||
+                         cedulaBen.includes(textoBusqueda);
             }
 
             return c1 && c2 && c3 && cTexto;
