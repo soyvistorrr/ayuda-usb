@@ -36,6 +36,7 @@
             <a class="nav-item" onclick="navegarA('view-buscar')">Buscar</a>
             <a class="nav-item" onclick="navegarA('view-enlaces')">Enlaces</a>
             <a class="nav-item" onclick="navegarA('view-donar')">Donar</a>
+            <a class="nav-item admin-action-header" style="display: none; cursor: pointer;" onclick="navegarA('view-inventario')">Inventario</a>
             <a class="nav-item admin-action-header" style="display: none; cursor: pointer;" onclick="navegarA('view-etiquetas-logistica'); cargarTablaLogisticaFuerza();">Logística</a>
         </div>
     </nav>
@@ -109,8 +110,30 @@
                     </div>
                 </div>
                 
-                <!-- BOTONES DE ACCIÓN DEL HOME -->
                 <div class="home-grid-buttons">
+                    <div class="action-card admin-action-header" style="display: none;" onclick="navegarA('view-necesito-ayuda')">
+                        <div>
+                            <h3>Censo de Afectados</h3>
+                            <p>Módulo exclusivo para administradores. Ingresa y gestiona los requerimientos de la comunidad en tu punto de acopio.</p>
+                        </div>
+                        <button class="btn btn-warning btn-block">Gestionar Solicitudes</button>
+                    </div>
+
+                    <div class="action-card admin-action-header" style="display: none;" onclick="navegarA('view-inventario')">
+                        <div>
+                            <h3>Inventario General</h3>
+                            <p>Consulta y gestiona las existencias de medicinas, alimentos, higiene y refugio en los puntos de acopio.</p>
+                        </div>
+                        <button class="btn btn-primary btn-block" style="background-color: #3b82f6; color: white;">Ver Inventario</button>
+                    </div>
+
+                    <div class="action-card" onclick="navegarA('view-colaborar')">
+                        <div>
+                            <h3>Quiero ser Colaborador</h3>
+                            <p>Súmate a los listados de brigadas activas para remoción de escombros, clasificación de insumos y primeros auxilios.</p>
+                        </div>
+                        <button class="btn btn-success btn-block">Ver Voluntarios / Inscribirme</button>
+                    </div>
                     <div class="action-card admin-action-header" style="display: none;" onclick="navegarA('view-necesito-ayuda')">
                         <div>
                             <h3>Censo de Afectados</h3>
@@ -1052,9 +1075,6 @@
 
         </div>
 
-        <!-- ============================================== -->
-        <!-- VISTA: INVENTARIO GENERAL -->
-        <!-- ============================================== -->
         <section class="app-view" id="view-inventario">
             <div class="container">
                 <div class="toolbar" style="margin-top: 1.5rem; margin-bottom: 2rem; background: transparent; padding: 0;">
