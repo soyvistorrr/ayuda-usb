@@ -1915,14 +1915,16 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let c1 = (filtroCentro === 'Todos') || (p.punto_usb === filtroCentro);
             let c2 = (filtroCat === 'Todos') || (p.categoria_insumo === filtroCat);
             let c3 = (filtroEst === 'Todos') || (p.estado === filtroEst);
-            let cTexto = true;
             
+            let cTexto = true;
             if (textoBusqueda !== '') {
                 let reqStr = String(p.requerimiento || '').toLowerCase();
                 let encStr = String(p.encargado || '').toLowerCase();
                 let idCortoStr = String(p.id || '').split('-')[0].toLowerCase();
+                
                 cTexto = reqStr.includes(textoBusqueda) || encStr.includes(textoBusqueda) || idCortoStr.includes(textoBusqueda);
             }
+
             return c1 && c2 && c3 && cTexto;
         });
 
