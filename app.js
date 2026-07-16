@@ -2866,27 +2866,21 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         if(!cuerpo) return;
 
         const texto = (document.getElementById('buscarInventarioInput') ? document.getElementById('buscarInventarioInput').value : '').toLowerCase();
-        const fCen = document.getElementById('filtroCentroInventario') ? document.getElementById('filtroCentroInventario').value : 'Todos';
         const fCat = document.getElementById('filtroCategoriaInventario') ? document.getElementById('filtroCategoriaInventario').value : 'Todas';
 
         let filtrados = inventarioNube.filter(i => {
             let cumpleTexto = String(i.item || '').toLowerCase().includes(texto) || String(i.ubicacion_caja || '').toLowerCase().includes(texto);
-            let cumpleCen = (fCen === 'Todos') || (i.punto_usb === fCen);
-            
-            if (perfilUsuarioActual && perfilUsuarioActual.rol === 'admin_centro') {
-                cumpleCen = i.punto_usb === perfilUsuarioActual.centro_acopio;
-            }
-            
+            let cumpleCen = i.punto_usb === 'CVA Las Mercedes (Caracas)'; 
             let cumpleCat = (fCat === 'Todas') || (i.categoria === fCat);
             return cumpleTexto && cumpleCen && cumpleCat;
         });
 
         if(filtrados.length === 0) {
-            cuerpo.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">No hay ítems en el inventario con esos filtros.</td></tr>';
+            cuerpo.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">No hay ítems en el inventario con esos filtros.</td></tr>';
             return;
         }
 
-        const puedeEditar = perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'admin_centro');
+        const puedeEditar = perfilUsuarioActual && (perfilUsuarioActual.rol === 'super_admin' || perfilUsuarioActual.rol === 'especialista_cva');
 
         cuerpo.innerHTML = filtrados.map(i => {
             let icono = '📦';
@@ -2900,7 +2894,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 : '';
 
             return `<tr>
-                <td data-label="Centro"><strong>${i.punto_usb}</strong></td>
                 <td data-label="Categoría">${icono} ${i.categoria}</td>
                 <td data-label="Ítem"><strong>${i.item}</strong></td>
                 <td data-label="Presentación">${i.presentacion || '-'}</td>
@@ -2916,7 +2909,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         fileInventario.addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
             
-            const centro = document.getElementById('inventario_centro_carga').value;
+            const centro = 'CVA Las Mercedes (Caracas)'; 
             const categoria = document.getElementById('inventario_categoria_carga').value;
             const pElement = document.querySelector('#dropZoneInventario p');
             const textoOriginal = pElement.innerHTML;
@@ -2955,8 +2948,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         const { error } = await supabaseClient.from('inventario_general').insert(registrosAInsertar);
                         if (error) throw error;
                         
-                        alert(`✅ ¡Inventario cargado exitosamente!\n\nSe añadieron ${registrosAInsertar.length} ítems a la categoría ${categoria} en ${centro}.`);
-                        await cargarInventarioNube(); // Refresca la tabla
+                        alert(`✅ ¡Inventario cargado exitosamente!\n\nSe añadieron ${registrosAInsertar.length} ítems a la categoría ${categoria}.`);
+                        await cargarInventarioNube(); 
                     } else {
                         alert("⚠️ No se encontraron datos válidos. Asegúrate de que las columnas digan: 'Medicamento', 'Presentación', 'Cantidad' y 'Caja'.");
                     }
@@ -2979,20 +2972,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         boton.innerText = "Borrando...";
         boton.disabled = true;
         const { error } = await supabaseClient.from('inventario_general').delete().eq('id', id);
-        if(error) alert("Error: " + error.message);
+        if(error) { alert("Error: " + error.message); boton.innerText = "🗑️ Borrar"; boton.disabled = false; }
         else await cargarInventarioNube();
     };
 
     window.vaciarInventario = async function() {
-        const centro = document.getElementById('filtroCentroInventario').value;
+        const centro = 'CVA Las Mercedes (Caracas)';
         const categoria = document.getElementById('filtroCategoriaInventario').value;
         
-        if (centro === 'Todos' || categoria === 'Todas') {
-            alert("⚠️ Para proteger la base de datos, debes seleccionar un CENTRO ESPECÍFICO y una CATEGORÍA ESPECÍFICA en los filtros antes de usar la función de Vaciar.");
+        if (categoria === 'Todas') {
+            alert("⚠️ Para proteger la base de datos, debes seleccionar una CATEGORÍA ESPECÍFICA en el filtro antes de usar la función de Vaciar.");
             return;
         }
         
-        let msg = `⚠️ ¡PELIGRO! Vas a borrar TODOS los ítems de ${categoria.toUpperCase()} en el centro ${centro.toUpperCase()}.\n\n¿Estás absolutamente seguro? Esto no se puede deshacer.`;
+        let msg = `⚠️ ¡PELIGRO! Vas a borrar TODOS los ítems de ${categoria.toUpperCase()} del inventario general.\n\n¿Estás absolutamente seguro? Esto no se puede deshacer.`;
         if(!confirm(msg)) return;
         
         const { error } = await supabaseClient.from('inventario_general')

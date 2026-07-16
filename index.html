@@ -142,14 +142,6 @@
                         <button class="btn btn-warning btn-block">Gestionar Solicitudes</button>
                     </div>
 
-                    <div class="action-card" onclick="navegarA('view-colaborar')">
-                        <div>
-                            <h3>Quiero ser Colaborador</h3>
-                            <p>Súmate a los listados de brigadas activas para remoción de escombros, clasificación de insumos y primeros auxilios.</p>
-                        </div>
-                        <button class="btn btn-success btn-block">Ver Voluntarios / Inscribirme</button>
-                    </div>
-
                     <div class="action-card" onclick="navegarA('view-buscar')">
                         <div>
                             <h3>Busco a Alguien</h3>
@@ -1082,30 +1074,16 @@
                 </div>
                 
                 <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 2.5rem 2rem; margin-bottom: 2.5rem; text-align: center; border-radius: 12px;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Control de Inventario</h2>
-                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Consulta la disponibilidad de recursos en los centros de acopio: Alimentos, Higiene, Salud y Refugio.</p>
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Inventario Almacén CVA</h2>
+                    <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Control centralizado de las existencias globales (Alimentos, Higiene, Salud y Refugio) ubicadas en Las Mercedes.</p>
                 </div>
 
                 <div class="grid-system" id="mallaInventario">
                     <div class="left-column admin-action-header" id="panel-carga-inventario" style="display: none;">
                         <div class="panel-card" style="border-top: 4px solid #10b981;">
-                            <div class="panel-header"><div class="panel-title">📥 Carga de Inventario (Excel)</div></div>
+                            <div class="panel-header"><div class="panel-title">📥 Carga de Insumos (Excel)</div></div>
                             <div class="panel-body">
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Sube el reporte. Columnas válidas: <strong>Medicamento o Ítem</strong>, <strong>Presentación</strong>, <strong>Cantidad</strong> y <strong>Caja</strong>.</p>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Asignar al Centro de Acopio:</label>
-                                    <select id="inventario_centro_carga" class="form-select">
-                                        <option value="Catia la Mar Centro">Catia la Mar Centro</option>
-                                        <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
-                                        <option value="Caraballeda">Caraballeda</option>
-                                        <option value="Naiguatá">Naiguatá</option>
-                                        <option value="Camurí Grande">Camurí Grande</option>
-                                        <option value="Maiquetía">Maiquetía</option>
-                                        <option value="La Guaira - Macuto">La Guaira - Macuto</option>
-                                        <option value="CVA Las Mercedes (Caracas)">CVA Las Mercedes (Caracas)</option>
-                                    </select>
-                                </div>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Sube el reporte del almacén central. Columnas válidas: <strong>Medicamento o Ítem</strong>, <strong>Presentación</strong>, <strong>Cantidad</strong> y <strong>Caja</strong>.</p>
                                 
                                 <div class="form-group">
                                     <label class="form-label">Categoría de los Ítems a subir:</label>
@@ -1131,18 +1109,6 @@
                                 <input type="text" id="buscarInventarioInput" placeholder="🔍 Buscar insumo o medicamento...">
                             </div>
                             
-                            <select id="filtroCentroInventario" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="filtrarYActualizarInventario()">
-                                <option value="Todos">Todos los Centros</option>
-                                <option value="Catia la Mar Centro">Catia la Mar Centro</option>
-                                <option value="Las Tunitas - Mamo">Las Tunitas - Mamo</option>
-                                <option value="Caraballeda">Caraballeda</option>
-                                <option value="Naiguatá">Naiguatá</option>
-                                <option value="Camurí Grande">Camurí Grande</option>
-                                <option value="Maiquetía">Maiquetía</option>
-                                <option value="La Guaira - Macuto">La Guaira - Macuto</option>
-                                <option value="CVA Las Mercedes (Caracas)">CVA Las Mercedes (Caracas)</option>
-                            </select>
-
                             <select id="filtroCategoriaInventario" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="filtrarYActualizarInventario()">
                                 <option value="Todas">Todas las Categorías</option>
                                 <option value="Salud">💊 Salud / Medicinas</option>
@@ -1151,14 +1117,13 @@
                                 <option value="Refugio">⛺ Refugio / Herramientas</option>
                             </select>
                             
-                            <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Centro</button>
+                            <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Categoría</button>
                         </div>
                         
                         <div class="table-container">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>CENTRO</th>
                                         <th>CATEGORÍA</th>
                                         <th>ÍTEM / MEDICAMENTO</th>
                                         <th>PRESENTACIÓN</th>
@@ -1168,7 +1133,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tablaInventarioCuerpo">
-                                    <tr><td colspan="7" style="text-align: center; padding: 2rem;">Cargando inventario...</td></tr>
+                                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">Cargando inventario...</td></tr>
                                 </tbody>
                             </table>
                         </div>
