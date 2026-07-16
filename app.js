@@ -1680,114 +1680,158 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         XLSX.writeFile(wb, `${nombreArchivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    // ==========================================
-    // FUNCIONES DE BORRADO CORREGIDAS
-    // ==========================================
-
     window.eliminarFila = async function(id, boton) {
         if (!boton) return;
-        let texto = boton.innerText.trim();
-        if (texto === "Eliminar") {
+        
+        if (boton.dataset.estado !== "confirmar") {
+            boton.dataset.textoOriginal = boton.innerText;
+            boton.dataset.estado = "confirmar";
             boton.innerText = "¿Seguro?";
             boton.style.backgroundColor = "#dc2626";
             boton.style.color = "#ffffff";
             boton.style.borderColor = "#dc2626";
-            boton.timeoutId = setTimeout(() => {
-                boton.innerText = "Eliminar";
-                boton.style.backgroundColor = "#fef2f2";
-                boton.style.color = "var(--danger)";
-                boton.style.borderColor = "#fecaca";
-            }, 3000);
-        } else if (texto.includes("Seguro")) {
-            if (boton.timeoutId) clearTimeout(boton.timeoutId);
-            boton.innerText = "Borrando...";
-            boton.disabled = true;
             
-            // Eliminamos el .select() problemático
-            const { error } = await supabaseClient.from('registros_ciudadanos').delete().eq('id', id);
-            
-            if (error) {
-                alert("Error interno: " + error.message);
-                boton.innerText = "Eliminar";
-                boton.disabled = false;
-            } else {
-                mostrarNotificacion("Registro eliminado exitosamente.");
-                await cargarDatosDesdeNube();
-            }
-        }
-    };
-
-    window.eliminarAyuda = async function(id, boton) {
-        if (!boton) return;
-        let texto = boton.innerText.trim();
-        if (texto.includes("Borrar") || texto.includes("Eliminar")) {
-            boton.innerText = "¿Seguro?";
-            boton.style.backgroundColor = "#dc2626";
-            boton.style.color = "#ffffff";
-            boton.style.borderColor = "#dc2626";
             boton.timeoutId = setTimeout(() => {
-                boton.innerText = "🗑️ Borrar";
-                boton.style.backgroundColor = "#fef2f2";
-                boton.style.color = "var(--danger)";
-                boton.style.borderColor = "#fecaca";
+                restaurarBoton(boton);
             }, 3000);
-        } else if (texto.includes("Seguro")) {
+        } else {
             if (boton.timeoutId) clearTimeout(boton.timeoutId);
             boton.innerText = "Borrando...";
             boton.disabled = true;
             
             try {
-                // Borrado en cascada: limpiamos la logística asociada primero
-                await supabaseClient.from('etiquetas_logistica').delete().eq('solicitud_id', id);
-                
-                // Borramos la solicitud principal sin el .select()
-                const { error } = await supabaseClient.from('solicitudes_ayuda').delete().eq('id', id);
+                const { error, count } = await supabaseClient
+                    .from('registros_ciudadanos')
+                    .delete({ count: 'exact' })
+                    .eq('id', id);
                 
                 if (error) {
-                    alert("Error interno: " + error.message);
-                    boton.innerText = "🗑️ Borrar";
-                    boton.disabled = false;
+                    alert("Error en la Base de Datos: " + error.message);
+                    restaurarBoton(boton);
+                } else if (count === 0) {
+                    alert("⚠️ Supabase bloqueó el borrado. \n\nVe a tu panel de Supabase > Authentication > Policies y asegúrate de que la política pública tenga el permiso 'DELETE' marcado.");
+                    restaurarBoton(boton);
                 } else {
-                    mostrarNotificacion("Registro y pedidos asociados eliminados.");
+                    mostrarNotificacion("✅ Registro general eliminado.");
+                    await cargarDatosDesdeNube();
+                }
+            } catch(e) {
+                alert("Error crítico: " + e.message);
+                restaurarBoton(boton);
+            }
+        }
+        
+        function restaurarBoton(b) {
+            b.innerText = b.dataset.textoOriginal || "Eliminar";
+            b.dataset.estado = "";
+            b.disabled = false;
+            b.style.backgroundColor = "#fef2f2";
+            b.style.color = "var(--danger)";
+            b.style.borderColor = "#fecaca";
+        }
+    };
+
+    window.eliminarAyuda = async function(id, boton) {
+        if (!boton) return;
+        
+        if (boton.dataset.estado !== "confirmar") {
+            boton.dataset.textoOriginal = boton.innerText;
+            boton.dataset.estado = "confirmar";
+            boton.innerText = "¿Seguro?";
+            boton.style.backgroundColor = "#dc2626";
+            boton.style.color = "#ffffff";
+            boton.style.borderColor = "#dc2626";
+            
+            boton.timeoutId = setTimeout(() => {
+                restaurarBoton(boton);
+            }, 3000);
+        } else {
+            if (boton.timeoutId) clearTimeout(boton.timeoutId);
+            boton.innerText = "Borrando...";
+            boton.disabled = true;
+            
+            try {
+                await supabaseClient.from('etiquetas_logistica').delete().eq('solicitud_id', id);
+                
+                const { error, count } = await supabaseClient
+                    .from('solicitudes_ayuda')
+                    .delete({ count: 'exact' })
+                    .eq('id', id);
+                
+                if (error) {
+                    alert("Error en la Base de Datos: " + error.message);
+                    restaurarBoton(boton);
+                } else if (count === 0) {
+                    alert("⚠️ Supabase bloqueó el borrado de Ayuda. \n\nRevisa que la política RLS de la tabla 'solicitudes_ayuda' tenga permitido el DELETE público.");
+                    restaurarBoton(boton);
+                } else {
+                    mostrarNotificacion("✅ Registro y pedidos eliminados.");
                     await cargarDatosDesdeNube();
                 }
             } catch(e) {
                 alert("Error crítico en borrado: " + e.message);
-                boton.innerText = "🗑️ Borrar";
-                boton.disabled = false;
+                restaurarBoton(boton);
             }
+        }
+        
+        function restaurarBoton(b) {
+            b.innerText = b.dataset.textoOriginal || "🗑️ Borrar";
+            b.dataset.estado = "";
+            b.disabled = false;
+            b.style.backgroundColor = "#fef2f2";
+            b.style.color = "var(--danger)";
+            b.style.borderColor = "#fecaca";
         }
     };
 
     window.eliminarColab = async function(id, boton) {
         if (!boton) return;
-        let texto = boton.innerText.trim();
-        if (texto === "Eliminar") {
+        
+        if (boton.dataset.estado !== "confirmar") {
+            boton.dataset.textoOriginal = boton.innerText;
+            boton.dataset.estado = "confirmar";
             boton.innerText = "¿Seguro?";
             boton.style.backgroundColor = "#dc2626";
             boton.style.color = "#ffffff";
             boton.style.borderColor = "#dc2626";
+            
             boton.timeoutId = setTimeout(() => {
-                boton.innerText = "Eliminar";
-                boton.style.backgroundColor = "#fef2f2";
-                boton.style.color = "var(--danger)";
-                boton.style.borderColor = "#fecaca";
+                restaurarBoton(boton);
             }, 3000);
-        } else if (texto.includes("Seguro")) {
+        } else {
             if (boton.timeoutId) clearTimeout(boton.timeoutId);
             boton.innerText = "Borrando...";
             boton.disabled = true;
             
-            const { error } = await supabaseClient.from('colaboradores').delete().eq('id', id);
-            
-            if (error) {
-                alert("Error interno: " + error.message);
-                boton.innerText = "Eliminar";
-                boton.disabled = false;
-            } else {
-                mostrarNotificacion("Colaborador eliminado.");
-                await cargarDatosDesdeNube();
+            try {
+                const { error, count } = await supabaseClient
+                    .from('colaboradores')
+                    .delete({ count: 'exact' })
+                    .eq('id', id);
+                
+                if (error) {
+                    alert("Error interno: " + error.message);
+                    restaurarBoton(boton);
+                } else if (count === 0) {
+                    alert("⚠️ Supabase bloqueó el borrado de Colaboradores. Falta permiso DELETE en Supabase.");
+                    restaurarBoton(boton);
+                } else {
+                    mostrarNotificacion("✅ Colaborador eliminado.");
+                    await cargarDatosDesdeNube();
+                }
+            } catch(e) {
+                alert("Error crítico: " + e.message);
+                restaurarBoton(boton);
             }
+        }
+        
+        function restaurarBoton(b) {
+            b.innerText = b.dataset.textoOriginal || "Eliminar";
+            b.dataset.estado = "";
+            b.disabled = false;
+            b.style.backgroundColor = "#fef2f2";
+            b.style.color = "var(--danger)";
+            b.style.borderColor = "#fecaca";
         }
     };
 
