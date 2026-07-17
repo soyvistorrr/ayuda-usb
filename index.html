@@ -1273,5 +1273,42 @@
 
     <script src="app.js" defer></script>
 
+    <div id="modal-despacho-asistido" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div class="panel-card" style="width: 90%; max-width: 500px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid #f59e0b;">
+            <div class="panel-header">
+                <div class="panel-title" style="text-transform: uppercase;">📦 Despacho y Descuento de Inventario</div>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1rem;">Verifica qué insumo exacto vas a entregar para descontarlo del almacén central.</p>
+                
+                <div style="background-color: #eff6ff; padding: 10px; border-left: 4px solid #3b82f6; border-radius: 4px; margin-bottom: 1.5rem;">
+                    <strong style="font-size: 0.8rem; color: #1e3a8a; text-transform: uppercase;">Lo que pidió el afectado:</strong>
+                    <div id="despacho-texto-pedido" style="font-size: 1rem; font-weight: bold; color: #1e40af; margin-top: 5px;"></div>
+                </div>
+
+                <form id="form-despacho-asistido">
+                    <input type="hidden" id="despacho-ticket-id">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Insumo a extraer del Inventario (CVA)</label>
+                        <select id="despacho-item-select" class="form-select">
+                            <option value="">-- No descontar nada (Solo cerrar el pedido) --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cantidad a extraer</label>
+                        <input type="number" id="despacho-cantidad" class="form-input" min="1" value="1" style="max-width: 150px;">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-warning" id="btn-procesar-despacho" style="font-weight: bold; flex: 1; min-width: 200px;">Descontar y Despachar</button>
+                        <button type="button" class="btn" style="background: #e2e8f0; color: #475569; font-weight: bold; flex: 1; min-width: 100px;" onclick="document.getElementById('modal-despacho-asistido').style.display='none';">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

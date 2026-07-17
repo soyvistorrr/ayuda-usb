@@ -711,7 +711,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let grpLimpio = mapaGrupo[String(reg.edad).trim().toLowerCase()] || reg.edad || '-';
             let damLimpio = reg.damnificado || 'No sé';
 
-            // Botones de acción (Solo editar para admins normales, borrar solo para Super Admin)
             let botonesAccion = '';
             if (esAdministrador) {
                 let btnEditar = `<button class="btn-edit-table" onclick="activarEdiciónEnPagina('${reg.id}')">Editar</button>`;
@@ -2045,13 +2044,20 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let btnAccion = '';
             let checkboxHtml = `<input type="checkbox" class="cb-logistica" value="${p.id}" style="width:18px; height:18px;">`;
             
+            let btnEditar = `<button class="btn" style="background-color:#0ea5e9; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="editarRequerimientoLogistica('${p.id}')" title="Modificar Insumos">✏️ Editar</button>`;
+            let btnDescartar = `<button class="btn" style="background-color:#dc2626; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="eliminarTicketLogistica('${p.id}')" title="Descartar Pedido">🗑️ Descartar</button>`;
+            
             if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda')) {
                 btnAccion = `<span class="badge" style="background:#e2e8f0; color:#475569; padding:4px 8px;">👁️ Solo Vista</span>`;
             } else {
                 if (p.estado === 'Pendiente') {
-                    btnAccion = `<button class="btn" style="background-color:#3b82f6; color:white; padding:0.5rem; font-size:0.8rem; width:100%;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>`;
+                    btnAccion = `
+                    <button class="btn" style="background-color:#3b82f6; color:white; padding:0.5rem; font-size:0.8rem; width:100%; margin-bottom:5px;" onclick="tomarPedidoLogistica('${p.id}')">✋ Tomar Pedido</button>
+                    <div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">${btnEditar}${btnDescartar}</div>`;
                 } else if (p.estado === 'Empacando') {
-                    btnAccion = `<button class="btn" style="background-color:#f59e0b; color:white; padding:0.5rem; font-size:0.8rem; width:100%;" onclick="finalizarDespacho('${p.id}')">📦 Finalizar y Despachar</button>`;
+                    btnAccion = `
+                    <button class="btn" style="background-color:#f59e0b; color:white; padding:0.5rem; font-size:0.8rem; width:100%; margin-bottom:5px;" onclick="finalizarDespacho('${p.id}')">📦 Finalizar y Despachar</button>
+                    <div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">${btnEditar}${btnDescartar}</div>`;
                 } else {
                     btnAccion = `<div style="display:flex; gap:5px; width:100%; flex-wrap:wrap;">
                         <span class="badge" style="background-color:#e2e8f0; color:#64748b; padding:0.4rem; flex:1; min-width: 50px; text-align:center; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">✅ Listo</span>
@@ -2289,28 +2295,103 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         if (pedido) imprimirTicketEmpaque(pedido);
     };
 
-    window.finalizarDespacho = async function(idRegistro) {
+    // ====================================================
+    // DESPACHO ASISTIDO: CONEXIÓN LOGÍSTICA -> INVENTARIO
+    // ====================================================
+    window.finalizarDespacho = function(idRegistro) {
         const pedido = pedidosLogistica.find(p => p.id === idRegistro);
         if(!pedido) return;
 
-        if(!confirm(`¿Marcar este pedido como DESPACHADO para el centro: ${pedido.punto_usb}?`)) return;
-
-        const fechaActualISO = new Date().toISOString();
-
-        const { error } = await supabaseClient.from('etiquetas_logistica')
-            .update({ estado: 'Despachado', fecha_despacho: fechaActualISO })
-            .eq('id', idRegistro);
-
-        if(error) { alert("Error: " + error.message); return; }
+        // 1. Mostrar lo que pidió el afectado
+        document.getElementById('despacho-ticket-id').value = idRegistro;
+        document.getElementById('despacho-texto-pedido').innerText = pedido.requerimiento || 'Sin requerimiento especificado';
         
-        cargarTablaLogisticaFuerza();
+        // 2. Llenar el desplegable con el inventario actual (CVA)
+        const selectItem = document.getElementById('despacho-item-select');
+        selectItem.innerHTML = '<option value="">-- No descontar nada (Solo cerrar el pedido) --</option>';
+        
+        // Ordenamos alfabéticamente para que sea fácil de buscar
+        let inventarioOrdenado = [...inventarioNube].sort((a, b) => String(a.item).localeCompare(String(b.item)));
 
-        setTimeout(() => {
-            if(confirm("✅ Pedido cerrado y fecha registrada.\n\n¿Deseas imprimir la ETIQUETA PEQUEÑA para pegarla en la caja ahora?")) {
-                imprimirTicketEmpaque(pedido);
+        inventarioOrdenado.forEach(inv => {
+            // Solo mostrar insumos que tengan más de 0 cantidades
+            if (parseInt(inv.cantidad) > 0) {
+                const opt = document.createElement('option');
+                opt.value = inv.id;
+                opt.dataset.max = inv.cantidad; // Guardamos el límite para validación
+                opt.innerText = `[Quedan ${inv.cantidad}] - ${inv.item} (${inv.categoria}) | Caja ${inv.ubicacion_caja || 'N/A'}`;
+                selectItem.appendChild(opt);
             }
-        }, 300);
+        });
+
+        document.getElementById('despacho-cantidad').value = 1;
+        document.getElementById('modal-despacho-asistido').style.display = 'flex';
     };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const formDespacho = document.getElementById('form-despacho-asistido');
+        if (formDespacho) {
+            formDespacho.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const btn = document.getElementById('btn-procesar-despacho');
+                btn.innerText = "Procesando Base de Datos..."; btn.disabled = true;
+
+                const ticketId = document.getElementById('despacho-ticket-id').value;
+                const itemId = document.getElementById('despacho-item-select').value;
+                const cantidadDescontar = parseInt(document.getElementById('despacho-cantidad').value) || 0;
+                const fechaActualISO = new Date().toISOString();
+
+                try {
+                    if (itemId && cantidadDescontar > 0) {
+                        const selectElement = document.getElementById('despacho-item-select');
+                        const opcionElegida = selectElement.options[selectElement.selectedIndex];
+                        const stockActual = parseInt(opcionElegida.dataset.max);
+
+                        if (cantidadDescontar > stockActual) {
+                            alert(`⚠️ ERROR MATEMÁTICO:\nEstás intentando sacar ${cantidadDescontar} unidades, pero solo quedan ${stockActual} en el inventario físico.`);
+                            btn.innerText = "Descontar y Despachar"; btn.disabled = false;
+                            return;
+                        }
+
+                        const nuevoStock = stockActual - cantidadDescontar;
+
+                        const { error: errInv } = await supabaseClient
+                            .from('inventario_general')
+                            .update({ cantidad: nuevoStock })
+                            .eq('id', itemId);
+
+                        if (errInv) throw new Error("Fallo al restar del inventario: " + errInv.message);
+                    }
+
+                    const { error: errTicket } = await supabaseClient
+                        .from('etiquetas_logistica')
+                        .update({ estado: 'Despachado', fecha_despacho: fechaActualISO })
+                        .eq('id', ticketId);
+
+                    if (errTicket) throw new Error("Fallo al cerrar el ticket logístico: " + errTicket.message);
+
+                    mostrarNotificacion("✅ Pedido cerrado y descontado exitosamente del inventario.");
+                    document.getElementById('modal-despacho-asistido').style.display = 'none';
+
+                    await cargarTablaLogisticaFuerza();
+                    if(typeof cargarInventarioNube === 'function') await cargarInventarioNube();
+
+                    const pedido = pedidosLogistica.find(p => p.id === ticketId);
+                    setTimeout(() => {
+                        if(confirm("📦 ¡Operación Exitosa!\n\n¿Deseas imprimir la ETIQUETA PEQUEÑA para pegarla en la caja de entrega ahora mismo?")) {
+                            imprimirTicketEmpaque(pedido);
+                        }
+                    }, 400);
+
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    btn.innerText = "Descontar y Despachar"; btn.disabled = false;
+                }
+            });
+        }
+    });
 
     window.toggleSelectAllLogistica = function(source) {
         const checkboxes = document.querySelectorAll('.cb-logistica');
@@ -3149,3 +3230,40 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
     };
 
     document.addEventListener('DOMContentLoaded', actualizarBarraDonaciones);
+
+    window.editarRequerimientoLogistica = async function(id) {
+        const ticket = pedidosLogistica.find(p => p.id === id);
+        if(!ticket) return;
+
+        let nuevoReq = prompt("Modifica los insumos de este pedido (ej. borra lo que no hay en inventario):", ticket.requerimiento);
+        
+        if(nuevoReq !== null && nuevoReq.trim() !== "") {
+            const { error } = await supabaseClient
+                .from('etiquetas_logistica')
+                .update({ requerimiento: nuevoReq.trim() })
+                .eq('id', id);
+                
+            if(error) {
+                alert("Error al actualizar el pedido: " + error.message);
+            } else {
+                mostrarNotificacion("✅ Pedido modificado correctamente.");
+                cargarTablaLogisticaFuerza();
+            }
+        }
+    };
+
+    window.eliminarTicketLogistica = async function(id) {
+        if(confirm("🚨 ¿Estás absolutamente seguro de que deseas descartar y eliminar este pedido por completo? Esta acción no se puede deshacer.")) {
+            const { error } = await supabaseClient
+                .from('etiquetas_logistica')
+                .delete()
+                .eq('id', id);
+                
+            if(error) {
+                alert("Error al descartar el pedido: " + error.message);
+            } else {
+                mostrarNotificacion("🗑️ Pedido descartado del sistema.");
+                cargarTablaLogisticaFuerza();
+            }
+        }
+    };
