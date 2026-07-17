@@ -3291,8 +3291,12 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
     };
 
     window.actualizarEstadisticasPuntos = function() {
+        const panel = document.getElementById('panel-estadisticas-admin');
         const contenedor = document.getElementById('stats-puntos-acopio');
+        
         if (!contenedor) return;
+
+        if (panel) panel.style.display = 'block';
 
         if (!ayudaNube || ayudaNube.length === 0) {
             contenedor.innerHTML = '<div style="color: #94a3b8; text-align: center; width: 100%;">Aún no hay registros de afectados en la base de datos.</div>';
