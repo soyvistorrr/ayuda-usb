@@ -552,6 +552,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                 ayudaNube = resAyudas.data || [];
                 pedidosLogistica = resLogistica.data || [];
+
+                if (typeof actualizarEstadisticasPuntos === 'function') {
+                    actualizarEstadisticasPuntos();
+                }
                 
                 const btnAdmin = document.getElementById('btn-novedades-admin');
                 let nov = resNov.data || [];
@@ -2664,17 +2668,26 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             let nomVal = iNom !== -1 ? String(row[iNom] || '').trim() : '';
                             if (!nomVal) continue;
                             let cedVal = iCed !== -1 ? String(row[iCed] || '-').trim() : '-';
+                            let excelPuntoUsb = iPun !== -1 && row[iPun] ? String(row[iPun]).trim() : 'Sin Asignar';
                             
                             let personaExistente = ayudaNube.find(p => {
                                 if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
-                                else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                else {
+                                    let mismoNombre = String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                    let mismoPunto = true;
+                                    if (p.punto_usb && p.punto_usb !== 'Sin Asignar' && excelPuntoUsb !== 'Sin Asignar') {
+                                        mismoPunto = (p.punto_usb === excelPuntoUsb);
+                                    }
+                                    return mismoNombre && mismoPunto;
+                                }
                             });
 
                             let repetidoIntra = false;
                             if (cedVal !== '-' && cedVal !== '') {
                                 if (cedulasEnEsteExcel.has(cedVal)) repetidoIntra = true;
                             } else {
-                                if (nombresEnEsteExcel.has(nomVal.toLowerCase())) repetidoIntra = true;
+                                let claveRepetido = nomVal.toLowerCase() + "|" + excelPuntoUsb;
+                                if (nombresEnEsteExcel.has(claveRepetido)) repetidoIntra = true;
                             }
 
                             if (personaExistente || repetidoIntra) {
@@ -2705,7 +2718,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
 
                                 if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
-                                nombresEnEsteExcel.add(nomVal.toLowerCase());
+                                nombresEnEsteExcel.add(nomVal.toLowerCase() + "|" + excelPuntoUsb);
                                 continue; 
                             }
 
@@ -2764,14 +2777,22 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                             let personaExistente = ayudaNube.find(p => {
                                 if (cedVal !== '-' && cedVal !== '') return String(p.cedula).trim() === cedVal;
-                                else return String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                else {
+                                    let mismoNombre = String(p.nombre).trim().toLowerCase() === nomVal.toLowerCase();
+                                    let mismoPunto = true;
+                                    if (p.punto_usb && p.punto_usb !== 'Sin Asignar' && sedeArchivo !== 'Sin Asignar') {
+                                        mismoPunto = (p.punto_usb === sedeArchivo);
+                                    }
+                                    return mismoNombre && mismoPunto;
+                                }
                             });
 
                             let repetidoIntra = false;
                             if (cedVal !== '-' && cedVal !== '') {
                                 if (cedulasEnEsteExcel.has(cedVal)) repetidoIntra = true;
                             } else {
-                                if (nombresEnEsteExcel.has(nomVal.toLowerCase())) repetidoIntra = true;
+                                let claveRepetido = nomVal.toLowerCase() + "|" + sedeArchivo;
+                                if (nombresEnEsteExcel.has(claveRepetido)) repetidoIntra = true;
                             }
 
                             if (personaExistente || repetidoIntra) {
@@ -2799,7 +2820,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                 }
                                 
                                 if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
-                                nombresEnEsteExcel.add(nomVal.toLowerCase());
+                                nombresEnEsteExcel.add(nomVal.toLowerCase() + "|" + sedeArchivo);
                                 continue; 
                             }
 
@@ -2936,6 +2957,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 await cargarDatosDesdeNube();
                 if(typeof filtrarYActualizarAyuda === "function") filtrarYActualizarAyuda();
                 if(typeof cargarTablaLogisticaFuerza === "function") cargarTablaLogisticaFuerza();
+                if(typeof actualizarEstadisticasPuntos === "function") actualizarEstadisticasPuntos();
             }
         };
         lector.readAsArrayBuffer(file);
@@ -3266,4 +3288,36 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 cargarTablaLogisticaFuerza();
             }
         }
+    };
+
+    window.actualizarEstadisticasPuntos = function() {
+        const contenedor = document.getElementById('stats-puntos-acopio');
+        if (!contenedor) return;
+
+        if (!ayudaNube || ayudaNube.length === 0) {
+            contenedor.innerHTML = '<div style="color: #94a3b8; text-align: center; width: 100%;">Aún no hay registros de afectados en la base de datos.</div>';
+            return;
+        }
+
+        let conteo = {};
+        ayudaNube.forEach(a => {
+            let punto = a.punto_usb || 'Sin Asignar';
+            if (!conteo[punto]) conteo[punto] = 0;
+            conteo[punto]++;
+        });
+
+        let puntosOrdenados = Object.keys(conteo).sort();
+        
+        let html = '';
+        puntosOrdenados.forEach(p => {
+            let colorBorde = p === 'Sin Asignar' ? 'var(--gray-700)' : 'var(--accent)';
+            html += `
+            <div class="stat-card" style="border-left-color: ${colorBorde}; background: rgba(255,255,255,0.05); text-align: left; flex: 1; min-width: 140px; padding: 1rem;">
+                <span class="stat-value" style="font-size: 1.6rem; color: #fff;">${conteo[p]}</span>
+                <span class="stat-label" style="color: #cbd5e1; font-size: 0.7rem; margin-top: 0.2rem;">${p}</span>
+            </div>
+            `;
+        });
+
+        contenedor.innerHTML = html;
     };
