@@ -233,6 +233,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             window.history.pushState({ vistaActiva: idSeccion }, "", nuevaUrl);
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (idSeccion === 'view-buscar' && registrosNube.length === 0) {
+            cargarAfectadosNube();
+        }
+        if (idSeccion === 'view-colaborar' && colaboradoresNube.length === 0) {
+            cargarColaboradoresNube();
+        }
     }
 
     let perfilUsuarioActual = null;
@@ -373,7 +380,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         if(filtroCen) filtroCen.style.display = "inline-block";
                         
                         if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
-                        if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
+                        if(btnExpBusqueda) btnExpBusqueda.style.display = (rol === 'super_admin') ? "inline-block" : "none";
                         if(btnExpColab) btnExpColab.style.display = "inline-block";
                         
                         if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "block";
@@ -385,31 +392,10 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         mostrarElementos(elementosColaborar, true);
                         mostrarElementos(elementosInventario, false);
                         
-                        if(btnExpBusqueda) btnExpBusqueda.style.display = "inline-block";
                         if(btnExpColab) btnExpColab.style.display = "inline-block";
 
                     } else if (rol === 'admin_centro') {
-                        mostrarElementos(elementosAyuda, true);
-                        mostrarElementos(elementosLogistica, false);
-                        mostrarElementos(elementosBusqueda, false);
-                        mostrarElementos(elementosColaborar, false);
-                        mostrarElementos(elementosInventario, false);
-                        
-                        if(dropAyuda) dropAyuda.style.display = "block";
-                        if(dropLogistica) dropLogistica.style.display = "none";
-                        
-                        if(btnExpAyuda) btnExpAyuda.style.display = "inline-block";
-                        if(document.getElementById('panel-carga-inventario')) document.getElementById('panel-carga-inventario').style.display = "none";
-
-                    } else if (rol === 'especialista_cva') {
-                        mostrarElementos(elementosAyuda, false);
-                        mostrarElementos(elementosLogistica, true);
-                        mostrarElementos(elementosBusqueda, false);
-                        mostrarElementos(elementosColaborar, false);
-                        mostrarElementos(elementosInventario, true);
-                    } else {
-                        console.warn("Rol no reconocido:", rol);
-                        alert("Atención: Tu usuario no tiene un rol válido asignado.");
+                    
                     }
 
                 } catch(navErr) {
@@ -443,66 +429,27 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         return c.length > 4 ? c.substring(0, c.length - 4) + "****" : "****";
     }
 
-    async function cargarDatosDesdeNube() {
-        if (registrosNube.length === 0) {
-            const cuerpo = document.getElementById('tablaCuerpo');
-            if (cuerpo) cuerpo.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--text-muted);"><strong>⏳ Conectando con la base de datos...</strong></td></tr>';
-        }
-
+    // ==========================================
+    // CARGA DE DATOS OPTIMIZADA (LAZY LOADING)
+    // ==========================================
+    async function cargarNoticiasNube() {
         try {
-            const [resAfectados, resNoticias, resColabs] = await Promise.all([
-                supabaseClient
-                    .from('registros_ciudadanos')
-                    .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
-                    .order('created_at', { ascending: false })
-                    .limit(1000),
-                supabaseClient
-                    .from('noticias_oficiales')
-                    .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
-                    .order('fecha_publicacion', { ascending: false })
-                    .limit(15),
-                supabaseClient
-                    .from('colaboradores')
-                    .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
-                    .order('created_at', { ascending: false })
-                    .limit(500)
-            ]);
-
-            let tempAfectados = resAfectados.data || [];
-            if (tempAfectados.length === 1000) {
-                let rangoInicio = 1000;
-                let rangoFin = 1999;
-                let hayMasDatos = true;
-                while (hayMasDatos) {
-                    const { data } = await supabaseClient.from('registros_ciudadanos')
-                        .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
-                        .order('created_at', { ascending: false }).range(rangoInicio, rangoFin);
-                    
-                    if (data && data.length > 0) {
-                        tempAfectados = tempAfectados.concat(data);
-                        rangoInicio += 1000;
-                        rangoFin += 1000;
-                    }
-                    if (!data || data.length < 1000) hayMasDatos = false; 
-                }
-            }
-            registrosNube = tempAfectados;
+            const { data } = await supabaseClient.from('noticias_oficiales')
+                .select('id, titulo, contenido, fecha_publicacion, etiqueta, imagen_url, imagen_miniatura')
+                .order('fecha_publicacion', { ascending: false }).limit(15);
             
-            colaboradoresNube = resColabs.data || [];
-            actualizarInterfazColaboradores(colaboradoresNube);
-
-            if (resNoticias && resNoticias.data) {
-                noticiasNube = resNoticias.data; 
+            if (data) {
+                noticiasNube = data; 
                 const contenedorCarrusel = document.getElementById('carrusel-noticias');
                 const contenedorPagina = document.getElementById('contenedor-todas-noticias');
                 
-                if (resNoticias.data.length === 0) {
+                if (data.length === 0) {
                     const msjVacio = '<div style="color: var(--text-muted);">No hay boletines.</div>';
                     if(contenedorCarrusel) contenedorCarrusel.innerHTML = msjVacio;
                     if(contenedorPagina) contenedorPagina.innerHTML = msjVacio;
                 } else {
                     let htmlCarrusel = ''; let htmlPagina = '';
-                    resNoticias.data.forEach((n, index) => {
+                    data.forEach((n, index) => {
                         const fString = new Date(n.fecha_publicacion).toLocaleDateString('es-VE', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
                         let colBorde = "var(--accent)"; let colFondo = "var(--primary)";
                         let eVal = n.etiqueta ? n.etiqueta.toLowerCase() : '';
@@ -538,14 +485,58 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     if(contenedorPagina) contenedorPagina.innerHTML = htmlPagina;
                 }
             }
+        } catch(e) { console.error(e); }
+    }
 
+    async function cargarAfectadosNube() {
+        if (registrosNube.length > 0) return;
+        const cuerpo = document.getElementById('tablaCuerpo');
+        if (cuerpo) cuerpo.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 3rem; color: var(--text-muted);"><strong>⏳ Descargando registros de la base de datos...</strong></td></tr>';
+
+        try {
+            let tempAfectados = [];
+            let rangoInicio = 0;
+            let rangoFin = 999;
+            let hayMasDatos = true;
+            while (hayMasDatos) {
+                const { data } = await supabaseClient.from('registros_ciudadanos')
+                    .select('id, nombre, cedula_identidad, cedula, edad, estado, damnificado, ubicacion, telefono, observaciones')
+                    .order('created_at', { ascending: false }).range(rangoInicio, rangoFin);
+                
+                if (data && data.length > 0) {
+                    tempAfectados = tempAfectados.concat(data);
+                    rangoInicio += 1000;
+                    rangoFin += 1000;
+                }
+                if (!data || data.length < 1000) hayMasDatos = false; 
+            }
+            registrosNube = tempAfectados;
             filtrarYActualizarTablero();
+        } catch (error) { console.error("Error en afectados:", error); }
+    }
 
-            if (esAdministrador) {
+    async function cargarColaboradoresNube() {
+        if (colaboradoresNube.length > 0) return;
+        try {
+            const { data } = await supabaseClient.from('colaboradores')
+                .select('id, nombre, cargo_usb, ubicacion_geografica, area_apoyo, traslado_logistico, lugar_voluntariado, vehiculo, ofrecimiento_detallado, telefono, disponibilidad')
+                .order('created_at', { ascending: false }).limit(500);
+            if (data) {
+                colaboradoresNube = data;
+                actualizarInterfazColaboradores(colaboradoresNube);
+            }
+        } catch (error) { console.error("Error en colabs:", error); }
+    }
+
+    async function cargarDatosDesdeNube() {
+        await cargarNoticiasNube();
+
+        if (esAdministrador) {
+            await Promise.all([ cargarAfectadosNube(), cargarColaboradoresNube() ]);
+
+            try {
                 const [resAyudas, resNov, resLogistica] = await Promise.all([
-                    supabaseClient.from('solicitudes_ayuda')
-                        .select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda')
-                        .order('created_at', { ascending: false }).limit(500),
+                    supabaseClient.from('solicitudes_ayuda').select('id, created_at, punto_usb, estado_despacho, nombre, cedula, telefono, correo, comunidad, grupo, estado, ubicacion, es_damnificado, requiere_atencion_medica, personas_hogar, ninos_hogar, adultos_mayores_hogar, req_medicina, req_alimentos, req_limpieza, req_general, descripcion_ayuda').order('created_at', { ascending: false }).limit(500),
                     supabaseClient.from('novedades_pendientes').select('*').order('created_at', { ascending: false }),
                     supabaseClient.from('etiquetas_logistica').select('id, solicitud_id, categoria_insumo, requerimiento, estado, encargado, punto_usb').order('created_at', { ascending: false })
                 ]);
@@ -553,19 +544,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 ayudaNube = resAyudas.data || [];
                 pedidosLogistica = resLogistica.data || [];
 
-                if (typeof actualizarEstadisticasPuntos === 'function') {
-                    actualizarEstadisticasPuntos();
-                }
+                if (typeof actualizarEstadisticasPuntos === 'function') actualizarEstadisticasPuntos();
                 
                 const btnAdmin = document.getElementById('btn-novedades-admin');
                 let nov = resNov.data || [];
                 
                 if (nov && nov.length > 0) {
-                    if (btnAdmin) {
-                        btnAdmin.style.setProperty('display', 'flex', 'important');
-                        btnAdmin.style.zIndex = '999999';
-                    }
-                    
+                    if (btnAdmin) { btnAdmin.style.setProperty('display', 'flex', 'important'); btnAdmin.style.zIndex = '999999'; }
                     document.getElementById('contador-novedades').innerText = nov.length;
                     
                     let htmlNovedades = '';
@@ -573,11 +558,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         let original = registrosNube.find(r => r.id == n.registro_id);
                         let nomOrig = original ? original.nombre : 'Usuario no encontrado';
                         let estOrig = original ? original.estado : 'Desconocido';
-                        
                         let cedOrig = 'No tiene';
-                        if (original && original.cedula_identidad && original.cedula_identidad.trim() !== '' && original.cedula_identidad.trim() !== '-') {
-                            cedOrig = original.cedula_identidad;
-                        }
+                        if (original && original.cedula_identidad && original.cedula_identidad.trim() !== '' && original.cedula_identidad.trim() !== '-') cedOrig = original.cedula_identidad;
                         
                         let comBruto = original ? (original.cedula || '-') : '-';
                         let grpBruto = original ? (original.edad || '-') : '-';
@@ -615,16 +597,15 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     document.getElementById('contenedor-lista-novedades').innerHTML = '<p style="text-align:center; padding: 20px; color: #64748b;">✅ No hay reportes pendientes de revisión.</p>';
                 }
                 actualizarInterfazColaboradores(colaboradoresNube);
-                
-                if (typeof filtrarYActualizarAyuda === 'function') {
-                    filtrarYActualizarAyuda();
-                } else {
-                    actualizarInterfazAyuda(ayudaNube);
-                }
+                if (typeof filtrarYActualizarAyuda === 'function') filtrarYActualizarAyuda();
+                else actualizarInterfazAyuda(ayudaNube);
+            } catch (error) { console.error("Error admin en sincronización:", error); }
+        } else {
+            let viewActiva = document.querySelector('.app-view.active');
+            if(viewActiva) {
+                if (viewActiva.id === 'view-buscar') cargarAfectadosNube();
+                if (viewActiva.id === 'view-colaborar') cargarColaboradoresNube();
             }
-
-        } catch (error) {
-            console.error("Error en sincronización:", error);
         }
     }
 
@@ -1252,6 +1233,45 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         } catch (err) {
             console.error("Error guardando:", err);
             alert("Ocurrió un error al procesar tu solicitud. Intenta de nuevo.");
+        }
+    });
+
+    document.getElementById('cedulaAfectado').addEventListener('blur', function() {
+        if (idEdicionAyuda !== null) return;
+        
+        let ced = this.value.trim();
+        if (ced.length < 5 || ced === '-') return;
+
+        let personaAyuda = ayudaNube.find(a => String(a.cedula).trim() === ced);
+        if (personaAyuda) {
+            document.getElementById('nombreAfectado').value = personaAyuda.nombre || '';
+            document.getElementById('telefonoAfectado').value = personaAyuda.telefono || '';
+            document.getElementById('ubicacionAfectado').value = personaAyuda.ubicacion || '';
+            document.getElementById('correoAfectado').value = personaAyuda.correo || '';
+            document.getElementById('grupoAfectado').value = personaAyuda.grupo || 'Estudiante';
+            if (personaAyuda.carnet_estudiante && personaAyuda.carnet_estudiante !== 'N/A') {
+                document.getElementById('carnetAfectado').value = personaAyuda.carnet_estudiante;
+            }
+            mostrarNotificacion("✅ Datos precargados del historial de ayuda.");
+            return;
+        }
+
+        let afectado = registrosNube.find(r => String(r.cedula_identidad).trim() === ced);
+        if (afectado) {
+            document.getElementById('nombreAfectado').value = afectado.nombre || '';
+            if (afectado.telefono && afectado.telefono !== '-') document.getElementById('telefonoAfectado').value = afectado.telefono;
+            if (afectado.ubicacion && afectado.ubicacion !== '-') document.getElementById('ubicacionAfectado').value = afectado.ubicacion;
+            
+            let gKey = String(afectado.edad).trim().toLowerCase();
+            let grupoMapeado = "Estudiante";
+            if(gKey.includes('prof')) grupoMapeado = "Profesor";
+            if(gKey.includes('egr')) grupoMapeado = "Egresado";
+            if(gKey.includes('adm')) grupoMapeado = "Administrativo";
+            if(gKey.includes('obr')) grupoMapeado = "Obrero";
+            if(gKey.includes('ext')) grupoMapeado = "Externo";
+            document.getElementById('grupoAfectado').value = grupoMapeado;
+            
+            mostrarNotificacion("✅ Datos precargados del registro general.");
         }
     });
 
