@@ -166,6 +166,14 @@
                         </div>
                         <button class="btn btn-block" style="background-color: #f59e0b; color: white; border: none; font-weight: bold;" onclick="navegarA('view-etiquetas-logistica'); cargarTablaLogisticaFuerza();">GESTIONAR DESPACHOS</button>    
                     </div>
+
+                    <div class="action-card" id="btn-auditoria-admin" style="display: none; border-top: 4px solid #1e293b;" onclick="verAuditoria()">
+                        <div style="text-align: center; margin-bottom: 1.5rem; flex: 1;">
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; text-transform: uppercase;">🕵️Auditoría General</h3>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Registro de cambios, subidas y eliminaciones.</p>
+                        </div>
+                        <button class="btn btn-block" style="background-color: #1e293b; color: white; border: none; font-weight: bold;">VER HISTORIAL</button>    
+                    </div>
                 </div>
             </section>
 
@@ -1315,6 +1323,32 @@
                         <button type="button" class="btn" style="background: #e2e8f0; color: #475569; font-weight: bold; flex: 1; min-width: 100px;" onclick="document.getElementById('modal-despacho-asistido').style.display='none';">Cancelar</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUDITORÍA (SÓLO SUPER ADMIN) -->
+    <div id="modal-auditoria" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:99999;">
+        <div class="panel-card" style="width: 95%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid var(--slate-800);">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; background: var(--slate-800); color: white;">
+                <div class="panel-title" style="color: white;">🕵️‍♂️ Registro de Auditoría del Sistema</div>
+                <button onclick="document.getElementById('modal-auditoria').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:white;">&times;</button>
+            </div>
+            <div class="panel-body" style="overflow-y: auto; flex: 1; padding: 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #f1f5f9; position: sticky; top: 0;">
+                        <tr>
+                            <th style="padding: 10px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1;">FECHA</th>
+                            <th style="padding: 10px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1;">USUARIO</th>
+                            <th style="padding: 10px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1;">ACCIÓN</th>
+                            <th style="padding: 10px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1;">MÓDULO</th>
+                            <th style="padding: 10px; text-align: left; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1;">DETALLES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAuditoriaCuerpo">
+                        <!-- Se llena con JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

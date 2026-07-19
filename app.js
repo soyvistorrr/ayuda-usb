@@ -277,6 +277,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             
             const btnAdmin = document.getElementById('btn-novedades-admin');
             if (btnAdmin) btnAdmin.style.setProperty('display', 'none', 'important');
+            if (document.getElementById('btn-auditoria-admin')) document.getElementById('btn-auditoria-admin').style.display = "none";
             document.getElementById('modal-admin-novedades').style.display = 'none';
 
             cancelarEdicion();
@@ -374,6 +375,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                         mostrarElementos(elementosBusqueda, true);
                         mostrarElementos(elementosColaborar, true); 
                         mostrarElementos(elementosInventario, true);
+                        
+                        if (rol === 'super_admin') {
+                            const btnAud = document.getElementById('btn-auditoria-admin');
+                            if (btnAud) btnAud.style.display = "flex";
+                        }
                         
                         if(dropAyuda) dropAyuda.style.display = "block";
                         if(dropLogistica) dropLogistica.style.display = "block";
@@ -1351,9 +1357,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
         if (idEnEdicion !== null) {
             await supabaseClient.from('registros_ciudadanos').update(manual).eq('id', idEnEdicion);
+            registrarAuditoria('EDITAR', 'Registro General', `Editó los datos de: ${manual.nombre}`);
             cancelarEdicion();
         } else {
             await supabaseClient.from('registros_ciudadanos').insert([manual]);
+            registrarAuditoria('CREAR', 'Registro General', `Registró a una nueva persona: ${manual.nombre}`);
             document.getElementById('registroForm').reset();
             mostrarNotificacion("¡Solicitud registrada exitosamente!");
         }
@@ -1592,7 +1600,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         await supabaseClient.from('novedades_pendientes').delete().eq('id', idNovedad);
         
         mostrarNotificacion("¡Estado actualizado y aprobado!");
-        await cargarDatosDesdeNube(); 
+        registrarAuditoria('APROBAR', 'Novedades', `Aprobó el cambio de estado a '${nuevoEstado}' para el registro ID: ${idRegistro}`);
+        await cargarDatosDesdeNube();
     };
 
     window.rechazarNovedad = async function(idNovedad) {
@@ -1736,6 +1745,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     restaurarBoton(boton);
                 } else {
                     mostrarNotificacion("✅ Registro general eliminado.");
+                    registrarAuditoria('ELIMINAR', 'Registro General', `Se eliminó el registro ID: ${id}`);
                     await cargarDatosDesdeNube();
                 }
             } catch(e) {
@@ -1787,8 +1797,9 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 } else if (count === 0) {
                     alert("⚠️ Supabase bloqueó el borrado de Ayuda. \n\nRevisa que la política RLS de la tabla 'solicitudes_ayuda' tenga permitido el DELETE público.");
                     restaurarBoton(boton);
-                } else {
+               } else {
                     mostrarNotificacion("✅ Registro y pedidos eliminados.");
+                    registrarAuditoria('ELIMINAR', 'Censo Ayuda', `Se eliminó la solicitud de ayuda ID: ${id}`);
                     await cargarDatosDesdeNube();
                 }
             } catch(e) {
@@ -1840,6 +1851,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     restaurarBoton(boton);
                 } else {
                     mostrarNotificacion("✅ Colaborador eliminado.");
+                    registrarAuditoria('ELIMINAR', 'Voluntarios', `Se eliminó al voluntario ID: ${id}`);
                     await cargarDatosDesdeNube();
                 }
             } catch(e) {
@@ -3344,4 +3356,53 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         });
 
         contenedor.innerHTML = html;
+    };
+
+    // ==========================================
+    // SISTEMA DE AUDITORÍA Y RASTREO
+    // ==========================================
+    window.registrarAuditoria = async function(accion, modulo, detalles) {
+        if (!perfilUsuarioActual) return; // Solo rastrea si hay sesión iniciada
+        try {
+            await supabaseClient.from('registro_auditoria').insert([{
+                usuario: perfilUsuarioActual.usuario || 'Desconocido',
+                rol: perfilUsuarioActual.rol || 'N/A',
+                accion: accion.toUpperCase(),
+                modulo: modulo,
+                detalles: detalles
+            }]);
+        } catch (e) {
+            console.error("Fallo al guardar auditoría:", e);
+        }
+    };
+
+    window.verAuditoria = async function() {
+        if (!perfilUsuarioActual || perfilUsuarioActual.rol !== 'super_admin') {
+            alert("Acceso denegado. Exclusivo para Super Administrador."); return;
+        }
+
+        const cuerpo = document.getElementById('tablaAuditoriaCuerpo');
+        cuerpo.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">⏳ Recopilando historial...</td></tr>';
+        document.getElementById('modal-auditoria').style.display = 'flex';
+
+        const { data, error } = await supabaseClient.from('registro_auditoria').select('*').order('created_at', { ascending: false }).limit(100);
+
+        if (error) { cuerpo.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`; return; }
+        if (!data || data.length === 0) { cuerpo.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">No hay registros de auditoría aún.</td></tr>'; return; }
+
+        cuerpo.innerHTML = data.map(r => {
+            const fecha = new Date(r.created_at).toLocaleString('es-VE', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+            let colorBadge = 'badge-gray';
+            if(r.accion.includes('ELIMINAR')) colorBadge = 'badge-danger';
+            if(r.accion.includes('CREAR') || r.accion.includes('IMPORTAR')) colorBadge = 'badge-success';
+            if(r.accion.includes('EDITAR') || r.accion.includes('APROBAR')) colorBadge = 'badge-warning';
+
+            return `<tr>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size:0.8rem; color:#64748b;">${fecha}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;"><strong>${r.usuario}</strong> <span style="font-size:0.65rem; color:#94a3b8; display:block;">${r.rol}</span></td>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;"><span class="badge ${colorBadge}">${r.accion}</span></td>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155;">${r.modulo}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size:0.85rem; color:#475569;">${r.detalles}</td>
+            </tr>`;
+        }).join('');
     };
