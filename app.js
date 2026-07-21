@@ -3266,13 +3266,13 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
         const fechaInicio = new Date('2026-07-15T00:00:00').getTime(); 
         const ahora = new Date().getTime();
         
-        const diasPasados = Math.max(0, Math.floor((ahora - fechaInicio) / (1000 * 60 * 60 * 24)));
+        const mediosDiasPasados = Math.max(0, Math.floor((ahora - fechaInicio) / (1000 * 60 * 60 * 12)));
         
-        let montoActual = 3000 + (diasPasados * 138) + ((diasPasados % 3) * 17); 
+        let montoActual = 3000 + (mediosDiasPasados * 69) + ((mediosDiasPasados % 3) * 8); 
         
-        if (montoActual > 10000) montoActual = 10000;
+        if (montoActual > 25000) montoActual = 25000;
         
-        const porcentaje = Math.floor((montoActual / 10000) * 100);
+        const porcentaje = Math.floor((montoActual / 25000) * 100);
         
         const elMonto = document.getElementById('monto-recaudado');
         const elPorcentaje = document.getElementById('porcentaje-recaudado');
