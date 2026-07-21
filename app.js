@@ -1432,7 +1432,8 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 let registrosActualizados = 0;
                 let nuevosRegistros = [];
                 let listaParaActualizar = []; 
-                let validacionCombinada = [...registrosNube]; 
+                let validacionCombinada = [...registrosNube];
+                let nombresOmitidos = [];
 
                 for (let row of rawData) {
                     let nomVal = String(row[iNom] || '').trim();
@@ -1491,6 +1492,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                             registrosActualizados++;
                         } else {
                             duplicadosOmitidos++; 
+                            nombresOmitidos.push(nomVal);
                         }
                         continue; 
                     }
@@ -1523,7 +1525,16 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                 }
                 
-                alert(`Plantilla procesada.\n✅ ${nuevosRegistros.length} registros nuevos.\n🔄 ${registrosActualizados} registros actualizados.\n⚠️ ${duplicadosOmitidos} filas omitidas.`);
+                let msgOmitidos = "";
+                if (nombresOmitidos.length > 0) {
+                    let unicos = [...new Set(nombresOmitidos)];
+                    let tope = 15;
+                    let listaStr = unicos.slice(0, tope).join(", ");
+                    if (unicos.length > tope) listaStr += ` y ${unicos.length - tope} más...`;
+                    msgOmitidos = `\n\nNombres omitidos (Repetidos/Sin cambios):\n${listaStr}`;
+                }
+
+                alert(`Plantilla procesada.\n✅ ${nuevosRegistros.length} registros nuevos.\n🔄 ${registrosActualizados} registros actualizados.\n⚠️ ${duplicadosOmitidos} filas omitidas.${msgOmitidos}`);
                 document.getElementById('excelFile').value = ''; 
                 await cargarDatosDesdeNube();
             } catch (err) { alert('Error de lectura de archivo. Asegúrate de usar la plantilla correcta.'); console.error(err); }
@@ -2653,6 +2664,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 let cedulasEnEsteExcel = new Set();
                 let nombresEnEsteExcel = new Set();
                 let ticketsEnEsteExcel = new Set();
+                let nombresAyudaOmitidos = [];
 
                 for (let nombreHoja of libro.SheetNames) {
                     const hoja = libro.Sheets[nombreHoja];
@@ -2744,9 +2756,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                         if (!error) personasActualizadas++;
                                     } else {
                                         personasOmitidas++;
+                                        nombresAyudaOmitidos.push(nomVal);
                                     }
                                 } else {
                                     personasOmitidas++;
+                                    nombresAyudaOmitidos.push(nomVal);
                                 }
 
                                 if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
@@ -2846,9 +2860,11 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                                         if (!error) personasActualizadas++;
                                     } else {
                                         personasOmitidas++;
+                                        nombresAyudaOmitidos.push(nomVal);
                                     }
                                 } else {
                                     personasOmitidas++;
+                                    nombresAyudaOmitidos.push(nomVal);
                                 }
                                 
                                 if (cedVal !== '-' && cedVal !== '') cedulasEnEsteExcel.add(cedVal);
@@ -2978,7 +2994,16 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                     }
                 } 
 
-                alert(`✅ Base de datos verificada y actualizada.\n\n👤 Afectados Nuevos: ${personasNuevas}\n👤 Afectados Actualizados: ${personasActualizadas}\n\n📦 Pedidos Nuevos: ${ticketsNuevos}\n📦 Tickets Actualizados: ${ticketsActualizados}\n\n🛡️ OMITIDOS (DUPLICADOS):\n🚫 ${personasOmitidas} personas repetidas.\n🚫 ${ticketsOmitidos} pedidos repetidos.`);
+                let msgPersonasOmitidas = "";
+                if (nombresAyudaOmitidos.length > 0) {
+                    let unicos = [...new Set(nombresAyudaOmitidos)];
+                    let tope = 15;
+                    let listaStr = unicos.slice(0, tope).join(", ");
+                    if (unicos.length > tope) listaStr += ` y ${unicos.length - tope} más...`;
+                    msgPersonasOmitidas = `\n\n📝 Afectados Omitidos (Ya existían o repetidos):\n${listaStr}`;
+                }
+
+                alert(`✅ Base de datos verificada y actualizada.\n\n👤 Afectados Nuevos: ${personasNuevas}\n👤 Afectados Actualizados: ${personasActualizadas}\n\n📦 Pedidos Nuevos: ${ticketsNuevos}\n📦 Tickets Actualizados: ${ticketsActualizados}\n\n🛡️ OMITIDOS (DUPLICADOS):\n🚫 ${personasOmitidas} personas repetidas.${msgPersonasOmitidas}\n🚫 ${ticketsOmitidos} pedidos repetidos.`);
                 
             } catch (err) { 
                 alert('ERROR: ' + err.message); 
@@ -3142,7 +3167,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             if(i.categoria === 'Salud') icono = '💊';
             if(i.categoria === 'Alimentos') icono = '🥫';
             if(i.categoria === 'Higiene') icono = '🧼';
-            if(i.categoria === 'Refugio') icono = '⛺';
+            if(i.categoria === 'Otros') icono = '⛺';
             
             let btnAccion = puedeEditar 
                 ? `<td class="admin-action-header" style="text-align:center;"><button class="btn-delete" style="padding:0.4rem; font-size:0.8rem; border-radius:4px;" onclick="eliminarItemInventario('${i.id}', this)">🗑️ Borrar</button></td>`
@@ -3165,48 +3190,144 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             const file = e.target.files[0]; if (!file) return;
             
             const centro = 'CVA Las Mercedes (Caracas)'; 
-            const categoria = document.getElementById('inventario_categoria_carga').value;
+            const categoriaGlobal = document.getElementById('inventario_categoria_carga').value;
             const pElement = document.querySelector('#dropZoneInventario p');
             const textoOriginal = pElement.innerHTML;
 
             const lector = new FileReader();
             lector.onload = async function(evt) {
-                pElement.innerHTML = "<strong>⏳ Analizando archivo de inventario...</strong>";
+                pElement.innerHTML = "<strong>⏳ Analizando pestañas y cruzando datos...</strong>";
                 try {
-                    const data = new Uint8Array(evt.target.result);
-                    const libro = XLSX.read(data, { type: 'array' });
-                    const hoja = libro.Sheets[libro.SheetNames[0]];
-                    const rawData = XLSX.utils.sheet_to_json(hoja, { defval: "" }); 
-                    
-                    let registrosAInsertar = [];
-                    
-                    for (let row of rawData) {
-                        let item = String(row['Medicamento'] || row['medicamento'] || row['Item'] || row['Ítem'] || row['Insumo'] || '').trim();
-                        if (!item) continue;
-
-                        let presentacion = String(row['Presentación'] || row['Presentacion'] || row['Detalle'] || '').trim();
-                        let cantidad = String(row['Cantidad'] || row['cantidad'] || '0').trim();
-                        let caja = String(row['Caja'] || row['caja'] || row['Ubicación'] || '').trim();
-
-                        registrosAInsertar.push({
-                            punto_usb: centro,
-                            categoria: categoria,
-                            item: item,
-                            presentacion: presentacion,
-                            cantidad: cantidad,
-                            ubicacion_caja: caja
-                        });
+                    if (!inventarioNube || inventarioNube.length === 0) {
+                        await cargarInventarioNube();
                     }
 
-                    if (registrosAInsertar.length > 0) {
-                        pElement.innerHTML = "<strong>⏳ Subiendo a la base de datos...</strong>";
-                        const { error } = await supabaseClient.from('inventario_general').insert(registrosAInsertar);
-                        if (error) throw error;
+                    const data = new Uint8Array(evt.target.result);
+                    const libro = XLSX.read(data, { type: 'array' });
+                    
+                    let registrosAInsertar = [];
+                    let registrosAActualizar = [];
+                    
+                    for (let nombreHoja of libro.SheetNames) {
                         
-                        alert(`✅ ¡Inventario cargado exitosamente!\n\nSe añadieron ${registrosAInsertar.length} ítems a la categoría ${categoria}.`);
+                        let categoriaHoja = categoriaGlobal;
+                        if (categoriaGlobal === 'Todas') {
+                            let n = nombreHoja.toLowerCase();
+                            if (n.includes('higiene') || n.includes('aseo')) categoriaHoja = 'Higiene';
+                            else if (n.includes('alimento') || n.includes('comida') || n.includes('agua')) categoriaHoja = 'Alimentos';
+                            else if (n.includes('otros') || n.includes('refugio')) categoriaHoja = 'Otros';
+                            else categoriaHoja = 'Salud'; 
+                            
+                            if (categoriaHoja === 'Salud' && n.includes('caja') && !n.includes('stock')) {
+                                let tieneStock = libro.SheetNames.some(s => s.toLowerCase().includes('stock'));
+                                if (tieneStock) continue; 
+                            }
+                        }
+
+                        const hoja = libro.Sheets[nombreHoja];
+                        const rawData = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" }); 
+                        
+                        let cabecera = [];
+                        while (rawData.length > 0) {
+                            let temp = rawData[0].map(c => String(c).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+                            if (temp.some(c => c.includes('medicamento') || c.includes('contenido') || c.includes('item'))) {
+                                cabecera = temp;
+                                break;
+                            }
+                            rawData.shift();
+                        }
+                        if (cabecera.length === 0) continue; 
+                        rawData.shift(); 
+
+                        let iItem = cabecera.indexOf('medicamento');
+                        if (iItem === -1) iItem = cabecera.findIndex(c => c === 'contenido' || c.includes('contenido'));
+                        if (iItem === -1) iItem = cabecera.findIndex(c => c === 'item' || c.includes('item'));
+
+                        let iPres = cabecera.findIndex(c => c.includes('presentacion') || c.includes('presentación'));
+                        if (iPres === -1) iPres = cabecera.findIndex(c => c === 'item' || c.includes('item/cantidad'));
+
+                        let iCant = cabecera.findIndex(c => c.includes('cantidad'));
+                        let iCaja = cabecera.findIndex(c => c.includes('ubicacion') || (c.includes('caja') && !c.includes('item')));
+
+                        for (let row of rawData) {
+                            let itemRaw = iItem !== -1 ? String(row[iItem] || '').trim() : '';
+                            if (!itemRaw || itemRaw.toLowerCase().includes('item') || itemRaw.toLowerCase() === 'nan') continue;
+
+                            let presentacionRaw = iPres !== -1 ? String(row[iPres] || '').trim() : '';
+                            let cantidadRaw = iCant !== -1 ? parseInt(String(row[iCant] || '0').trim()) || 0 : 0;
+                            let cajaRaw = iCaja !== -1 ? String(row[iCaja] || '').trim().replace(/caja/i, '').trim() : '';
+                            
+                            if (categoriaHoja === 'Higiene' && cantidadRaw === 0) {
+                               let matchNum = presentacionRaw.match(/\d+/);
+                               if (matchNum) cantidadRaw = parseInt(matchNum[0]);
+                            }
+
+                            let itemExistente = inventarioNube.find(i => 
+                                i.categoria === categoriaHoja && 
+                                String(i.item).trim().toLowerCase() === itemRaw.toLowerCase() &&
+                                String(i.presentacion || '').trim().toLowerCase() === presentacionRaw.toLowerCase()
+                            );
+
+                            if (itemExistente) {
+                                let yaEnActualizar = registrosAActualizar.find(r => r.id === itemExistente.id);
+                                if (yaEnActualizar) {
+                                    yaEnActualizar.cantidad += cantidadRaw; 
+                                } else {
+                                    registrosAActualizar.push({
+                                        id: itemExistente.id,
+                                        cantidad: cantidadRaw,
+                                        presentacion: presentacionRaw !== '' ? presentacionRaw : itemExistente.presentacion,
+                                        ubicacion_caja: cajaRaw !== '' ? cajaRaw : itemExistente.ubicacion_caja
+                                    });
+                                }
+                            } else {
+                                let yaEnInsertar = registrosAInsertar.find(r => r.item.toLowerCase() === itemRaw.toLowerCase() && r.presentacion.toLowerCase() === presentacionRaw.toLowerCase());
+                                if (yaEnInsertar) {
+                                    yaEnInsertar.cantidad += cantidadRaw;
+                                } else {
+                                    registrosAInsertar.push({
+                                        punto_usb: centro,
+                                        categoria: categoriaHoja,
+                                        item: itemRaw,
+                                        presentacion: presentacionRaw,
+                                        cantidad: cantidadRaw,
+                                        ubicacion_caja: cajaRaw
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    pElement.innerHTML = "<strong>⏳ Subiendo y actualizando la base de datos...</strong>";
+
+                    let insertados = 0;
+                    let actualizados = 0;
+
+                    if (registrosAInsertar.length > 0) {
+                        const { error: errIns } = await supabaseClient.from('inventario_general').insert(registrosAInsertar);
+                        if (errIns) throw errIns;
+                        insertados = registrosAInsertar.length;
+                    }
+
+                    if (registrosAActualizar.length > 0) {
+                        const promesasActualizacion = registrosAActualizar.map(reg => 
+                            supabaseClient.from('inventario_general').update({
+                                cantidad: reg.cantidad,
+                                presentacion: reg.presentacion,
+                                ubicacion_caja: reg.ubicacion_caja
+                            }).eq('id', reg.id)
+                        );
+                        await Promise.all(promesasActualizacion);
+                        actualizados = registrosAActualizar.length;
+                    }
+
+                    if (insertados > 0 || actualizados > 0) {
+                        if(typeof registrarAuditoria === 'function') registrarAuditoria('IMPORTAR', 'Inventario', `Excel Multi-pestañas: ${insertados} creados, ${actualizados} actualizados`);
+                        
+                        alert(`✅ ¡Inventario procesado exitosamente!\n\n📦 Ítems nuevos añadidos: ${insertados}\n🔄 Ítems actualizados: ${actualizados}`);
                         await cargarInventarioNube(); 
                     } else {
-                        alert("⚠️ No se encontraron datos válidos. Asegúrate de que las columnas digan: 'Medicamento', 'Presentación', 'Cantidad' y 'Caja'.");
+                        alert("⚠️ Todo tu inventario estaba al día. No hubo cambios nuevos que procesar.");
                     }
                 } catch(err) {
                     alert('Error cargando inventario: ' + err.message);

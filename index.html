@@ -1098,10 +1098,11 @@
                                 <div class="form-group">
                                     <label class="form-label">Categoría de los Ítems a subir:</label>
                                     <select id="inventario_categoria_carga" class="form-select">
+                                        <option value="Todas">📂 Automático (Leer todas las pestañas del Excel)</option>
                                         <option value="Salud">💊 Salud (Medicinas, 1eros auxilios, protector solar)</option>
                                         <option value="Alimentos">🥫 Alimentos (Enlatados, agua, fórmulas)</option>
                                         <option value="Higiene">🧼 Higiene (Shampoo, jabón, toallas)</option>
-                                        <option value="Refugio">⛺ Refugio (Linternas, carpas, sábanas)</option>
+                                        <option value="Otros">⛺ Otros (Linternas, sábanas, varios)</option>
                                     </select>
                                 </div>
 
@@ -1124,7 +1125,7 @@
                                 <option value="Salud">💊 Salud / Medicinas</option>
                                 <option value="Alimentos">🥫 Alimentos / Agua</option>
                                 <option value="Higiene">🧼 Higiene Personal</option>
-                                <option value="Refugio">⛺ Refugio / Herramientas</option>
+                                <option value="Otros">⛺ Otros / Herramientas</option>
                             </select>
                             
                             <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Categoría</button>
