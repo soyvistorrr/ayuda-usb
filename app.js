@@ -2629,18 +2629,24 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
     window.procesarExcelMaestro = async function(file, dropZoneId, inputId) {
         
+        // 1. Deducir por el nombre del archivo (siendo tolerantes con los errores de tipeo comunes)
         let nombreRaw = String(file.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         let sedeArchivo = 'Sin Asignar';
         
-        if (nombreRaw.includes('catia')) sedeArchivo = 'Catia la Mar Centro';
-        else if (nombreRaw.includes('tunita') || nombreRaw.includes('mamo')) sedeArchivo = 'Las Tunitas - Mamo';
-        else if (nombreRaw.includes('caraballeda')) sedeArchivo = 'Caraballeda';
-        else if (nombreRaw.includes('naiguata')) sedeArchivo = 'Naiguatá';
-        else if (nombreRaw.includes('camuri')) sedeArchivo = 'Camurí Grande';
-        else if (nombreRaw.includes('maiquetia')) sedeArchivo = 'Maiquetía';
-        else if (nombreRaw.includes('macuto') || nombreRaw.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
-        else if (nombreRaw.includes('cva') || nombreRaw.includes('mercedes') || nombreRaw.includes('caracas')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
-        else sedeArchivo = 'Maiquetía'; 
+        // PROTECCIÓN DE ROL: Si es un coordinador local, forzamos su centro asignado
+        if (perfilUsuarioActual && perfilUsuarioActual.rol === 'admin_centro' && perfilUsuarioActual.centro_acopio) {
+            sedeArchivo = perfilUsuarioActual.centro_acopio;
+        } else {
+            // Intentamos por el nombre del archivo primero
+            if (nombreRaw.includes('catia')) sedeArchivo = 'Catia la Mar Centro';
+            else if (nombreRaw.includes('tunita') || nombreRaw.includes('mamo')) sedeArchivo = 'Las Tunitas - Mamo';
+            else if (nombreRaw.includes('caraball')) sedeArchivo = 'Caraballeda'; // Tolerancia a "Caraballleda"
+            else if (nombreRaw.includes('naiguata')) sedeArchivo = 'Naiguatá';
+            else if (nombreRaw.includes('camuri')) sedeArchivo = 'Camurí Grande';
+            else if (nombreRaw.includes('maiquetia') || nombreRaw.includes('maiquetía')) sedeArchivo = 'Maiquetía';
+            else if (nombreRaw.includes('macuto') || nombreRaw.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
+            else if (nombreRaw.includes('cva') || nombreRaw.includes('mercedes') || nombreRaw.includes('caracas')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
+        }
 
         const lector = new FileReader();
         lector.onload = async function(evt) {
@@ -2657,6 +2663,32 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                 const data = new Uint8Array(evt.target.result);
                 const libro = XLSX.read(data, { type: 'array' });
+
+                if (sedeArchivo === 'Sin Asignar' && (!perfilUsuarioActual || perfilUsuarioActual.rol !== 'admin_centro')) {
+                    const primeraHoja = libro.Sheets[libro.SheetNames[0]];
+                    const celdasRaw = XLSX.utils.sheet_to_json(primeraHoja, { header: 1, defval: "" });
+                    
+                    let textoInterno = "";
+                    for (let i = 0; i < Math.min(10, celdasRaw.length); i++) {
+                        textoInterno += celdasRaw[i].join(" ").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + " ";
+                    }
+
+                    if (textoInterno.includes('catia')) sedeArchivo = 'Catia la Mar Centro';
+                    else if (textoInterno.includes('tunita') || textoInterno.includes('mamo')) sedeArchivo = 'Las Tunitas - Mamo';
+                    else if (textoInterno.includes('caraball')) sedeArchivo = 'Caraballeda';
+                    else if (textoInterno.includes('naiguata')) sedeArchivo = 'Naiguatá';
+                    else if (textoInterno.includes('camuri')) sedeArchivo = 'Camurí Grande';
+                    else if (textoInterno.includes('maiquetia')) sedeArchivo = 'Maiquetía';
+                    else if (textoInterno.includes('macuto') || textoInterno.includes('guaira')) sedeArchivo = 'La Guaira - Macuto';
+                    else if (textoInterno.includes('cva') || textoInterno.includes('mercedes')) sedeArchivo = 'CVA Las Mercedes (Caracas)';
+                    
+                    if (sedeArchivo === 'Sin Asignar') {
+                        let titulosPestanas = libro.SheetNames.join(" ").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        if (titulosPestanas.includes('catia')) sedeArchivo = 'Catia la Mar Centro';
+                        else if (titulosPestanas.includes('caraball')) sedeArchivo = 'Caraballeda';
+                        else if (titulosPestanas.includes('maiquetia')) sedeArchivo = 'Maiquetía';
+                    }
+                }
 
                 let ticketsNuevos = 0; let ticketsOmitidos = 0; let ticketsActualizados = 0;
                 let personasNuevas = 0; let personasOmitidas = 0; let personasActualizadas = 0;
