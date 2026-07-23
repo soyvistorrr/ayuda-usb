@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma de Contingencia USB - Centro de Control Central</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -58,22 +60,22 @@
                         <div class="news-section-header" style="margin-bottom: 0;">
                             <h3>Boletines Informativos</h3>
                         </div>
-                        <a class="btn-ver-todas" onclick="navegarA('view-todas-noticias')">Ver todas ➔</a>
+                        <a class="btn-ver-todas" onclick="navegarA('view-todas-noticias')">Ver todas</a>
                     </div>
                     
                     <div class="carousel-wrapper">
                         <button class="carousel-arrow left" onclick="moverCarrusel(-1)">&#10094;</button>
                         <div class="news-carousel-container" id="carrusel-noticias">
-                            <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; font-weight: 600;">⏳ Actualizando boletines...</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0; font-weight: 600;">Actualizando boletines...</div>
                         </div>
                         <button class="carousel-arrow right" onclick="moverCarrusel(1)">&#10095;</button>
                     </div>
                 </div>
 
                 <div class="seccion-destacada" style="background-color: #fffbeb; border-color: #fcd34d; padding: 2rem; margin-bottom: 2rem; text-align: center;">
-                    <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #b45309; margin-bottom: 0.5rem; text-transform: uppercase;">¿Necesitas ayuda médica, alimentos o insumos?</h3>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #b45309; margin-bottom: 0.5rem; text-transform: uppercase;">¿Necesitas ayuda médica, alimentos o insumos?</h3>
                     <p style="color: #92400e; font-size: 1.05rem; max-width: 800px; margin: 0 auto 1.5rem auto;">Para evitar duplicidad en los registros y organizar mejor los despachos, el registro de necesidades ahora se realiza de forma directa a través de los coordinadores locales. Si necesitas asistencia, comunícate con el encargado del punto más cercano para que tome tus datos.</p>
-                    <button class="btn" style="font-weight: 700; font-size: 1rem; padding: 0.75rem 1.5rem; background-color: #f59e0b; color: white; border: none;" onclick="navegarA('view-puntos-usb')">📞 Contactar Encargado Local</button>
+                    <button class="btn" style="font-weight: 700; font-size: 1rem; padding: 0.75rem 1.5rem; background-color: #f59e0b; color: white; border: none;" onclick="navegarA('view-puntos-usb')">Contactar Encargado Local</button>
                 </div>
 
                 <div class="seccion-destacada" style="border-top: 4px solid var(--success);">
@@ -81,7 +83,7 @@
                         <div class="news-section-header" style="margin-bottom: 0;">
                             <h3>Puntos USB y Centros de Acopio</h3>
                         </div>
-                        <a class="btn-ver-todas" onclick="navegarA('view-puntos-usb')">Ver detalles y ubicaciones ➔</a>
+                        <a class="btn-ver-todas" onclick="navegarA('view-puntos-usb')">Ver detalles y ubicaciones</a>
                     </div>
                     
                     <div class="acopio-banner-card" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
@@ -90,7 +92,7 @@
                             <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1.25rem;">Recepción de Donaciones Punto USB CVA Las Mercedes. Dirección Av. Principal de Las Mercedes, Centro Venezolano Americano</p>
                             
                             <div style="background-color: #fffbeb; padding: 1rem; border-radius: 8px; border-left: 4px solid var(--warning); margin-bottom: 1.25rem;">
-                                <strong style="color: var(--warning); font-size: 0.85rem; text-transform: uppercase;">⚠️ Insumos urgentes requeridos actualmente:</strong>
+                                <strong style="color: var(--warning); font-size: 0.85rem; text-transform: uppercase;">Atención: Insumos urgentes requeridos actualmente:</strong>
                                 <p style="font-size: 0.85rem; color: var(--gray-700); margin-top: 0.5rem; line-height: 1.5;">Agua, alimentos no perecederos, artículos de higiene personal y limpieza, medicinas básicas, colchones, cobijas, sábanas, toallas, pañales de niños y adultos de todas las tallas, juguetes, libros para pintar y colores.</p>
                             </div>
                         </div>
@@ -98,13 +100,13 @@
                         <div>
                             <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; letter-spacing: 0.05em;">Puntos de Distribución (Contactos Directos):</p>
                             <ul class="acopio-list-grid">
-                                <li><strong>Catia la Mar Centro</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Aitana Mora</span><br><span style="color: var(--primary); font-weight: bold;">📞 0412-4176735</span></li>
-                                <li><strong>Las Tunitas - Mamo</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Prof. Alba Peraza</span><br><span style="color: var(--primary); font-weight: bold;">📞 0424-1622863</span></li>
-                                <li><strong>Caraballeda</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Illeny Aponte</span><br><span style="color: var(--primary); font-weight: bold;">📞 0414-3725800</span></li>
-                                <li><strong>Naiguatá</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Lic. Diana Mata</span><br><span style="color: var(--primary); font-weight: bold;">📞 0414-3009903</span></li>
-                                <li><strong>Maiquetía</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Luis de Quintal</span><br><span style="color: var(--primary); font-weight: bold;">📞 0414-2518760</span></li>
-                                <li><strong>La Guaira - Macuto</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Maleixis Echandia</span><br><span style="color: var(--primary); font-weight: bold;">📞 0412-2982783</span></li>
-                                <li><strong>Camurí</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Lic. Pilar Martínez</span><br><span style="color: var(--primary); font-weight: bold;">📞 0424-2184956</span></li>
+                                <li><strong>Catia la Mar Centro</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Aitana Mora</span><br><span style="color: var(--primary); font-weight: bold;">0412-4176735</span></li>
+                                <li><strong>Las Tunitas - Mamo</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Prof. Alba Peraza</span><br><span style="color: var(--primary); font-weight: bold;">0424-1622863</span></li>
+                                <li><strong>Caraballeda</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Illeny Aponte</span><br><span style="color: var(--primary); font-weight: bold;">0414-3725800</span></li>
+                                <li><strong>Naiguatá</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Lic. Diana Mata</span><br><span style="color: var(--primary); font-weight: bold;">0414-3009903</span></li>
+                                <li><strong>Maiquetía</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Luis de Quintal</span><br><span style="color: var(--primary); font-weight: bold;">0414-2518760</span></li>
+                                <li><strong>La Guaira - Macuto</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Maleixis Echandia</span><br><span style="color: var(--primary); font-weight: bold;">0412-2982783</span></li>
+                                <li><strong>Camurí</strong><br><span style="color: var(--text-muted); font-size: 0.8rem;">Lic. Pilar Martínez</span><br><span style="color: var(--primary); font-weight: bold;">0424-2184956</span></li>
                             </ul>
                         </div>
                     </div>
@@ -181,16 +183,16 @@
             <!-- VISTA: PUNTOS USB (TARJETAS CON WHATSAPP) -->
             <!-- ============================================== -->
             <section class="app-view" id="view-puntos-usb">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al inicio</button></div>
                 
                 <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 3rem 2rem; margin-bottom: 2.5rem; text-align: center;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Red de Distribución USB</h2>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Red de Distribución USB</h2>
                     <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Conoce a detalle los puntos estratégicos donde estaremos canalizando la ayuda humanitaria recolectada en el CVA.</p>
                 </div>
 
                 <div class="admin-action-header" id="panel-estadisticas-admin" style="display: none; margin-bottom: 2.5rem;">
                     <div class="dashboard-hero" style="background-color: #0f172a; padding: 2rem; border-radius: 12px; margin-bottom: 0;">
-                        <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: #f59e0b; margin-bottom: 1rem; text-transform: uppercase; text-align: center;">📊 Conteo de Afectados por Punto</h3>
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: #f59e0b; margin-bottom: 1rem; text-transform: uppercase; text-align: center;">Conteo de Afectados por Punto</h3>
                         <div class="stats-bar" id="stats-puntos-acopio" style="margin-top: 0; justify-content: center; display: flex; flex-wrap: wrap; gap: 15px;">
                             <div style="text-align: center; color: #94a3b8; width: 100%;">Cargando estadísticas...</div>
                         </div>
@@ -208,8 +210,8 @@
 
                 <div style="margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
                     <div style="background-color: var(--slate-800); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; text-transform: uppercase; color: var(--accent);">🗺️ Ubicación de los Puntos</h3>
-                        <a href="https://www.google.com/maps/d/u/0/edit?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4&usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: var(--accent); color: var(--primary); text-decoration: none; font-weight: bold;">📍 Abrir en Google Maps</a>
+                        <h3 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem; text-transform: uppercase; color: var(--accent);">Ubicación de los Puntos</h3>
+                        <a href="https://www.google.com/maps/d/u/0/edit?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4&usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: var(--accent); color: var(--primary); text-decoration: none; font-weight: bold;">Abrir en Google Maps</a>
                     </div>
                     <iframe src="https://www.google.com/maps/d/embed?mid=1zvJrayhhGa_VtWbytYlrQFCsQpmw_F4" width="100%" height="450" style="border:0; display: block;" allowfullscreen="" loading="lazy" title="Mapa de Puntos USB"></iframe>
                 </div>
@@ -218,7 +220,7 @@
                     
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Catia la Mar Centro</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Catia la Mar Centro</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Aitana Mora</p>
@@ -229,7 +231,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Las Tunitas - Mamo</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Las Tunitas - Mamo</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Prof. Alba Peraza</p>
@@ -240,7 +242,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Caraballeda</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Caraballeda</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Illeny Aponte</p>
@@ -251,7 +253,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Naiguatá</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Naiguatá</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Lic. Diana Mata</p>
@@ -262,7 +264,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Camurí</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Camurí</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Lic. Pilar Martínez</p>
@@ -273,7 +275,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 CVA Las Mercedes (Caracas)</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">CVA Las Mercedes (Caracas)</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Equipo AEUSB</p>
@@ -284,7 +286,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 Maiquetía</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">Maiquetía</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargado:</strong> Luis de Quintal</p>
@@ -295,7 +297,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column; height: 100%; border-top: 4px solid var(--success);">
                         <div class="panel-header" style="background-color: white;">
-                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">📍 La Guaira - Macuto</div>
+                            <div class="panel-title" style="color: var(--success); font-size: 1.1rem;">La Guaira - Macuto</div>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                             <p style="margin-bottom: 0.75rem; font-size: 0.95rem;"><strong>Encargada:</strong> Maleixis Echandia</p>
@@ -311,7 +313,7 @@
             <!-- VISTA: NECESITO AYUDA -->
             <!-- ============================================== -->
             <section class="app-view" id="view-necesito-ayuda">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al menú principal</button></div>
                 
                 <div class="grid-system" id="mallaAyuda">
                     <div class="left-column">
@@ -409,7 +411,7 @@
                                         <input type="number" id="adultosMayores" class="form-input" min="0" value="0" required>
                                     </div>
 
-                                    <h4 style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; text-transform: uppercase;">📦 Requerimientos Logísticos (Opcional)</h4>
+                                    <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; text-transform: uppercase;">Requerimientos Logísticos (Opcional)</h4>
     
                                         <div class="form-row">
                                             <div class="form-group">
@@ -441,15 +443,15 @@
                     <div class="right-column" id="panel-tabla-solicitudes" style="display: none;">
                         
                         <div class="import-zone" id="dropZoneAyuda" onclick="document.getElementById('excelFileAyuda').click()" style="display: none; margin-bottom: 1.5rem; border-color: var(--warning); background-color: #fffbeb;">
-                            <p style="color: #b45309;"><strong>📥 IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel de Censo</strong></p>
+                            <p style="color: #b45309;"><strong>IMPORTACIÓN MAESTRA: Haz clic o arrastra tu archivo Excel de Censo</strong></p>
                             <input type="file" id="excelFileAyuda" accept=".xlsx, .xls, .csv" style="display:none">
                         </div>
 
                         <div class="toolbar" style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-200); gap: 10px; display: flex; flex-wrap: wrap;">
-                            <div style="font-family:'Montserrat'; font-weight:800; text-transform:uppercase; font-size:0.9rem; width: 100%; color: var(--warning); margin-bottom: 5px;">Filtros de Búsqueda y Control</div>
+                            <div style="font-family:'Outfit'; font-weight:800; text-transform:uppercase; font-size:0.9rem; width: 100%; color: var(--warning); margin-bottom: 5px;">Filtros de Búsqueda y Control</div>
                             
                             <div class="search-box" style="flex: 1; min-width: 200px;">
-                                <input type="text" id="buscarAyudaInput" placeholder="🔍 Buscar nombre o cédula...">
+                                <input type="text" id="buscarAyudaInput" placeholder="Buscar nombre o cédula...">
                             </div>
                             
                             <select id="filtroDamnificado" class="form-select" style="width: auto; flex: 1; min-width: 140px;">
@@ -478,8 +480,8 @@
                                 <option value="CVA Las Mercedes (Caracas)">CVA Las Mercedes (Caracas)</option>
                             </select>
                             
-                            <button id="btnFiltroDupAyuda" class="btn btn-warning admin-action-header" style="width: auto; flex: 1; min-width: 160px; font-weight: bold; padding: 0.5rem;" onclick="toggleDuplicadosAyuda()">🚨 Filtrar Duplicados</button>
-                            <button id="btnExportarAyuda" class="btn btn-warning" style="display: none; min-width: 150px; flex: 1;">⬇️ Descargar Excel</button>
+                            <button id="btnFiltroDupAyuda" class="btn btn-warning admin-action-header" style="width: auto; flex: 1; min-width: 160px; font-weight: bold; padding: 0.5rem;" onclick="toggleDuplicadosAyuda()">Filtrar Duplicados</button>
+                            <button id="btnExportarAyuda" class="btn btn-warning" style="display: none; min-width: 150px; flex: 1;">Descargar Excel</button>
                         </div>
                         
                         <div class="table-container">
@@ -496,7 +498,7 @@
             <!-- VISTA: QUIERO SER COLABORADOR -->
             <!-- ============================================== -->
             <section class="app-view" id="view-colaborar">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al menú principal</button></div>
                 <div class="grid-system" id="mallaColaboradores">
                     <div class="left-column">
                         <div class="panel-card" style="border-top: 4px solid var(--success);">
@@ -564,7 +566,7 @@
                     </div>
                     <div class="right-column" id="panel-tabla-colaboradores">
                         <div class="toolbar">
-                            <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
+                            <div style="font-family:'Outfit'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--success);">Cuadrillas de Apoyo Registradas</div>
                             <button id="btnExportarColab" class="btn btn-primary" style="background-color: var(--primary); color: white; display: none;">Descargar Excel Voluntarios</button>
                         </div>
                         <div class="table-container">
@@ -581,7 +583,7 @@
             <!-- VISTA: BUSCAR A ALGUIEN -->
             <!-- ============================================== -->
             <section class="app-view" id="view-buscar">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al menú principal</button></div>
                 <div class="dashboard-hero">
                     <div class="container hero-context">
                         <p>Sistema Integral de Registro y Monitoreo de Afectados</p>
@@ -688,15 +690,15 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th onclick="ordenarTablaAfectados('estado')" style="cursor:pointer">SITUACIÓN <span id="sort-af-estado">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('cedula_identidad')" style="cursor:pointer">CÉDULA <span id="sort-af-cedula_identidad">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('nombre')" style="cursor:pointer">NOMBRE <span id="sort-af-nombre">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('cedula')" style="cursor:pointer">COMUNIDAD <span id="sort-af-cedula">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('edad')" style="cursor:pointer">GRUPO <span id="sort-af-edad">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('damnificado')" style="cursor:pointer">DAMNIFICADO <span id="sort-af-damnificado">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('ubicacion')" style="cursor:pointer">UBICACIÓN <span id="sort-af-ubicacion">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('telefono')" style="cursor:pointer">TELÉFONO <span id="sort-af-telefono">↕</span></th>
-                                        <th onclick="ordenarTablaAfectados('observaciones')" style="cursor:pointer">OBSERVACIÓN <span id="sort-af-observaciones">↕</span></th>
+                                        <th onclick="ordenarTablaAfectados('estado')" style="cursor:pointer">SITUACIÓN <span id="sort-af-estado"></span></th>
+                                        <th onclick="ordenarTablaAfectados('cedula_identidad')" style="cursor:pointer">CÉDULA <span id="sort-af-cedula_identidad"></span></th>
+                                        <th onclick="ordenarTablaAfectados('nombre')" style="cursor:pointer">NOMBRE <span id="sort-af-nombre"></span></th>
+                                        <th onclick="ordenarTablaAfectados('cedula')" style="cursor:pointer">COMUNIDAD <span id="sort-af-cedula"></span></th>
+                                        <th onclick="ordenarTablaAfectados('edad')" style="cursor:pointer">GRUPO <span id="sort-af-edad"></span></th>
+                                        <th onclick="ordenarTablaAfectados('damnificado')" style="cursor:pointer">DAMNIFICADO <span id="sort-af-damnificado"></span></th>
+                                        <th onclick="ordenarTablaAfectados('ubicacion')" style="cursor:pointer">UBICACIÓN <span id="sort-af-ubicacion"></span></th>
+                                        <th onclick="ordenarTablaAfectados('telefono')" style="cursor:pointer">TELÉFONO <span id="sort-af-telefono"></span></th>
+                                        <th onclick="ordenarTablaAfectados('observaciones')" style="cursor:pointer">OBSERVACIÓN <span id="sort-af-observaciones"></span></th>
                                         <th class="admin-action-header" style="display: none;">ACCIONES</th>
                                     </tr>
                                 </thead>
@@ -711,7 +713,7 @@
             <!-- VISTA: DONACIONES -->
             <!-- ============================================== -->
             <section class="app-view" id="view-donar">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al menú principal</button></div>
                 
                 <div class="donation-hero-banner" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
                     <h2 style="font-size: 2.2rem; color: #fbc02d;">Fondo de Emergencia USB</h2>
@@ -734,7 +736,7 @@
                 </div>
 
                 <div style="text-align: center; margin-bottom: 3.5rem;">
-                    <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.6rem; color: var(--primary); text-transform: uppercase; font-weight: 900;">¿Cuál es el impacto de tu donación?</h3>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; color: var(--primary); text-transform: uppercase; font-weight: 900;">¿Cuál es el impacto de tu donación?</h3>
                     <p style="color: var(--gray-700); font-size: 1.05rem; max-width: 600px; margin: 0 auto;">Cualquier monto salva vidas. Aquí tienes un estimado de lo que los brigadistas pueden adquirir gracias a tu aporte:</p>
                     
                     <div class="impact-grid">
@@ -764,30 +766,30 @@
                 <hr style="border: 0; border-top: 1px solid var(--gray-200); margin: 2rem 0 3rem 0;">
 
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <h3 style="font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: var(--primary); text-transform: uppercase; font-weight: 800;">Vías Oficiales de Recepción</h3>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: var(--primary); text-transform: uppercase; font-weight: 800;">Vías Oficiales de Recepción</h3>
                     <p style="color: var(--text-muted); font-size: 0.95rem;">Selecciona tu método de pago preferido. Todo el proceso es auditado por la AEUSB.</p>
                 </div>
 
                 <div class="donation-data-row">
                     <div class="donation-data-card" style="border-top: 4px solid #0284c7;">
-                        <div class="donation-data-header">🌐 Donaciones Internacionales (USD)</div>
+                        <div class="donation-data-header">Donaciones Internacionales (USD)</div>
                         <div class="donation-data-body" style="display:flex; flex-direction:column; justify-content:space-between; min-height:220px;">
                             <p style="line-height:1.6; margin-bottom:1rem;">Apoyar a la Simón desde la distancia es rápido, fácil y 100% seguro. Ponemos a tu disposición canales digitales oficiales para recibir tu contribución desde el extranjero a través de <strong>Zelle, PayPal o tarjetas de crédito internacionales Visa y Mastercard</strong>.</p>
                             <a href="https://www.aeusb.org/product/fondo-de-asistencia-de-emergencia-comunidad-usb-el-litoral" target="_blank" class="btn btn-primary btn-block" style="background-color:#0284c7; color:white; text-decoration:none;">Acceder a Pasarela AEUSB</a>
                         </div>
                     </div>
                     <div class="donation-data-card" style="border-top: 4px solid var(--success);">
-                        <div class="donation-data-header">🇻🇪 Transferencias Nacionales (Bolívares)</div>
+                        <div class="donation-data-header">Transferencias Nacionales (Bolívares)</div>
                         <div class="donation-data-body">
                             <table class="donation-table-info">
                                 <tr><td><strong>Beneficiario</strong>Asociación de Egresados USB</td></tr>
                                 <tr><td><strong>Identificación (RIF)</strong>J-30167233-0</td></tr>
-                                <tr><td><strong>🏦 Entidad Bancaria</strong>Banco Mercantil (Cuenta Corriente)</td></tr>
+                                <tr><td><strong>Entidad Bancaria</strong>Banco Mercantil (Cuenta Corriente)</td></tr>
                                 <tr><td><strong>Número de Cuenta</strong>0105 0024 9210 2427 9154</td></tr>
-                                <tr><td><strong>📱 Pago Móvil Interbancario</strong>0412-4038790 (Mercantil)</td></tr>
+                                <tr><td><strong>Pago Móvil Interbancario</strong>0412-4038790 (Mercantil)</td></tr>
                             </table>
                             <div style="font-size:0.8rem; background-color:var(--gray-100); padding:0.65rem; border-radius:4px; border-left:3px solid var(--warning); color:var(--gray-700); margin-top:1rem; font-weight:500;">
-                                ⚠️ <strong>Concepto Requerido:</strong> "Ayuda USB y Nº de Cédula".
+                                <strong>Atención - Concepto Requerido:</strong> "Ayuda USB y Nº de Cédula".
                             </div>
                         </div>
                     </div>
@@ -798,9 +800,9 @@
             <!-- VISTA: ENLACES -->
             <!-- ============================================== -->
             <section class="app-view" id="view-enlaces">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al menú principal</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al menú principal</button></div>
                 <div style="margin-bottom: 2rem;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">🗂️ Enlaces y Listas Oficiales</h2>
+                    <h2 style="font-family: 'Outfit', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">Enlaces y Listas Oficiales</h2>
                     <p style="color: var(--text-muted); font-size: 0.95rem;">Accede de forma directa a las herramientas de rastreo unificado, bases de datos médicas y a la hoja oficial de control de la contingencia comunitaria.</p>
                 </div>
                 <div class="links-grid">
@@ -870,14 +872,14 @@
             <!-- VISTA: DETALLE DE NOTICIA -->
             <!-- ============================================== -->
             <section class="app-view" id="view-noticia-detalle">
-                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button></div>
+                <div class="toolbar"><button class="btn btn-primary" onclick="navegarA('view-home')">Volver al inicio</button></div>
                 <div class="panel-card" style="max-width: 850px; margin: 0 auto; border-top: 4px solid var(--primary);" id="pagina-noticia-borde">
                     <img id="pagina-noticia-imagen" src="" alt="Portada" style="width: 100%; max-height: 450px; object-fit: cover; display: none; border-bottom: 1px solid var(--gray-200);">                        
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                             <span id="pagina-noticia-etiqueta" class="news-badge"></span>
                             <span id="pagina-noticia-fecha" class="news-date"></span>
                         </div>
-                        <h1 id="pagina-noticia-titulo" style="font-family: 'Montserrat', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem;"></h1>
+                        <h1 id="pagina-noticia-titulo" style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem;"></h1>
                         <div id="pagina-noticia-contenido" style="font-size: 1.05rem; color: var(--gray-700); line-height: 1.8; word-break: break-word;"></div>                        <div style="margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
                             <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1.25rem;">Difundir este Boletín:</div>
                             <div style="display: flex; gap: 1rem; flex-wrap: wrap;" id="pagina-botones-compartir"></div>
@@ -893,11 +895,11 @@
                 <div class="container">
                     
                     <div class="toolbar" style="margin-top: 1.5rem; margin-bottom: 2rem; background: transparent; padding: 0;">
-                        <button class="btn btn-primary" onclick="navegarA('view-home')">⬅ Volver al inicio</button>
+                        <button class="btn btn-primary" onclick="navegarA('view-home')">Volver al inicio</button>
                     </div>
                     
                     <div style="margin-bottom: 2rem;">
-                        <h2 style="font-family: 'Montserrat', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">Todos los Boletines</h2>
+                        <h2 style="font-family: 'Outfit', sans-serif; text-transform: uppercase; font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);">Todos los Boletines</h2>
                         <p style="color: var(--text-muted); font-size: 0.95rem;">Historial completo de comunicados oficiales y actualizaciones de la contingencia.</p>
                     </div>
                     
@@ -914,11 +916,11 @@
             <div class="container">
                 
                 <div class="toolbar" style="margin-top: 1.5rem; margin-bottom: 2rem; background: transparent; padding: 0;">
-                    <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">⬅ VOLVER AL MENÚ PRINCIPAL</button>
+                    <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">VOLVER AL MENÚ PRINCIPAL</button>
                 </div>
 
                 <div class="dashboard-hero" style="background-color: #1e3a8a; color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: #fbc02d; margin-bottom: 0.5rem; text-transform: uppercase;">Métricas de Logística</h2>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; color: #fbc02d; margin-bottom: 0.5rem; text-transform: uppercase;">Métricas de Logística</h2>
                     <p style="font-size: 0.95rem; color: #bfdbfe; margin-bottom: 1.5rem;">Resumen en tiempo real de la preparación y despacho de cajas.</p>
                     
                     <div class="stats-bar" style="margin-top: 0;">
@@ -931,7 +933,7 @@
                 <div class="panel-card" style="margin-bottom: 2rem; border-top: 4px solid #3b82f6;">
                     <div class="panel-body" style="padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; background-color: #eff6ff;">
                         <div>
-                            <h3 style="font-size: 1.1rem; color: #1e3a8a; margin-bottom: 0.25rem;">👷‍♂️ Identificación de Guardia</h3>
+                            <h3 style="font-size: 1.1rem; color: #1e3a8a; margin-bottom: 0.25rem;">Identificación de Guardia</h3>
                             <p style="font-size: 0.85rem; color: #3b82f6; margin: 0;">Ingresa tu nombre antes de procesar o tomar pedidos del almacén.</p>
                         </div>
                         <div style="flex: 1; max-width: 400px;">
@@ -944,7 +946,7 @@
                     
                     <div class="panel-card" style="margin: 0;">
                         <div class="panel-header">
-                            <h3 class="panel-title">📝 CREAR TICKET MANUAL</h3>
+                            <h3 class="panel-title">Crear Ticket Manual</h3>
                         </div>
                         <div class="panel-body">
                             <form id="etiquetaForm">
@@ -981,18 +983,18 @@
                                         <div class="form-group" style="flex: 2; margin-bottom: 0;">
                                             <label class="form-label" style="font-size: 0.75rem;">Categoría</label>
                                             <select class="form-select manual-cat" required>
-                                                <option value="medicina">💊 Medicina</option>
-                                                <option value="alimentos_limpieza">🥫🧼 Alimentos, Agua y Limpieza</option>
-                                                <option value="otras">🛠️ Otras Solicitudes</option>
+                                                <option value="medicina">Medicina</option>
+                                                <option value="alimentos_limpieza">Alimentos, Agua y Limpieza</option>
+                                                <option value="otras">Otras Solicitudes</option>
                                             </select>
                                         </div>
                                         <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
-                                            <button type="button" class="btn btn-delete" style="padding: 0.6rem; height: 100%; font-weight: bold;" onclick="this.parentElement.parentElement.remove()" title="Eliminar fila">✖</button>
+                                            <button type="button" class="btn btn-delete" style="padding: 0.6rem; height: 100%; font-weight: bold;" onclick="this.parentElement.parentElement.remove()" title="Eliminar fila">X</button>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <button type="button" class="btn" style="background:#e2e8f0; color:#333; margin-bottom: 15px; width: 100%; border: 1px dashed #cbd5e1;" onclick="agregarFilaInsumoManual()">➕ Añadir otro insumo a este pedido</button>
+                                <button type="button" class="btn" style="background:#e2e8f0; color:#333; margin-bottom: 15px; width: 100%; border: 1px dashed #cbd5e1;" onclick="agregarFilaInsumoManual()">Añadir otro insumo a este pedido</button>
                                 
                                 <button type="submit" class="btn btn-success btn-block" style="padding: 0.8rem; font-weight: 700; font-size: 0.95rem;">CREAR PEDIDO EN EL SISTEMA</button>
                             </form>
@@ -1001,7 +1003,7 @@
 
                     <div class="panel-card" style="margin: 0; display: flex; flex-direction: column;">
                         <div class="panel-header">
-                            <h3 class="panel-title">📤 IMPORTACIÓN MASIVA (EXCEL)</h3>
+                            <h3 class="panel-title">Importación Masiva (Excel)</h3>
                         </div>
                         <div class="panel-body" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Sube una plantilla Excel para crear cientos de tickets al instante. Columnas necesarias: <strong>Centro</strong>, <strong>Categoria</strong> y <strong>Requerimiento</strong>.</p>
@@ -1015,10 +1017,10 @@
                 </div>
 
                 <div class="toolbar" style="margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                    <div style="font-family:'Montserrat'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--primary); min-width: 100%;">PANEL DE DESPACHO EN TIEMPO REAL</div>
+                    <div style="font-family:'Outfit'; font-weight:700; text-transform:uppercase; font-size:0.9rem; flex:1; color: var(--primary); min-width: 100%;">PANEL DE DESPACHO EN TIEMPO REAL</div>
                     
                     <div class="search-box" style="flex: 1; min-width: 200px;">
-                        <input type="text" id="buscarLogisticaInput" placeholder="🔍 Buscar ticket, insumo o encargado..." oninput="cargarTablaLogisticaFuerza()">
+                        <input type="text" id="buscarLogisticaInput" placeholder="Buscar ticket, insumo o encargado..." oninput="cargarTablaLogisticaFuerza()">
                     </div>
                     
                     <select id="filtroCentroLogistica" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="cargarTablaLogisticaFuerza()">
@@ -1048,18 +1050,18 @@
                     </select>
 
                     <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-primary" onclick="imprimirTicketsIndividualesMasivos()" style="background-color: #0284c7; color: white; flex: 1; min-width: 150px;">🖨️ Etiquetas Indiv.</button>
-                        <button type="button" class="btn btn-primary" onclick="imprimirTicketEmpaqueMasivo()" style="background-color: #0369a1; color: white; flex: 1; min-width: 150px;">🖨️ Ticket Agrupado</button>
-                        <button type="button" class="btn btn-warning" onclick="generarNotaEntregaMasiva()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 150px;">📄 Acta Masiva</button>
-                        <button type="button" class="btn btn-success" onclick="descargarExcelLogistica()" style="background-color: #16a34a; color: white; flex: 1; min-width: 150px;">⬇️ Exportar Excel</button>
+                        <button type="button" class="btn btn-primary" onclick="imprimirTicketsIndividualesMasivos()" style="background-color: #0284c7; color: white; flex: 1; min-width: 150px;">Etiquetas Indiv.</button>
+                        <button type="button" class="btn btn-primary" onclick="imprimirTicketEmpaqueMasivo()" style="background-color: #0369a1; color: white; flex: 1; min-width: 150px;">Ticket Agrupado</button>
+                        <button type="button" class="btn btn-warning" onclick="generarNotaEntregaMasiva()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 150px;">Acta Masiva</button>
+                        <button type="button" class="btn btn-success" onclick="descargarExcelLogistica()" style="background-color: #16a34a; color: white; flex: 1; min-width: 150px;">Exportar Excel</button>
                     </div>
 
                     <div style="display: flex; gap: 10px; width: 100%; margin-top: 15px; flex-wrap: wrap; background: #e0f2fe; padding: 12px; border-radius: 8px; border: 1px solid #bae6fd; align-items: center;">
-                        <span style="font-weight: 800; color: #0369a1; font-size: 0.85rem; text-transform: uppercase; margin-right: 5px;">⚡ Acciones Masivas:</span>
-                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Pendiente')" style="background-color: #ef4444; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">🔄 Volver a Pendiente</button>
-                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Empacando')" style="background-color: #f59e0b; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">✋ Tomar (Empacando)</button>
-                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Despachado')" style="background-color: #10b981; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">📦 Despachar</button>
-                        <button type="button" class="btn" onclick="eliminarTicketsMasivos()" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; flex: 1; min-width: 130px; font-size: 0.8rem;">🗑️ Descartar Varios</button>
+                        <span style="font-weight: 800; color: #0369a1; font-size: 0.85rem; text-transform: uppercase; margin-right: 5px;">Acciones Masivas:</span>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Pendiente')" style="background-color: #ef4444; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">Volver a Pendiente</button>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Empacando')" style="background-color: #f59e0b; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">Tomar (Empacando)</button>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Despachado')" style="background-color: #10b981; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">Despachar</button>
+                        <button type="button" class="btn" onclick="eliminarTicketsMasivos()" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; flex: 1; min-width: 130px; font-size: 0.8rem;">Descartar Varios</button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -1088,29 +1090,29 @@
         <section class="app-view" id="view-inventario">
             <div class="container">
                 <div class="toolbar" style="margin-top: 1.5rem; margin-bottom: 2rem; background: transparent; padding: 0;">
-                    <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">⬅ VOLVER AL MENÚ PRINCIPAL</button>
+                    <button class="btn" style="background-color: #fbb316; color: #1a1a1a; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase;" onclick="navegarA('view-home')">VOLVER AL MENÚ PRINCIPAL</button>
                 </div>
                 
                 <div class="dashboard-hero" style="background-color: var(--slate-800); color: white; padding: 2.5rem 2rem; margin-bottom: 2.5rem; text-align: center; border-radius: 12px;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Inventario Almacén CVA</h2>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase;">Inventario Almacén CVA</h2>
                     <p style="max-width: 800px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6; color: #e2e8f0;">Control centralizado de las existencias globales (Alimentos, Higiene, Salud y Refugio) ubicadas en Las Mercedes.</p>
                 </div>
 
                 <div class="grid-system" id="mallaInventario">
                     <div class="left-column admin-action-header" id="panel-carga-inventario" style="display: none;">
                         <div class="panel-card" style="border-top: 4px solid #10b981;">
-                            <div class="panel-header"><div class="panel-title">📥 Carga de Insumos (Excel)</div></div>
+                            <div class="panel-header"><div class="panel-title">Carga de Insumos (Excel)</div></div>
                             <div class="panel-body">
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Sube el reporte del almacén central. Columnas válidas: <strong>Medicamento o Ítem</strong>, <strong>Presentación</strong>, <strong>Cantidad</strong> y <strong>Caja</strong>.</p>
                                 
                                 <div class="form-group">
                                     <label class="form-label">Categoría de los Ítems a subir:</label>
                                     <select id="inventario_categoria_carga" class="form-select">
-                                        <option value="Todas">📂 Automático (Leer todas las pestañas del Excel)</option>
-                                        <option value="Salud">💊 Salud (Medicinas, 1eros auxilios, protector solar)</option>
-                                        <option value="Alimentos">🥫 Alimentos (Enlatados, agua, fórmulas)</option>
-                                        <option value="Higiene">🧼 Higiene (Shampoo, jabón, toallas)</option>
-                                        <option value="Otros">⛺ Otros (Linternas, sábanas, varios)</option>
+                                        <option value="Todas">Automático (Leer todas las pestañas del Excel)</option>
+                                        <option value="Salud">Salud (Medicinas, 1eros auxilios, protector solar)</option>
+                                        <option value="Alimentos">Alimentos (Enlatados, agua, fórmulas)</option>
+                                        <option value="Higiene">Higiene (Shampoo, jabón, toallas)</option>
+                                        <option value="Otros">Otros (Linternas, sábanas, varios)</option>
                                     </select>
                                 </div>
 
@@ -1125,19 +1127,19 @@
                     <div class="right-column" style="width: 100%;">
                         <div class="toolbar" style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-200); gap: 10px; display: flex; flex-wrap: wrap;">
                             <div class="search-box" style="flex: 1; min-width: 200px;">
-                                <input type="text" id="buscarInventarioInput" placeholder="🔍 Buscar insumo o medicamento...">
+                                <input type="text" id="buscarInventarioInput" placeholder="Buscar insumo o medicamento...">
                             </div>
                             
                             <select id="filtroCategoriaInventario" class="form-select" style="width: auto; flex: 1; min-width: 140px;" onchange="filtrarYActualizarInventario()">
                                 <option value="Todas">Todas las Categorías</option>
-                                <option value="Salud">💊 Salud / Medicinas</option>
-                                <option value="Alimentos">🥫 Alimentos / Agua</option>
-                                <option value="Higiene">🧼 Higiene Personal</option>
-                                <option value="Otros">⛺ Otros / Herramientas</option>
+                                <option value="Salud">Salud / Medicinas</option>
+                                <option value="Alimentos">Alimentos / Agua</option>
+                                <option value="Higiene">Higiene Personal</option>
+                                <option value="Otros">Otros / Herramientas</option>
                             </select>
                             
-                            <button class="btn btn-primary" id="btnToggleVistaInv" onclick="toggleVistaInventario()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 160px;">📉 Ver Salidas Diarias</button>
-                            <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Categoría</button>
+                            <button class="btn btn-primary" id="btnToggleVistaInv" onclick="toggleVistaInventario()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 160px;">Ver Salidas Diarias</button>
+                            <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">Vaciar Categoría</button>
                         </div>
                         
                         <div class="table-container" id="contenedor-tabla-stock">
@@ -1198,7 +1200,7 @@
 
     <div id="toast-notificacion" class="toast-oculto">
         <div class="toast-contenido">
-            <span id="toast-icono">✅</span>
+            <span id="toast-icono"></span>
             <span id="toast-mensaje">¡Registro enviado con éxito!</span>
         </div>
     </div>
@@ -1210,7 +1212,7 @@
                 <div class="panel-title">Sugerir Actualización de Estado</div>
             </div>
             <div class="panel-body">
-                <p id="novedad-persona-nombre" style="font-family: 'Montserrat', sans-serif; font-weight:800; margin-bottom:1.5rem; color: var(--primary); font-size: 1.15rem; text-align: center; text-transform: uppercase; letter-spacing: 0.02em;"></p>
+                <p id="novedad-persona-nombre" style="font-family: 'Outfit', sans-serif; font-weight:800; margin-bottom:1.5rem; color: var(--primary); font-size: 1.15rem; text-align: center; text-transform: uppercase; letter-spacing: 0.02em;"></p>
                 <form id="novedadForm">
                     <input type="hidden" id="novedad_registro_id">
                     <div class="form-row">
@@ -1269,12 +1271,12 @@
     </div>
 
     <button id="btn-novedades-admin" class="btn" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #f59e0b; color: white; border: none; font-weight: bold; padding: 10px 15px; border-radius: 30px;" onclick="document.getElementById('modal-admin-novedades').style.display='flex'">
-        🔔 Novedades (<span id="contador-novedades">0</span>)
+        Novedades (<span id="contador-novedades">0</span>)
     </button>
 
     <div id="floating-donation-widget" class="floating-donation">
         <button class="close-btn" onclick="document.getElementById('floating-donation-widget').style.display='none'">&times;</button>
-        <h4>¡La Simón nos necesita! 💛</h4>
+        <h4>¡La Simón nos necesita!</h4>
         <p>Con tu aporte sumamos insumos médicos y logística para las brigadas de rescate USB.</p>
         <button class="btn btn-warning" style="width: 100%; font-size: 0.85rem; padding: 0.6rem; margin-top: 5px;" onclick="navegarA('view-donar'); document.getElementById('floating-donation-widget').style.display='none';">Haz tu Donativo Aquí</button>
     </div>
@@ -1320,7 +1322,7 @@
     <div id="modal-despacho-asistido" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:9999;">
         <div class="panel-card" style="width: 90%; max-width: 500px; margin: 0; animation: aparecerModal 0.3s ease-out forwards; border-top: 4px solid #f59e0b;">
             <div class="panel-header">
-                <div class="panel-title" style="text-transform: uppercase;">📦 Despacho y Descuento de Inventario</div>
+                <div class="panel-title" style="text-transform: uppercase;">Despacho y Descuento de Inventario</div>
             </div>
             <div class="panel-body">
                 <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1rem;">Verifica qué insumo exacto vas a entregar para descontarlo del almacén central.</p>
