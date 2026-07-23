@@ -979,8 +979,10 @@ document.getElementById('formSolicitudAyuda').addEventListener('submit', async f
         mostrarNotificacion("Procesando solicitud...", true);
         
         if (idEdicionAyuda !== null) {
-            const { error: updateError } = await supabaseClient.from('solicitudes_ayuda').update(payloadAyuda).eq('id', idEdicionAyuda);
-            if (updateError) throw updateError;
+                const { error: updateError } = await supabaseClient.from('solicitudes_ayuda').update(payloadAyuda).eq('id', idEdicionAyuda);
+                if (updateError) throw updateError;
+
+                await supabaseClient.from('etiquetas_logistica').update({ punto_usb: puntoSeleccionado }).eq('solicitud_id', idEdicionAyuda);
 
             const { data: ticketsExistentes } = await supabaseClient.from('etiquetas_logistica').select('categoria_insumo, id, requerimiento').eq('solicitud_id', idEdicionAyuda);
 
@@ -1329,8 +1331,18 @@ document.getElementById('etiquetaForm').addEventListener('submit', async functio
     });
     
     let nuevosTickets = [];
+    const prefijoBeneficiario = beneficiarioTxt ? `[ENTREGAR A: ${beneficiarioTxt}] - ` : '';
+    
     for (let cat in agrupados) {
-        if (agrupados[cat].length > 0) nuevosTickets.push({ punto_usb: centro, categoria_insumo: cat, requerimiento: agrupados[cat].join(', '), estado: "Pendiente", encargado: nombreDestino });
+        if (agrupados[cat].length > 0) {
+            nuevosTickets.push({ 
+                punto_usb: centro, 
+                categoria_insumo: cat, 
+                requerimiento: prefijoBeneficiario + agrupados[cat].join(', '), 
+                estado: "Pendiente", 
+                encargado: 'Sin Asignar' 
+            });
+        }
     }
     
     if (nuevosTickets.length === 0) { alert("Debes agregar al menos un insumo válido."); btn.innerText = "Crear Pedido"; btn.disabled = false; return; }
@@ -1449,7 +1461,7 @@ window.cargarTablaLogisticaFuerza = async function() {
         
         let btnAccion = '';
         let checkboxHtml = `<input type="checkbox" class="cb-logistica" value="${p.id}" style="width:18px; height:18px;">`;
-        let btnEditar = `<button class="btn" style="background-color:#0ea5e9; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="editarRequerimientoLogistica('${p.id}')">Editar</button>`;
+        let btnEditar = `<button class="btn" style="background-color:#0ea5e9; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="abrirModalEdicionLogistica('${p.id}')">Editar</button>`;
         let btnDescartar = `<button class="btn" style="background-color:#dc2626; color:white; padding:0.4rem; font-size:0.8rem; flex:1; min-width: 50px;" onclick="eliminarTicketLogistica('${p.id}')">Descartar</button>`;
         
         if (perfilUsuarioActual && (perfilUsuarioActual.rol === 'auditor' || perfilUsuarioActual.rol === 'admin_busqueda')) {
@@ -2723,26 +2735,62 @@ window.actualizarBarraDonaciones = function() {
 
 document.addEventListener('DOMContentLoaded', actualizarBarraDonaciones);
 
-window.editarRequerimientoLogistica = async function(id) {
+window.abrirModalEdicionLogistica = function(id) {
     const ticket = pedidosLogistica.find(p => p.id === id);
     if(!ticket) return;
 
-    let nuevoReq = prompt("Modifica los insumos de este pedido (ej. borra lo que no hay en inventario):", ticket.requerimiento);
-    
-    if(nuevoReq !== null && nuevoReq.trim() !== "") {
-        const { error } = await supabaseClient
-            .from('etiquetas_logistica')
-            .update({ requerimiento: nuevoReq.trim() })
-            .eq('id', id);
-            
-        if(error) {
-            alert("Error al actualizar el pedido: " + error.message);
-        } else {
-            mostrarNotificacion("Pedido modificado correctamente.");
-            cargarTablaLogisticaFuerza();
-        }
-    }
+    document.getElementById('edit-log-id').value = ticket.id;
+    document.getElementById('edit-log-sol-id').value = ticket.solicitud_id || '';
+    document.getElementById('edit-log-centro').value = ticket.punto_usb || 'CVA Las Mercedes (Caracas)';
+    document.getElementById('edit-log-req').value = ticket.requerimiento || '';
+
+    document.getElementById('modal-editar-logistica').style.display = 'flex';
 };
+
+document.getElementById('form-editar-logistica').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-save-log');
+    btn.innerText = "Guardando..."; btn.disabled = true;
+
+    const ticketId = document.getElementById('edit-log-id').value;
+    const solId = document.getElementById('edit-log-sol-id').value;
+    const nuevoCentro = document.getElementById('edit-log-centro').value;
+    const nuevoReq = document.getElementById('edit-log-req').value.trim();
+
+    try {
+        // 1. Actualizar el ticket en logística
+        const { error: errLog } = await supabaseClient
+            .from('etiquetas_logistica')
+            .update({ punto_usb: nuevoCentro, requerimiento: nuevoReq })
+            .eq('id', ticketId);
+            
+        if (errLog) throw errLog;
+
+        // 2. Si el ticket pertenece a una persona censada, actualizar su perfil general
+        if (solId) {
+            const { error: errAyuda } = await supabaseClient
+                .from('solicitudes_ayuda')
+                .update({ punto_usb: nuevoCentro })
+                .eq('id', solId);
+                
+            if (errAyuda) console.error("Error de sincronización en Ayuda:", errAyuda.message);
+            else {
+                // Actualizar la memoria caché para evitar recargar la página entera
+                let personaCache = ayudaNube.find(a => String(a.id) === String(solId));
+                if (personaCache) personaCache.punto_usb = nuevoCentro;
+            }
+        }
+
+        mostrarNotificacion("Pedido actualizado y sincronizado.");
+        document.getElementById('modal-editar-logistica').style.display = 'none';
+        cargarTablaLogisticaFuerza();
+        
+    } catch (err) {
+        alert("Error al actualizar: " + err.message);
+    } finally {
+        btn.innerText = "Guardar Cambios"; btn.disabled = false;
+    }
+});
 
 window.eliminarTicketLogistica = async function(id) {
     if(confirm("Atención: ¿Estás absolutamente seguro de que deseas descartar y eliminar este pedido por completo? Esta acción no se puede deshacer.")) {
