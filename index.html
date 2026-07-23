@@ -1053,6 +1053,14 @@
                         <button type="button" class="btn btn-warning" onclick="generarNotaEntregaMasiva()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 150px;">📄 Acta Masiva</button>
                         <button type="button" class="btn btn-success" onclick="descargarExcelLogistica()" style="background-color: #16a34a; color: white; flex: 1; min-width: 150px;">⬇️ Exportar Excel</button>
                     </div>
+
+                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 15px; flex-wrap: wrap; background: #e0f2fe; padding: 12px; border-radius: 8px; border: 1px solid #bae6fd; align-items: center;">
+                        <span style="font-weight: 800; color: #0369a1; font-size: 0.85rem; text-transform: uppercase; margin-right: 5px;">⚡ Acciones Masivas:</span>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Pendiente')" style="background-color: #ef4444; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">🔄 Volver a Pendiente</button>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Empacando')" style="background-color: #f59e0b; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">✋ Tomar (Empacando)</button>
+                        <button type="button" class="btn" onclick="cambiarEstadoMasivo('Despachado')" style="background-color: #10b981; color: white; flex: 1; min-width: 130px; font-size: 0.8rem;">📦 Despachar</button>
+                        <button type="button" class="btn" onclick="eliminarTicketsMasivos()" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; flex: 1; min-width: 130px; font-size: 0.8rem;">🗑️ Descartar Varios</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -1128,10 +1136,11 @@
                                 <option value="Otros">⛺ Otros / Herramientas</option>
                             </select>
                             
+                            <button class="btn btn-primary" id="btnToggleVistaInv" onclick="toggleVistaInventario()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 160px;">📉 Ver Salidas Diarias</button>
                             <button class="btn btn-delete admin-action-header" style="display:none; flex: 1; min-width: 140px;" onclick="vaciarInventario()">🗑️ Vaciar Categoría</button>
                         </div>
                         
-                        <div class="table-container">
+                        <div class="table-container" id="contenedor-tabla-stock">
                             <table>
                                 <thead>
                                     <tr>
@@ -1145,6 +1154,23 @@
                                 </thead>
                                 <tbody id="tablaInventarioCuerpo">
                                     <tr><td colspan="6" style="text-align: center; padding: 2rem;">Cargando inventario...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-container" id="contenedor-tabla-salidas" style="display: none; border-color: #8b5cf6;">
+                            <table>
+                                <thead style="background: #6d28d9;">
+                                    <tr>
+                                        <th>HORA</th>
+                                        <th>ÍTEM DESCONTADO</th>
+                                        <th style="text-align: center;">CANTIDAD</th>
+                                        <th>CENTRO DESTINO</th>
+                                        <th>PREPARADOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaSalidasCuerpo">
+                                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">Cargando reporte...</td></tr>
                                 </tbody>
                             </table>
                         </div>

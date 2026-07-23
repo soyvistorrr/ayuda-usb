@@ -2101,6 +2101,14 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let badgeColor = p.estado === 'Pendiente' ? 'badge-danger' : (p.estado === 'Empacando' ? 'badge-warning' : 'badge-success');
             let icono = p.categoria_insumo === 'medicina' ? '💊' : (p.categoria_insumo === 'alimentos_limpieza' ? '🥫🧼' : '🛠️');
             
+            let selectEstado = `
+                <select onchange="cambiarEstadoTicket('${p.id}', this.value, '${p.estado}')" class="badge ${badgeColor}" style="border:none; outline:none; cursor:pointer; font-family: inherit; font-weight: 700; text-transform: uppercase;">
+                    <option value="Pendiente" ${p.estado === 'Pendiente' ? 'selected' : ''} style="color: black;">PENDIENTE</option>
+                    <option value="Empacando" ${p.estado === 'Empacando' ? 'selected' : ''} style="color: black;">EMPACANDO</option>
+                    <option value="Despachado" ${p.estado === 'Despachado' ? 'selected' : ''} style="color: black;">DESPACHADO</option>
+                </select>
+            `;
+            
             let btnAccion = '';
             let checkboxHtml = `<input type="checkbox" class="cb-logistica" value="${p.id}" style="width:18px; height:18px;">`;
             
@@ -2135,7 +2143,6 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
             let reqTexto = p.requerimiento || '-';
             if(reqTexto.length > 80) reqTexto = reqTexto.substring(0, 80) + '...';
 
-            // Formatear la fecha
             let fechaCreaObj = new Date(p.created_at);
             let fechaStr = isNaN(fechaCreaObj) ? '-' : fechaCreaObj.toLocaleDateString('es-VE', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
 
@@ -2143,7 +2150,7 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 <tr>
                     <td data-label="Sel." style="text-align: center;">${checkboxHtml}</td>
                     <td data-label="Fecha Creación"><span style="font-size:0.85rem; color:#475569; font-weight:600;">${fechaStr}</span></td>
-                    <td data-label="Estado"><span class="badge ${badgeColor}">${p.estado || 'Pendiente'}</span></td>
+                    <td data-label="Estado">${selectEstado}</td>
                     <td data-label="Destino"><strong>${p.punto_usb || 'Sin Asignar'}</strong></td>
                     <td data-label="Beneficiario">${htmlBeneficiario}</td>
                     <td data-label="Categoría" style="text-transform: capitalize;">${icono} ${p.categoria_insumo || '-'}</td>
@@ -2423,6 +2430,19 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
 
                         if (errInv) throw new Error("Fallo al restar del inventario: " + errInv.message);
                     }
+                        const itemBD = inventarioNube.find(inv => String(inv.id) === String(itemId));
+                        if (itemBD) {
+                            let nombreGuardia = document.getElementById('nombreGuardiaLogistica') ? document.getElementById('nombreGuardiaLogistica').value.trim() : '';
+                            const ticketAsociado = pedidosLogistica.find(p => String(p.id) === String(ticketId));
+                            
+                            await supabaseClient.from('salidas_inventario').insert([{
+                                item_nombre: itemBD.item,
+                                categoria: itemBD.categoria,
+                                cantidad: cantidadDescontar,
+                                destino: ticketAsociado ? ticketAsociado.punto_usb : 'Desconocido',
+                                encargado: nombreGuardia || 'Despacho Rápido'
+                            }]);
+                        }
 
                     const { error: errTicket } = await supabaseClient
                         .from('etiquetas_logistica')
@@ -3581,4 +3601,163 @@ const SUPABASE_URL = "https://idirgqiruxvdbgnlrgrp.supabase.co";
                 <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-size:0.85rem; color:#475569;">${r.detalles}</td>
             </tr>`;
         }).join('');
+    };
+
+    window.cambiarEstadoTicket = async function(id, nuevoEstado, estadoAnterior) {
+        if (nuevoEstado === 'Despachado') {
+            if (!confirm("⚠️ Vas a cambiar el estado a Despachado saltándote el asistente.\n\nEsto NO descontará el producto del Inventario del sistema de forma automática. ¿Deseas continuar?")) {
+                cargarTablaLogisticaFuerza(); 
+                return;
+            }
+        }
+        
+        let updateData = { estado: nuevoEstado };
+        let nombreGuardia = document.getElementById('nombreGuardiaLogistica').value.trim();
+        
+        if (nuevoEstado === 'Empacando') {
+            updateData.encargado = nombreGuardia || (perfilUsuarioActual ? perfilUsuarioActual.usuario : 'Guardia CVA');
+        } else if (nuevoEstado === 'Despachado') {
+            updateData.fecha_despacho = new Date().toISOString();
+        }
+
+        const { error } = await supabaseClient.from('etiquetas_logistica').update(updateData).eq('id', id);
+        
+        if (error) {
+            alert("Error al cambiar estado: " + error.message);
+        } else {
+            mostrarNotificacion(`✅ Estado revertido/cambiado a ${nuevoEstado}`);
+            registrarAuditoria('EDITAR', 'Logística', `Cambió estado del ticket de ${estadoAnterior} a ${nuevoEstado}`);
+        }
+        cargarTablaLogisticaFuerza();
+    };
+
+    window.cambiarEstadoMasivo = async function(nuevoEstado) {
+        const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+        if (seleccionados.length === 0) {
+            alert("⚠️ Selecciona al menos un pedido marcando las casillas de la izquierda.");
+            return;
+        }
+
+        if (nuevoEstado === 'Despachado') {
+            if (!confirm(`Vas a marcar ${seleccionados.length} pedidos como DESPACHADOS de un solo golpe.\n\n⚠️ Recuerda: Esto NO descontará automáticamente los insumos del Inventario. ¿Continuar?`)) {
+                return;
+            }
+        } else {
+            if (!confirm(`¿Seguro que deseas cambiar ${seleccionados.length} pedidos al estado: ${nuevoEstado}?`)) {
+                return;
+            }
+        }
+
+        let updateData = { estado: nuevoEstado };
+        if (nuevoEstado === 'Empacando') {
+            let nombreGuardia = document.getElementById('nombreGuardiaLogistica').value.trim();
+            updateData.encargado = nombreGuardia || (perfilUsuarioActual ? perfilUsuarioActual.usuario : 'Guardia CVA');
+        } else if (nuevoEstado === 'Despachado') {
+            updateData.fecha_despacho = new Date().toISOString();
+        }
+
+        try {
+            const { error } = await supabaseClient.from('etiquetas_logistica').update(updateData).in('id', seleccionados);
+            if (error) throw error;
+
+            mostrarNotificacion(`✅ ${seleccionados.length} pedidos cambiados a ${nuevoEstado}`);
+            registrarAuditoria('EDITAR', 'Logística', `Cambió masivamente ${seleccionados.length} tickets a ${nuevoEstado}`);
+            cargarTablaLogisticaFuerza();
+        } catch (e) {
+            alert("Error en actualización masiva: " + e.message);
+        }
+    };
+
+    window.eliminarTicketsMasivos = async function() {
+        const seleccionados = Array.from(document.querySelectorAll('.cb-logistica:checked')).map(cb => cb.value);
+        if (seleccionados.length === 0) {
+            alert("⚠️ Selecciona al menos un pedido marcando las casillas de la izquierda.");
+            return;
+        }
+
+        if (!confirm(`🚨 PELIGRO: ¿Estás absolutamente seguro de que deseas ELIMINAR y descartar ${seleccionados.length} pedidos del sistema?\n\nEsta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient.from('etiquetas_logistica').delete().in('id', seleccionados);
+            if (error) throw error;
+
+            mostrarNotificacion(`🗑️ ${seleccionados.length} pedidos eliminados del sistema.`);
+            registrarAuditoria('ELIMINAR', 'Logística', `Eliminó masivamente ${seleccionados.length} tickets`);
+            cargarTablaLogisticaFuerza();
+        } catch (e) {
+            alert("Error al eliminar masivamente: " + e.message);
+        }
+    };
+
+    let viendoSalidas = false;
+    let salidasNube = [];
+
+    window.toggleVistaInventario = async function() {
+        viendoSalidas = !viendoSalidas;
+        const btn = document.getElementById('btnToggleVistaInv');
+        const contStock = document.getElementById('contenedor-tabla-stock');
+        const contSalidas = document.getElementById('contenedor-tabla-salidas');
+        
+        if (viendoSalidas) {
+            btn.innerHTML = '📦 Volver al Stock Actual';
+            btn.style.backgroundColor = '#10b981';
+            contStock.style.display = 'none';
+            contSalidas.style.display = 'block';
+            await cargarSalidasNube();
+        } else {
+            btn.innerHTML = '📉 Ver Salidas Diarias';
+            btn.style.backgroundColor = '#8b5cf6';
+            contStock.style.display = 'block';
+            contSalidas.style.display = 'none';
+        }
+    };
+
+    window.cargarSalidasNube = async function() {
+        const cuerpo = document.getElementById('tablaSalidasCuerpo');
+        cuerpo.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">⏳ Descargando reporte de movimientos...</td></tr>';
+        
+        const { data, error } = await supabaseClient
+            .from('salidas_inventario')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+        if (error) { cuerpo.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`; return; }
+        
+        salidasNube = data || [];
+        renderizarSalidasPorDia();
+    };
+
+    window.renderizarSalidasPorDia = function() {
+        const cuerpo = document.getElementById('tablaSalidasCuerpo');
+        if (salidasNube.length === 0) {
+            cuerpo.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--gray-700);">No se han registrado salidas de inventario todavía.</td></tr>';
+            return;
+        }
+
+        let agrupado = {};
+        salidasNube.forEach(s => {
+            let dateStr = new Date(s.created_at).toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            if (!agrupado[dateStr]) agrupado[dateStr] = [];
+            agrupado[dateStr].push(s);
+        });
+
+        let html = '';
+        for (const [dia, items] of Object.entries(agrupado)) {
+            html += `<tr style="background-color: #f8fafc;"><td colspan="5" style="font-weight: 800; color: #6d28d9; text-transform: uppercase; padding: 0.5rem 1.25rem;">📅 ${dia}</td></tr>`;
+            
+            items.forEach(i => {
+                let hora = new Date(i.created_at).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+                html += `
+                <tr>
+                    <td style="padding-left: 2rem; color: #64748b; font-size: 0.8rem; font-weight: bold;">${hora}</td>
+                    <td><strong>${i.item_nombre}</strong> <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">(${i.categoria})</span></td>
+                    <td style="font-weight: 900; color: #dc2626; text-align: center; font-size: 1.1rem;">-${i.cantidad}</td>
+                    <td><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${i.destino || 'Desconocido'}</span></td>
+                    <td style="color: #0369a1; font-weight: bold; font-size: 0.85rem;">${i.encargado || '-'}</td>
+                </tr>`;
+            });
+        }
+        cuerpo.innerHTML = html;
     };
